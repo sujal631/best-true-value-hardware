@@ -1,4 +1,5 @@
-#BEST TRUE VALUE HARDWARE
+BEST TRUE VALUE HARDWARE
 
-#Abstract
+#Abstract: 
+
 The primary goal of this project is to build a website for the recently opened hardware business, Best True Value Hardware. Potential customers may engage with the business, gain trust, and learn more about its product and services via the website. The store owners will be able to keep track of goods and stock levels using the website's inventory management system. Additionally, the website will be visually appealing and have all the necessary product information to make it easy for customers to make a purchase. The website will have all the specific information on the item (such as the images, descriptions, and price) that the customer chooses to buy. By using the integrated search tool, customers may narrow down the products they are looking for. To enhance the user experience, the website will also enable online purchasing with debit/credit payment methods and secure checkout. The project will be led by Sujal Joshi and Dev S. Acharya, with Joshi concentrating mostly on front-end programming, online purchase, and payment methods, and Acharya working on database administration and website content. The major goal of this project is to create an online digital store for Best True Value Hardware that will interact with more customers and provide these customers with greater assistance while making purchases.
