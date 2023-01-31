@@ -1,38 +1,74 @@
+import { useEffect, useReducer } from 'react';
 import { Link } from 'react-router-dom';
-import data from '../data'; // importing data from '../data'
+import axios from 'axios';
+import logger from 'use-reducer-logger';
 
-const HomePage = () => (
-  // functional component to render the home page
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'FETCH_REQUEST':
+      return { ...state, loading: true };
+    case 'FETCH_SUCCESS':
+      return { ...state, product: action.payload, loading: false };
+    case 'FETCH_FAILURE':
+      return { ...state, error: action.payload, loading: false };
+    default:
+      return state;
+  }
+};
 
-  <div>
-    <h1>Sample Products</h1>
-    <div className="product-container">
-      {data.product.map(({ productNumber, slug, image, name, price }) => (
-        // mapping through the products in data and destructuring the required values
+function HomePage() {
+  const [{ loading, error, product }, dispatch] = useReducer(logger(reducer), {
+    product: [],
+    loading: true,
+    error: '',
+  });
 
-        <div className="product" key={productNumber && slug}>
-          {/* using productNumber and slug as key, both of them will be used */}
-
-          <Link to={`/product/${slug}`}>
-            {/* creating link using product's slug */}
-            <img src={image} alt={name} /> {/* using product's image */}
-          </Link>
-
-          <div className="product-info">
-            <Link to={`/product/${slug}`}>
-              {/* creating link using product's slug */}
-              <p>{name}</p> {/* displaying product's name */}
-            </Link>
-            <p>
-              <strong>${price}</strong> {/* displaying product's price */}
-            </p>
-            <button>Add to Cart</button> {/* Add to cart button */}
-          </div>
-        </div>
-      ))}
+  //const [product, setProduct] = useState([]);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      dispatch({ type: 'FETCH_REQUEST' });
+      try {
+        const result = await axios.get('/api/product');
+        dispatch({ type: 'FETCH_SUCCESS', payload: result.data });
+      } catch (error) {
+        dispatch({ type: 'FETCH_FAILURE', payload: error.message });
+      }
+      //setProduct(result.data);
+    };
+    fetchProduct();
+  }, []);
+  return (
+    <div>
+      <h1>Sample Products</h1>
+      <div className="product-container">
+        {loading ? (
+          <div>Loading...</div>
+        ) : error ? (
+          <div>{error}</div>
+        ) : (
+          product.map((product) => (
+            <div
+              className="product"
+              key={product.productNumber && product.slug}
+            >
+              <Link to={`/product/${product.slug}`}>
+                <img src={product.image} alt={product.name} />
+              </Link>
+              <div className="product-info">
+                <Link to={`/product/${product.slug}`}>
+                  <p>{product.name}</p>
+                </Link>
+                <p>
+                  <strong>{product.price}</strong>
+                </p>
+                <button>Add to Cart</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-// exporting HomePage component as default export
 export default HomePage;
