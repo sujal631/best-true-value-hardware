@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import data from '../data'; // importing data from '../data'
 
 const HomePage = () => (
@@ -12,16 +13,16 @@ const HomePage = () => (
         <div className="product" key={productNumber && slug}>
           {/* using productNumber and slug as key, both of them will be used */}
 
-          <a href={`/product/${slug}`}>
+          <Link to={`/product/${slug}`}>
             {/* creating link using product's slug */}
             <img src={image} alt={name} /> {/* using product's image */}
-          </a>
+          </Link>
 
           <div className="product-info">
-            <a href={`/product/${slug}`}>
+            <Link to={`/product/${slug}`}>
               {/* creating link using product's slug */}
               <p>{name}</p> {/* displaying product's name */}
-            </a>
+            </Link>
             <p>
               <strong>${price}</strong> {/* displaying product's price */}
             </p>
