@@ -1,4 +1,5 @@
 import './App.css';
+import HomePage from './Pages/HomePage';
 
 function App() {
   return (
@@ -6,7 +7,9 @@ function App() {
       <header>
         <a href="/">Best True Value Hardware</a>
       </header>
-      <main>LIST PRODUCTS</main>
+      <main>
+        <HomePage />
+      </main>
     </div>
   );
 }
