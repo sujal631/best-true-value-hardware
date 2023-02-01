@@ -1,13 +1,18 @@
 import { useEffect, useReducer } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Product from '../Components/Product';
+import { Helmet } from 'react-helmet-async';
+import LoadingComponent from '../Components/LoadingComponent';
+import MessageComponent from '../Components/MessageComponent';
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH_REQUEST':
       return { ...state, loading: true };
     case 'FETCH_SUCCESS':
-      return { ...state, product: action.payload, loading: false };
+      return { ...state, products: action.payload, loading: false };
     case 'FETCH_FAILURE':
       return { ...state, error: action.payload, loading: false };
     default:
@@ -16,8 +21,8 @@ const reducer = (state, action) => {
 };
 
 function HomePage() {
-  const [{ loading, error, product }, dispatch] = useReducer(reducer, {
-    product: [],
+  const [{ loading, error, products }, dispatch] = useReducer(reducer, {
+    products: [],
     loading: true,
     error: '',
   });
@@ -27,7 +32,7 @@ function HomePage() {
     const fetchProduct = async () => {
       dispatch({ type: 'FETCH_REQUEST' });
       try {
-        const result = await axios.get('/api/product');
+        const result = await axios.get('/api/products');
         dispatch({ type: 'FETCH_SUCCESS', payload: result.data });
       } catch (error) {
         dispatch({ type: 'FETCH_FAILURE', payload: error.message });
@@ -38,32 +43,23 @@ function HomePage() {
   }, []);
   return (
     <div>
+      <Helmet>
+        <title>Best True Value Hardware</title>
+      </Helmet>
       <h1>Sample Products</h1>
       <div className="product-container">
         {loading ? (
-          <div>Loading...</div>
+          <LoadingComponent />
         ) : error ? (
-          <div>{error}</div>
+          <MessageComponent variant="danger">{error}</MessageComponent>
         ) : (
-          product.map((product) => (
-            <div
-              className="product"
-              key={product.productNumber && product.slug}
-            >
-              <Link to={`/product/${product.slug}`}>
-                <img src={product.image} alt={product.name} />
-              </Link>
-              <div className="product-info">
-                <Link to={`/product/${product.slug}`}>
-                  <p>{product.name}</p>
-                </Link>
-                <p>
-                  <strong>{product.price}</strong>
-                </p>
-                <button>Add to Cart</button>
-              </div>
-            </div>
-          ))
+          <Row>
+            {products.map((product) => (
+              <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
+                <Product product={product} />
+              </Col>
+            ))}
+          </Row>
         )}
       </div>
     </div>

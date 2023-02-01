@@ -1,5 +1,5 @@
 const data = {
-  product: [
+  products: [
     {
       productNumber: 1001,
       name: 'Dewalt 20V Cordless Drill',
@@ -11,7 +11,7 @@ const data = {
       brand: 'Dewalt',
       rating: 4.8,
       numReviews: 500,
-      Description:
+      description:
         'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
     },
     {
@@ -148,7 +148,7 @@ const data = {
       category: 'Power Tools',
       image: '/images/p11.jpeg',
       price: 139.99,
-      countInStock: 20,
+      countInStock: 0,
       brand: 'Makita',
       rating: 4.7,
       numReviews: 35,

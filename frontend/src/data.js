@@ -1,5 +1,5 @@
 const data = {
-  product: [
+  products: [
     {
       productNumber: 1001,
       name: 'Dewalt 20V Cordless Drill',
