@@ -17,6 +17,11 @@ function HomePage() {
       setLoading(true);
       try {
         const result = await axios.get('/api/products');
+        /* const sorted = result.data
+          .sort((a, b) => b.views - a.views)
+          .slice(0, 5);
+        setProducts(sorted); */
+
         setProducts(result.data);
         setLoading(false);
       } catch (error) {
