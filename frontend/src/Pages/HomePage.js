@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -7,40 +7,26 @@ import { Helmet } from 'react-helmet-async';
 import LoadingComponent from '../Components/LoadingComponent';
 import MessageComponent from '../Components/MessageComponent';
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'FETCH_REQUEST':
-      return { ...state, loading: true };
-    case 'FETCH_SUCCESS':
-      return { ...state, products: action.payload, loading: false };
-    case 'FETCH_FAILURE':
-      return { ...state, error: action.payload, loading: false };
-    default:
-      return state;
-  }
-};
-
 function HomePage() {
-  const [{ loading, error, products }, dispatch] = useReducer(reducer, {
-    products: [],
-    loading: true,
-    error: '',
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [products, setProducts] = useState([]);
 
-  //const [product, setProduct] = useState([]);
   useEffect(() => {
     const fetchProduct = async () => {
-      dispatch({ type: 'FETCH_REQUEST' });
+      setLoading(true);
       try {
         const result = await axios.get('/api/products');
-        dispatch({ type: 'FETCH_SUCCESS', payload: result.data });
+        setProducts(result.data);
+        setLoading(false);
       } catch (error) {
-        dispatch({ type: 'FETCH_FAILURE', payload: error.message });
+        setError(error.message);
+        setLoading(false);
       }
-      //setProduct(result.data);
     };
     fetchProduct();
   }, []);
+
   return (
     <div>
       <Helmet>

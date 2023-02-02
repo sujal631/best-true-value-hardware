@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;800&display=swap');
+
 body {
   margin: 0;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Inter', 'Open Sans', sans-serif;
   font-size: 16px;
   background-color: #f5f5f5;
 }
@@ -9,19 +11,60 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: white;
 }
 
-main {
+.main-section {
   flex: 1;
   padding: 2rem;
 }
 
+.text-center {
+  background-color: rgb(112, 112, 112);
+  padding: 10px;
+  color: rgb(230, 227, 227);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.product-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.card-body {
+  background-color: rgba(255, 0, 0, 0.05);
+}
+
+.card-title {
+  color: #000000;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-text {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.remove-link-style {
+  text-decoration: none;
+  color: inherit;
+}
+
 .btn-primary {
   background-color: #bb0000;
-  color: white;
+  color: #ffffff;
   border-radius: 0.5rem;
   padding: 0.5rem 1.5rem;
-  font-weight: bold;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   transition: all 0.2s ease-in-out;
@@ -33,65 +76,8 @@ main {
   cursor: pointer;
 }
 
-.product-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 2rem;
-}
-
-.product {
-  border: 1px solid #e0e0e0;
-  background-color: white;
-  width: 22rem;
-  height: 25rem;
-  margin: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease-in-out;
-}
-
-.product:hover {
-  transform: translateY(-0.5rem);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-  cursor: pointer;
-}
-
-.product img {
-  width: 100%;
-  max-width: 325px;
-  max-height: 397px;
-}
-
-.product-info {
-  padding: 1rem;
-  color: #333;
-}
-
-.product-info h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.product-info p {
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-
 .rating span {
   color: #bb0000;
-}
-.card-body {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.card-title {
-  font-size: 1rem; /* reduce font size */
-  height: 40px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 800;
-  color: #000000;
 }
 
 .img-large {

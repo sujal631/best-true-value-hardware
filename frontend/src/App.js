@@ -9,9 +9,9 @@ import { LinkContainer } from 'react-router-bootstrap';
 function App() {
   return (
     <BrowserRouter>
-      <div className="d-flex flex-column site-container">
+      <div className="site-container">
         <header>
-          <Navbar bg="dark" variant="dark" expand="lg">
+          <Navbar bg="black" variant="dark" expand="lg">
             <Container>
               <LinkContainer to="/">
                 <Navbar.Brand>
@@ -30,8 +30,7 @@ function App() {
             </Container>
           </Navbar>
         </header>
-
-        <main>
+        <main className="main-section">
           <Container>
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -40,11 +39,9 @@ function App() {
           </Container>
         </main>
 
-        <footer>
-          <div className="text-center">
-            Copyright &copy; 2023 Best True Value Hardware || Designed by Joshi
-            & Acharya
-          </div>
+        <footer className="text-center" style={{ height: '50px' }}>
+          Copyright &copy; 2023 Best True Value Hardware || Designed by Joshi &
+          Acharya
         </footer>
       </div>
     </BrowserRouter>

@@ -1,6 +1,6 @@
 function Rating({ rating, numReviews }) {
-  const stars = [1, 2, 3, 4, 5].map((star) => (
-    <span>
+  const stars = [1, 2, 3, 4, 5].map((star, index) => (
+    <span key={`${star}-${index}`}>
       <i
         className={
           rating >= star
