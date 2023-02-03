@@ -47,10 +47,10 @@ const ProductPage = () => {
         <title>{product.name}</title>
       </Helmet>
       <Row>
-        <Col md={5}>
+        <Col md={6}>
           <img className="img-large" src={product.image} alt={product.name} />
         </Col>
-        <Col md={7}>
+        <Col md={6}>
           <ListGroup variant="flush">
             <ListGroup.Item>
               <h3>{product.name}</h3>
