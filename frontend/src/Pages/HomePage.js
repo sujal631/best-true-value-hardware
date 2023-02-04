@@ -3,6 +3,7 @@ import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Product from '../Components/Product';
+import Slider from '../Components/Slider';
 import { Helmet } from 'react-helmet-async';
 import LoadingComponent from '../Components/LoadingComponent';
 import MessageComponent from '../Components/MessageComponent';
@@ -37,6 +38,10 @@ function HomePage() {
       <Helmet>
         <title>Best True Value Hardware</title>
       </Helmet>
+      <div className="slider">
+        <Slider />
+      </div>
+
       <h1>Sample Products</h1>
       <div className="product-container">
         {loading ? (

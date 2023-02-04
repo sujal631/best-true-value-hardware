@@ -27,6 +27,9 @@ body {
   letter-spacing: 0.05em;
   font-weight: 500;
 }
+.slider {
+  height: 20;
+}
 
 .product-container {
   display: flex;
