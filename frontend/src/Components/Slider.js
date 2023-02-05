@@ -37,7 +37,7 @@ const Slider = () => {
                   className="d-block w-100 mx-auto"
                   src={image.url}
                   alt={image.name}
-                  style={{ height: '350px' }}
+                  style={{ height: '300px' }}
                 />
               </Carousel.Item>
             ))}

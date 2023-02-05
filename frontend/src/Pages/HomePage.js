@@ -38,7 +38,7 @@ function HomePage() {
       <Helmet>
         <title>Best True Value Hardware</title>
       </Helmet>
-      <div className="slider">
+      <div>
         <Slider />
       </div>
 
