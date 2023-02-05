@@ -30,6 +30,7 @@ function App() {
             </Container>
           </Navbar>
         </header>
+
         <main className="main-section">
           <Container>
             <Routes>

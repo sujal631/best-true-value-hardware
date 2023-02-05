@@ -17,18 +17,16 @@ body {
 .main-section {
   flex: 1;
   padding: 2rem;
+  background-color: #f2f2f2;
 }
 
 .text-center {
   background-color: rgb(112, 112, 112);
-  padding: 10px;
+  padding: 1rem;
   color: rgb(230, 227, 227);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 500;
-}
-.slider {
-  height: 20;
 }
 
 .product-container {
@@ -85,4 +83,8 @@ body {
 
 .img-large {
   width: 100%;
+}
+
+.loading {
+  text-align: center;
 }

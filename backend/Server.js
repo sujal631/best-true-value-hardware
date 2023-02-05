@@ -1,11 +1,17 @@
 import express from 'express';
 import data from './data.js';
+import images from './images.js';
 
 const app = express();
+
+app.get('/api/sliderImages', (req, res) => {
+  res.send(images.sliderImages);
+});
 
 app.get('/api/products', (req, res) => {
   res.send(data.products);
 });
+
 app.get('/api/products/slug/:slug', (req, res) => {
   const product = data.products.find((p) => p.slug === req.params.slug);
   if (product) {
