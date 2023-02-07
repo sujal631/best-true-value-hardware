@@ -18,6 +18,7 @@ import DashboardPage from './Pages/DashboardPage';
 import ListProductsPage from './Pages/ListProductsPage';
 import ListOrdersPage from './Pages/ListOrdersPage';
 import ListUsersPage from './Pages/ListUsersPage';
+import EditProductPage from './Pages/EditProductPage';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
               <Route path="/listProducts" element={<ListProductsPage />} />
               <Route path="/listOrders" element={<ListOrdersPage />} />
               <Route path="/listUsers" element={<ListUsersPage />} />
+              <Route path="/editProduct" element={<EditProductPage />} />
             </Routes>
           </Container>
         </main>

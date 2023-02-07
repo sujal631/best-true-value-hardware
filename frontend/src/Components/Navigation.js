@@ -65,6 +65,11 @@ export default function Navigation() {
                     List Products
                   </NavDropdown.Item>
                 </LinkContainer>
+                <LinkContainer to="/editProduct">
+                  <NavDropdown.Item className="nav-dropdown">
+                    Edit Product
+                  </NavDropdown.Item>
+                </LinkContainer>
                 <LinkContainer to="/listOrders">
                   <NavDropdown.Item className="nav-dropdown">
                     Orders

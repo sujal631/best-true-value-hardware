@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 const data = {
   products: [
     {
@@ -154,6 +156,21 @@ const data = {
       numReviews: 35,
       description:
         'The Makita 18V LXT Cordless Impact Driver is a powerful and versatile tool that is perfect for driving large screws and bolts. It has a comfortable grip and a range of adjustable settings for precision and control.',
+    },
+  ],
+
+  users: [
+    {
+      name: 'BTVH',
+      email: 'btvh@owner.com',
+      password: bcrypt.hashSync('btvh1234'),
+      isAdmin: true,
+    },
+    {
+      name: 'User',
+      email: 'user@customer.com',
+      password: bcrypt.hashSync('user1234'),
+      isAdmin: false,
     },
   ],
 };
