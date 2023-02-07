@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import routeSeed from './routes/routeSeed.js';
 import routeProduct from './routes/routeProduct.js';
+import routeSliderImage from './routes/routeSliderImage.js';
 
 dotenv.config();
 
@@ -20,9 +21,11 @@ const app = express();
 
 app.use('/api/seed', routeSeed);
 app.use('/api/products', routeProduct);
-app.get('/api/sliderImages', (req, res) => {
+app.use('/api/sliderImages', routeSliderImage);
+
+/* app.get('/api/sliderImages', (req, res) => {
   res.send(images.sliderImages);
-});
+}); */
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

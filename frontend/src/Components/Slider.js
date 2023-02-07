@@ -32,7 +32,7 @@ const Slider = () => {
         <div style={{ marginBottom: '2rem' }}>
           <Carousel>
             {sliderImages.map((image) => (
-              <Carousel.Item key={image.id}>
+              <Carousel.Item key={image._id}>
                 <img
                   className="d-block w-100 mx-auto"
                   src={image.url}
