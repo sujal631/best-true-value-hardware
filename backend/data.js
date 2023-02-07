@@ -1,7 +1,7 @@
 const data = {
   products: [
     {
-      productNumber: 1001,
+      //productNumber: 1001,
       name: 'Dewalt 20V Cordless Drill',
       slug: 'dewalt-20v-cordless-drill',
       category: 'Power Tools',
@@ -15,7 +15,7 @@ const data = {
         'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
     },
     {
-      productNumber: 1002,
+      //productNumber: 1002,
       name: 'Milwaukee M18 Cordless Impact Wrench',
       slug: 'milwaukee-m18-cordless-impact-wrench',
       category: 'Power Tools',
@@ -29,7 +29,7 @@ const data = {
         'The Milwaukee M18 Cordless Impact Wrench is a powerful and durable tool for heavy-duty projects. With a M18 lithium-ion battery, this impact wrench offers maximum power and a long-lasting charge.',
     },
     {
-      productNumber: 1003,
+      //productNumber: 1003,
       name: 'Kreg Jig K5 Pocket Hole System',
       slug: 'kreg-jig-k5-pocket-hole-system',
       category: 'Woodworking Tools',
@@ -44,7 +44,7 @@ const data = {
     },
 
     {
-      productNumber: 1004,
+      //productNumber: 1004,
       name: 'Bosch 10-Inch Table Saw',
       slug: 'bosch-10-inch-table-saw',
       category: 'Power Tools',
@@ -58,7 +58,7 @@ const data = {
         'The Bosch 10-Inch Table Saw is a powerful and precise tool for any woodworking project. With its durable construction and accurate cutting capabilities, this table saw is perfect for professional or DIY use.',
     },
     {
-      productNumber: 1005,
+      //productNumber: 1005,
       name: 'Kobalt 40-Piece Standard Tool Set',
       slug: 'kobalt-40-piece-standard-tool-set',
       category: 'Hand Tools',
@@ -72,7 +72,7 @@ const data = {
         "The Kobalt 40-Piece Standard (SAE) and Metric Mechanic's Tool Set is a comprehensive collection of tools that is perfect for mechanics and DIY enthusiasts. It includes a variety of sockets, wrenches, pliers, and screwdrivers in both standard and metric sizes.",
     },
     {
-      productNumber: 1006,
+      //productNumber: 1006,
       name: 'Milwaukee M18 Cordless Hammer Drill',
       slug: 'milwaukee-m18-cordless-hammer-drill',
       category: 'Power Tools',
@@ -86,7 +86,7 @@ const data = {
         'The Milwaukee M18 FUEL 18-Volt Lithium-Ion Brushless Cordless Hammer Drill/Impact Driver Combo Kit is a powerful and versatile tool set that is perfect for a wide range of drilling and driving applications. It features a high-performance brushless motor and a compact, lightweight design for easy maneuverability and control.',
     },
     {
-      productNumber: 1007,
+      //productNumber: 1007,
       name: 'Bosch Jigsaw JS470E',
       slug: 'bosch-jigsaw-js470e',
       category: 'Power Tools',
@@ -100,7 +100,7 @@ const data = {
         'The Bosch Jigsaw JS470E is a powerful and versatile tool for cutting a variety of materials. It features a precision guidance system for straight cuts and a comfortable grip for extended use.',
     },
     {
-      productNumber: 1008,
+      //productNumber: 1008,
       name: 'Kwikset Smart Lock',
       slug: 'kwikset-smart-lock',
       category: 'Home Security',
@@ -114,7 +114,7 @@ const data = {
         'The Kwikset Smart Lock is a convenient and secure way to control access to your home. It can be controlled with a smartphone app and features customizable access codes for guests.',
     },
     {
-      productNumber: 1009,
+      //productNumber: 1009,
       name: 'Behr Premium Plus Ultra Paint',
       slug: 'behr-premium-plus-ultra-paint',
       category: 'Painting Supplies',
@@ -128,7 +128,7 @@ const data = {
         'Behr Premium Plus Ultra Paint is a high-quality, self-priming paint that provides excellent coverage and durability. It is suitable for both indoor and outdoor use and comes in a variety of colors.',
     },
     {
-      productNumber: 1010,
+      //productNumber: 1010,
       name: 'TOTO Drake II Toilet',
       slug: 'toto-drake-ii-toilet',
       category: 'Plumbing',
@@ -142,7 +142,7 @@ const data = {
         'The TOTO Drake II Toilet is a sleek and powerful toilet that features a powerful flush system and an elongated bowl for added comfort.',
     },
     {
-      productNumber: 1011,
+      //productNumber: 1011,
       name: 'Makita 18V LXT Cordless Impact Driver',
       slug: 'makita-18v-lxt-cordless-impact-driver',
       category: 'Power Tools',
