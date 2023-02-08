@@ -26,7 +26,7 @@ const data = {
       rating: 3.2,
       numReviews: 8,
       description:
-        'The Milwaukee M18 Cordless Impact Wrench is a powerful and durable tool for heavy-duty projects. With a M18 lithium-ion battery, this impact wrench offers maximum power and a long-lasting charge.',
+        'The PikStick Pro All Purpose Stick is a versatile and durable tool designed for a wide range of outdoor activities. It features a strong and lightweight aluminum shaft that can be extended from 33 inches to 53 inches, making it suitable for people of different heights.The PikStick Pro All Purpose Stick is equipped with a sturdy tungsten tip at one end for added grip and stability on various terrains, as well as a removable basket at the other end for snow support during winter hikes. It also has a comfortable foam grip handle that provides a secure and comfortable grip, even during extended use. This stick is ideal for activities such as hiking, trekking, camping, and snowshoeing, as well as for use as a walking aid for people with mobility issues. It is compact, lightweight, and easy to carry, making it a must-have accessory for any outdoor enthusiast.',
     },
     {
       name: 'Globe 48ft LED String Lights',
@@ -39,7 +39,7 @@ const data = {
       rating: 4.7,
       numReviews: 18,
       description:
-        'The Kreg Jig K5 Pocket Hole System is a versatile and easy-to-use tool for any woodworking project. With its durable construction and simple design, this pocket hole system makes it easy to create strong, secure joints.',
+        'The Globe 48ft LED String Lights are a high-quality and stylish lighting solution for outdoor and indoor use. These lights feature 48 feet of bright and energy-efficient LED bulbs strung along a flexible and weather-resistant wire, providing a warm and inviting ambiance to any space.The lights have a classic globe shape and come in a variety of colors, making them suitable for a wide range of decor styles and settings. They are easy to install and come with end-to-end connectors, allowing you to connect multiple strings together for an even more dramatic effect.The Globe 48ft LED String Lights are ideal for outdoor patio and garden spaces, as well as indoor spaces like bedrooms, living rooms, and dining rooms. They are energy-saving, long-lasting, and require very little maintenance, making them a great choice for anyone looking to add a touch of warmth and ambiance to their space.',
     },
 
     {
@@ -53,7 +53,7 @@ const data = {
       rating: 4.9,
       numReviews: 11,
       description:
-        'The Bosch 10-Inch Table Saw is a powerful and precise tool for any woodworking project. With its durable construction and accurate cutting capabilities, this table saw is perfect for professional or DIY use.',
+        'Introducing the Vintage Style 60W Warm Candle Light - a beautiful and unique lighting solution that adds a touch of charm and character to any space. This warm candle light bulb features a classic and timeless design, with a transparent glass cover and a delicate filament that mimics the look of a traditional candle flame.With a warm and inviting color temperature of 2200K, this 60W bulb creates a warm and cozy atmosphere in any room. It is compatible with a range of fixtures and fittings, making it easy to upgrade your existing lighting. The bulb has an E26 base, making it easy to install in standard light fixtures, and its low heat emission makes it safe to use in any setting. The Vintage Style 60W Warm Candle Light is not just a beautiful addition to your home or office, it is also a practical and energy-efficient choice. It uses only 60 watts of power, reducing your energy consumption and lowering your electricity bill. And, with a long lifespan of up to 15,000 hours, this bulb is designed to last, reducing the need for frequent replacements.',
     },
     {
       name: '1/3 HP Master Plumber Submersible Sump Pump',
@@ -66,7 +66,7 @@ const data = {
       rating: 4.6,
       numReviews: 3,
       description:
-        "The Kobalt 40-Piece Standard (SAE) and Metric Mechanic's Tool Set is a comprehensive collection of tools that is perfect for mechanics and DIY enthusiasts. It includes a variety of sockets, wrenches, pliers, and screwdrivers in both standard and metric sizes.",
+        'Introducing the 1/3 HP Master Plumber Submersible Sump Pump - the ideal solution for effectively removing excess water from your basement or crawl space. This submersible pump features a powerful 1/3 horsepower motor and a durable thermoplastic construction, making it capable of handling heavy-duty applications. The Master Plumber Submersible Sump Pump has a maximum flow rate of 3,500 gallons per hour, making it highly efficient at removing excess water. It also has a 10-foot power cord, providing ample reach for most applications, and a reliable float switch for automatic operation.',
     },
     {
       name: 'Moen 6 Settings Magnetix Shower Head',
@@ -79,7 +79,7 @@ const data = {
       rating: 5,
       numReviews: 9,
       description:
-        'The Milwaukee M18 FUEL 18-Volt Lithium-Ion Brushless Cordless Hammer Drill/Impact Driver Combo Kit is a powerful and versatile tool set that is perfect for a wide range of drilling and driving applications. It features a high-performance brushless motor and a compact, lightweight design for easy maneuverability and control.',
+        'The Moen 6 Settings Magnetix Shower Head is the ultimate solution for a customizable and convenient shower experience. This innovative shower head features six different spray patterns, allowing you to choose the perfect setting for your needs. From a full-body spray to a targeted massage, this shower head has it all. What sets the Moen 6 Settings Magnetix Shower Head apart is its innovative Magnetix technology. This powerful magnet securely holds the handheld showerhead in place, making it easy to switch between spray patterns or hand-hold the showerhead for added convenience. The Moen 6 Settings Magnetix Shower Head is also designed for easy installation. It fits standard shower arms and comes with a simple to install bracket, so you can have it up and running in no time. And, with its sleek and modern design, this shower head is the perfect addition to any bathroom decor.',
     },
     {
       name: 'EZ-T Tint Base Easy Care Eggshell Interior Paint',
@@ -92,7 +92,7 @@ const data = {
       rating: 4.2,
       numReviews: 30,
       description:
-        'The Bosch Jigsaw JS470E is a powerful and versatile tool for cutting a variety of materials. It features a precision guidance system for straight cuts and a comfortable grip for extended use.',
+        'Introducing EZ-T Tint Base Easy Care Eggshell Interior Paint - the perfect solution for anyone looking for a high-quality, easy-to-use paint for their home or office. This premium interior paint is formulated to provide excellent coverage and a smooth, even finish in just one or two coats. EZ-T Tint Base Easy Care Eggshell Interior Paint is designed for ease of use, with a low-odor and low-VOC formula that makes it safe for use in any space. It is also formulated with an easy-care technology that helps resist scuffs, stains, and dirt, so your walls will look beautiful for years to come. The eggshell finish provides a smooth, subtle luster that enhances the natural beauty of your walls, making it perfect for any room in your home or office.',
     },
     {
       name: 'EZS-P Pure White Easy Care Semi-Gloss Interior Paint',
@@ -105,7 +105,7 @@ const data = {
       rating: 4.7,
       numReviews: 15,
       description:
-        'The Kwikset Smart Lock is a convenient and secure way to control access to your home. It can be controlled with a smartphone app and features customizable access codes for guests.',
+        'EZS-P Pure White Easy Care Semi-Gloss Interior Paint is a premium quality paint designed for ease of use and long-lasting beauty. This interior paint is formulated with easy-care technology that helps resist scuffs, stains, and dirt, ensuring that your walls will look beautiful for years to come. The semi-gloss finish provides a high-shine appearance that enhances the natural beauty of your walls, making it perfect for use in high-traffic areas such as kitchens and bathrooms. The pure white color provides a crisp, clean look that will brighten any room in your home or office. With its low-odor and low-VOC formula, EZS-P Pure White Easy Care Semi-Gloss Interior Paint is safe for use in any space, making it the ultimate solution for a beautiful and durable finish.',
     },
     {
       name: 'SHP-P Pure White Easy Care Satin Exterior Paint',
@@ -118,7 +118,7 @@ const data = {
       rating: 4.6,
       numReviews: 16,
       description:
-        'Behr Premium Plus Ultra Paint is a high-quality, self-priming paint that provides excellent coverage and durability. It is suitable for both indoor and outdoor use and comes in a variety of colors.',
+        'SHP-P Pure White Easy Care Satin Exterior Paint is a premium quality paint designed for long-lasting protection and beauty for your home exterior. This exterior paint is formulated with advanced technology that helps resist fading, chalking, and cracking, ensuring that your home will look great for years to come. The satin finish provides a subtle luster that enhances the natural beauty of your home exterior, while the pure white color provides a crisp, clean look that will brighten up any space. SHP-P Pure White Easy Care Satin Exterior Paint is also designed for ease of use, with a low-odor and low-VOC formula that makes it safe for use around your home and family. The paint is also resistant to mildew, making it perfect for use in areas with high humidity.',
     },
     {
       name: 'HPX-N Neutral Base Easy Care Flat Exterior Paint',
@@ -131,7 +131,7 @@ const data = {
       rating: 4.8,
       numReviews: 12,
       description:
-        'The TOTO Drake II Toilet is a sleek and powerful toilet that features a powerful flush system and an elongated bowl for added comfort.',
+        'HPX-N Neutral Base Easy Care Flat Exterior Paint is the perfect solution for anyone looking for a high-quality, easy-to-use paint for their home exterior. This premium exterior paint is formulated with advanced technology that helps resist fading, chalking, and cracking, ensuring that your home will look beautiful for years to come. The flat finish provides a smooth, non-reflective appearance that helps hide surface imperfections, making it perfect for use on older homes or homes with textured surfaces. The neutral base allows you to customize the paint to match any color, so you can create the perfect look for your home exterior. And, with its low-odor and low-VOC formula, HPX-N Neutral Base Easy Care Flat Exterior Paint is safe for use around your home and family.',
     },
     {
       name: '50ft Green Thumb Light Weight Water Hose',
@@ -144,10 +144,10 @@ const data = {
       rating: 3.7,
       numReviews: 7,
       description:
-        'The Makita 18V LXT Cordless Impact Driver is a powerful and versatile tool that is perfect for driving large screws and bolts. It has a comfortable grip and a range of adjustable settings for precision and control.',
+        'The 50ft Green Thumb Light Weight Water Hose is the perfect solution for all your watering needs. This hose is made from high-quality materials and is designed to be lightweight and easy to handle, making it perfect for use in any garden or outdoor space. With a 50ft length, you will have plenty of reach for all your watering needs, and the durable construction ensures that this hose will last for years to come. The hose features a leak-proof, anti-kink design that helps prevent kinks and leaks, ensuring a consistent water flow for all your watering needs. And, with its sturdy and durable brass fittings, this hose is easy to connect to any standard faucet, making it quick and easy to start using right away.',
     },
     {
-      name: 'Scotts Zoysia Grass Seed and Mulch ',
+      name: 'Scotts Zoysia Grass Seed and Mulch',
       slug: 'scotts-zoysia-grass-seed-and-mulch',
       department: 'Lawn & Garden',
       image: '/images/p12.png',
@@ -157,7 +157,7 @@ const data = {
       rating: 4.8,
       numReviews: 9,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'Scotts Zoysia Grass Seed and Mulch is the ideal solution for anyone looking to create a lush, green lawn. This product combines high-quality zoysia grass seed with a specially formulated mulch, making it easy to grow a beautiful and healthy lawn. The zoysia grass seed is carefully selected to ensure strong, vigorous growth, and the mulch helps retain moisture, providing essential nutrients to the seed as it grows.',
     },
     {
       name: 'Scotts Elite Spreader Wheelbarrow ',
@@ -170,10 +170,10 @@ const data = {
       rating: 4.1,
       numReviews: 16,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'The Scotts Elite Spreader Wheelbarrow is the ideal solution for anyone who wants to get their gardening and lawn care tasks done quickly and easily. This versatile spreader is designed to be used with a wheelbarrow, making it easy to transport and maneuver in any outdoor space. The spreader features a large hopper capacity, allowing you to cover a large area in one go, and the adjustable spread width allows you to control the coverage area for precision application.',
     },
     {
-      name: 'Drano Max Gel Clog Remover ',
+      name: 'Drano Max Gel Clog Remover',
       slug: 'drano-max-gel-clog-remover',
       department: 'Plumbing',
       image: '/images/p14.png',
@@ -183,10 +183,10 @@ const data = {
       rating: 4.8,
       numReviews: 12,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'Drano Max Gel Clog Remover is a powerful and effective solution for clearing stubborn clogs in your drains. Its thick gel formula clings to clogs, breaking them down and dissolving them quickly and effectively. This clog remover is safe to use on all types of pipes, including PVC, plastic, and metal, and it is compatible with septic systems. The easy-to-use squeeze bottle design allows for precision application, making it simple to target the clog and get the job done. Say goodbye to slow drains and clogged pipes with Drano Max Gel Clog Remover.',
     },
     {
-      name: 'Stanley 10pc Screwdriver Set ',
+      name: 'Stanley 10pc Screwdriver Set',
       slug: 'stanley-10pc-screwdriver-set',
       department: 'Tools',
       image: '/images/p15.png',
@@ -196,7 +196,7 @@ const data = {
       rating: 4.5,
       numReviews: 22,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'The Stanley 10pc Screwdriver Set is a must-have for any DIY enthusiast or professional trades person. This set includes 10 screwdrivers of various sizes, ensuring that you have the right tool for the job. Each screwdriver is made from high-quality materials, making them durable and long-lasting. The ergonomic handles provide a comfortable grip, allowing for better control and reduced hand fatigue. The set also includes a convenient carrying case, making it easy to store and transport your screwdrivers. Whether you are a seasoned pro or a DIY beginner, the Stanley 10pc Screwdriver Set is an essential addition to your toolkit.',
     },
     {
       name: 'Dewalt 168pc Mechanic Tool Set',
@@ -209,7 +209,7 @@ const data = {
       rating: 4.4,
       numReviews: 6,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'The Dewalt 168pc Mechanic Tool Set is the ultimate solution for mechanics, technicians, and DIY enthusiasts who require a comprehensive and high-quality tool set. This set includes a wide range of hand tools, such as sockets, wrenches, pliers, and screwdrivers, all made from durable and long-lasting materials. The set also includes a sturdy carrying case for easy storage and transport. Whether you are working on a car engine, a household appliance, or any other mechanical project, the Dewalt 168pc Mechanic Tool Set has the tools you need to get the job done. With its versatile selection and top-quality construction, this set is the perfect investment for anyone in need of a comprehensive mechanic tool set.',
     },
     {
       name: 'Vacmaster Pro Series Wet/Dry Vacuum 12 Gallons',
@@ -222,10 +222,10 @@ const data = {
       rating: 5,
       numReviews: 2,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'The Vacmaster Pro Series Wet/Dry Vacuum 12 Gallons is a powerful and versatile vacuum designed for both wet and dry cleaning tasks. With a 12-gallon tank capacity, it is capable of handling big messes and cleaning large areas. The vacuum is equipped with a powerful motor and high-performance HEPA filtration, ensuring that it can effectively remove dirt, dust, and debris from any surface. Its compact design and wheels make it easy to move around, and the included accessories make it suitable for various cleaning tasks. Whether you are cleaning up after a construction project, removing liquids from a flooded area, or simply vacuuming your home or workshop, the Vacmaster Pro Series Wet/Dry Vacuum 12 Gallons is a reliable and effective cleaning solution.',
     },
     {
-      name: 'Dewalt 12V Extreme Cordless Drill/Driver Kit ',
+      name: 'Dewalt 12V Extreme Cordless Drill/Driver Kit',
       slug: 'dewalt-12v-extreme-cordless-drill-driver-kit',
       department: 'Tools',
       image: '/images/p18.png',
@@ -235,7 +235,7 @@ const data = {
       rating: 4.8,
       numReviews: 27,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'The Dewalt 12V Extreme Cordless Drill/Driver Kit is a powerful and versatile tool for any DIY or professional project. With a 12V lithium-ion battery, this drill offers exceptional performance and longevity, allowing you to work longer without needing to stop for a recharge. The drill is equipped with two-speed settings and a 15-position adjustable torque control, providing you with the precision and control you need to get the job done. The compact and lightweight design of this drill makes it easy to maneuver in tight spaces, while the ergonomic handle provides a comfortable grip. The kit also includes a convenient carrying case and a range of accessories, making it a complete solution for your drilling and driving needs. Whether you are a seasoned pro or a DIY enthusiast, the Dewalt 12V Extreme Cordless Drill/Driver Kit is the ideal choice for all your drilling and driving needs.',
     },
     {
       name: 'Dewalt 20V Impact Brushless Driver Kit',
@@ -248,7 +248,7 @@ const data = {
       rating: 4.8,
       numReviews: 18,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'The Dewalt 20V Impact Brushless Driver Kit is a powerful and versatile tool designed for professionals and DIY enthusiasts. With a 20V lithium-ion battery, this impact driver provides exceptional performance and longevity, allowing you to tackle even the toughest jobs. The brushless motor technology delivers more power and efficiency, resulting in longer battery life and a more durable tool. The compact design and one-handed loading 1/4" hex chuck make it easy to maneuver in tight spaces, while the ergonomic handle provides a comfortable grip. The kit includes a range of accessories, making it a complete solution for your fastening needs. Whether you are working on a construction project or simply tackling a home renovation, the Dewalt 20V Impact Brushless Driver Kit is the ideal choice for all your fastening needs.',
     },
     {
       name: 'Dewalt 60V 17" String Trimmer',
@@ -261,7 +261,7 @@ const data = {
       rating: 4.1,
       numReviews: 11,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'The Dewalt 60V 17" String Trimmer is a powerful and efficient tool for tackling tough outdoor jobs. With a 60V lithium-ion battery, this trimmer provides exceptional performance and longevity, allowing you to work longer without needing to stop for a recharge. The 17" cutting swath and dual 0.080" line provides efficient and effective trimming, while the adjustable auxiliary handle and lightweight design make it easy to maneuver. The trimmer is designed for easy and quick line changes, and the folding design makes it easy to store when not in use. Whether you are a professional landscaper or just looking for a reliable trimmer for your yard, the Dewalt 60V 17" String Trimmer is the ideal choice for all your trimming needs.',
     },
     {
       name: 'Dewalt 60V Handheld Blower',
@@ -274,7 +274,46 @@ const data = {
       rating: 4.6,
       numReviews: 15,
       description:
-        'The Dewalt 20V Cordless Drill is a powerful and versatile tool for any DIY or professional project. With a 20V lithium-ion battery, this drill offers plenty of power and a long-lasting charge.',
+        'The Dewalt 60V Handheld Blower is a powerful and efficient tool for cleaning up outdoor spaces. With a 60V lithium-ion battery, this blower provides exceptional performance and longevity, allowing you to work longer without needing to stop for a recharge. The axial fan design delivers up to 450 CFM and 125 MPH of air volume and speed, making it effective for clearing leaves, grass clippings, and other debris from lawns, driveways, and sidewalks. The lightweight design and ergonomic handle make it easy to maneuver, while the low noise output makes it ideal for use in residential areas. Whether you are a professional landscaper or just looking for a reliable blower for your yard, the Dewalt 60V Handheld Blower is the ideal choice for all your cleaning needs.',
+    },
+    {
+      name: 'Dewalt 60V 18" Chainsaw',
+      slug: 'dewalt-60v-18"-chainsaw',
+      department: 'Power Tools',
+      image: '/images/p22.png',
+      price: 199.99,
+      countInStock: 3,
+      brand: 'Dewalt',
+      rating: 4.1,
+      numReviews: 8,
+      description:
+        'The Dewalt 60V 18" Chainsaw is a high-performance and reliable tool for outdoor cutting tasks. With a 60V lithium-ion battery, it provides the power of a gas chainsaw with the convenience of cordless operation. The 18" bar length is suitable for a range of cutting jobs, from small limbs to larger trees, and the low kickback bar and chain design helps to ensure user safety. The tool-free chain tensioning system makes it easy to adjust the chain on the fly, while the automatic oiling system helps to keep the chain lubricated and in good condition. The lightweight and ergonomic design make it comfortable to use for extended periods of time, and the low noise output allows for use in residential areas. Whether you are a professional logger or just need a dependable chainsaw for your yard, the Dewalt 60V 18" Chainsaw is an excellent choice for all your cutting needs.',
+    },
+    {
+      name: 'Char Broil Performance 5 Burners LP Gas Grill',
+      slug: 'char-broil-performance-5-burners-lp-gas-grill',
+      department: 'Outdoor & Patio',
+      image: '/images/p23.png',
+      price: 389.99,
+      countInStock: 2,
+      brand: 'Char Broil',
+      rating: 5,
+      numReviews: 2,
+      description:
+        'The Char Broil Performance 5 Burners LP Gas Grill is a versatile and high-performance cooking machine. With 5 stainless steel burners, it provides ample cooking space, capable of grilling up to 28 burgers at once. The lid-mounted temperature gauge allows you to monitor the heat inside the grill, ensuring consistent cooking results every time. The control knobs are strategically placed for easy access and precise temperature control, while the built-in side shelves provide additional workspace. The porcelain-coated grates are easy to clean and provide a non-stick cooking surface, while the swing-away warming rack allows you to keep food warm while you finish cooking other items. With a sturdy design and ample cooking space, the Char Broil Performance 5 Burners LP Gas Grill is perfect for large families, social events, and any grilling enthusiast.',
+    },
+    {
+      name: 'Schlage Keyless Touch Screen Lever Lockset',
+      slug: 'schlage-keyless-touch-screen-lever-lockset',
+      department: 'Outdoor & Patio',
+      image: '/images/p24.png',
+      price: 149.99,
+      countInStock: 8,
+      brand: 'Schlage',
+      rating: 5,
+      numReviews: 3,
+      description:
+        'The Schlage Keyless Touch Screen Lever Lockset is a modern and secure solution for your home security needs. With its touch screen keypad, you no longer have to carry around bulky keys and worry about lost or stolen keys. The lock allows you to create unique passcodes for each member of your household, providing secure access for everyone. The sleek and durable design is weather-resistant and perfect for both indoor and outdoor use. The lever handle makes it easy to open the door, even with your arms full. With its advanced security features and easy-to-use design, the Schlage Keyless Touch Screen Lever Lockset is a reliable and convenient way to secure your home.',
     },
   ],
 

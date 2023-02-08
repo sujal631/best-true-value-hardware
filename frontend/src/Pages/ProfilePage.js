@@ -4,10 +4,13 @@ import { Helmet } from 'react-helmet-async';
 export default function ProfilePage() {
   return (
     <div>
+      {/* Setting the page title using react-helmet-async */}
       <Helmet>
-        <title>ProfilePage</title>
+        <title>User Profile</title>
       </Helmet>
-      <h1>Profile Page goes here</h1>
+
+      {/* Displaying the page header */}
+      <h1>User Profile Page</h1>
     </div>
   );
 }

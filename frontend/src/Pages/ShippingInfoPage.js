@@ -4,10 +4,13 @@ import { Helmet } from 'react-helmet-async';
 export default function ShippingInfoPage() {
   return (
     <div>
+      {/* Setting the page title using react-helmet-async */}
       <Helmet>
         <title>Shipping Info</title>
       </Helmet>
-      <h1>Shipping Info Page goes here</h1>
+
+      {/* Displaying the page header */}
+      <h1>Shipping Info Page</h1>
     </div>
   );
 }

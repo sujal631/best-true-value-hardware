@@ -1,13 +1,19 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-export default function ListOrdersPage() {
+// A functional component that returns the page content for List Orders page
+const ListOrdersPage = () => {
   return (
     <div>
+      {/* Set the title of the page dynamically in the browser tab */}
       <Helmet>
         <title>List Orders</title>
       </Helmet>
-      <h1>List Orders Page goes here</h1>
+
+      {/* Page header */}
+      <h1>List Orders Page</h1>
     </div>
   );
-}
+};
+
+export default ListOrdersPage;

@@ -1,3 +1,4 @@
+// Importing necessary modules and components
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
@@ -6,13 +7,16 @@ import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import Product from '../Components/Product';
 
+// AllDepartmentsPage component
 export default function AllDepartmentsPage() {
+  // State variables to manage loading status, error message, products, selected department, and all departments
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [products, setProducts] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [allDepartments, setAllDepartments] = useState([]);
 
+  // useEffect hook to fetch products data from the API and set state variables
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
@@ -31,10 +35,12 @@ export default function AllDepartmentsPage() {
     fetchProduct();
   }, []);
 
+  // Function to handle change in the selected department
   const handleDepartmentChange = (department) => {
     setSelectedDepartment(department);
   };
 
+  // Filtered products based on the selected department
   const filteredProducts =
     selectedDepartment === ''
       ? products
@@ -42,11 +48,14 @@ export default function AllDepartmentsPage() {
 
   return (
     <div>
+      {/* Setting the page title */}
       <Helmet>
         <title>All Departments</title>
       </Helmet>
 
+      {/* Container for products */}
       <div className="product-container">
+        {/* Dropdown to select the department */}
         <div className="mb-3">
           <select
             className="all-departments-btn"
@@ -62,6 +71,7 @@ export default function AllDepartmentsPage() {
           </select>
         </div>
 
+        {/* Conditionally rendering loading spinner, error message, or product list */}
         {loading ? (
           <LoadingSpinner />
         ) : error ? (

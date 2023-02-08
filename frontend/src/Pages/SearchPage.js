@@ -4,10 +4,13 @@ import { Helmet } from 'react-helmet-async';
 export default function SearchPage() {
   return (
     <div>
+      {/* Setting the page title using react-helmet-async */}
       <Helmet>
-        <title>SearchPage</title>
+        <title>Search</title>
       </Helmet>
-      <h1>Search Page goes here</h1>
+
+      {/* Displaying the page header */}
+      <h1>Search Page</h1>
     </div>
   );
 }

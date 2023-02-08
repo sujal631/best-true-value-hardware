@@ -4,10 +4,13 @@ import { Helmet } from 'react-helmet-async';
 export default function OrderHistoryPage() {
   return (
     <div>
+      {/* Setting the page title using react-helmet-async */}
       <Helmet>
-        <title>OrderHistoryPage</title>
+        <title>Order History</title>
       </Helmet>
-      <h1>Order History Page goes here</h1>
+
+      {/* Displaying the page header */}
+      <h1>Order History Page</h1>
     </div>
   );
 }

@@ -4,10 +4,13 @@ import { Helmet } from 'react-helmet-async';
 export default function ShoppingCartPage() {
   return (
     <div>
+      {/* Setting the page title using react-helmet-async */}
       <Helmet>
         <title>Shopping Cart</title>
       </Helmet>
-      <h1>Cart Page goes here</h1>
+
+      {/* Displaying the page header */}
+      <h1>Shopping Cart Page</h1>
     </div>
   );
 }

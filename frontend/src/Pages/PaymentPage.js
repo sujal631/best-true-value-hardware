@@ -4,10 +4,13 @@ import { Helmet } from 'react-helmet-async';
 export default function PaymentPage() {
   return (
     <div>
+      {/* Setting the page title using react-helmet-async */}
       <Helmet>
-        <title>Payment Method</title>
+        <title>Payment Methods</title>
       </Helmet>
-      <h1>Payment Page goes here</h1>
+
+      {/* Displaying the page header */}
+      <h1>Select Payment Method Page</h1>
     </div>
   );
 }

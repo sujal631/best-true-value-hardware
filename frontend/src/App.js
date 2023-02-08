@@ -1,13 +1,15 @@
+import React from 'react';
 import './App.css';
-import HomePage from './Pages/HomePage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import ProductPage from './Pages/ProductPage';
 import Container from 'react-bootstrap/Container';
-import Navigation from './Components/Navigation';
+
+// Pages
+import HomePage from './Pages/HomePage';
+import ProductPage from './Pages/ProductPage';
 import ShoppingCartPage from './Pages/ShoppingCartPage';
 import LogInPage from './Pages/LogInPage';
-import ShippingInfoPage from './Pages/ShippingInfoPage';
 import RegistrationPage from './Pages/RegistrationPage';
+import ShippingInfoPage from './Pages/ShippingInfoPage';
 import PaymentPage from './Pages/PaymentPage';
 import PreviewOrderPage from './Pages/PreviewOrderPage';
 import OrderHistoryPage from './Pages/OrderHistoryPage';
@@ -20,16 +22,23 @@ import ListUsersPage from './Pages/ListUsersPage';
 import EditProductPage from './Pages/EditProductPage';
 import AllDepartmentsPage from './Pages/AllDepartmentsPage';
 
-function App() {
+// Components
+import Navigation from './Components/Navigation';
+import Footer from './Components/Footer';
+
+// Main App component that contains all the routes
+const App = () => {
   return (
     <BrowserRouter>
       <div className="site-container">
+        {/* Header with Navbar as Navigation */}
         <header>
           <Navigation />
         </header>
-
+        {/* Main content section */}
         <main className="main-section">
           <Container>
+            {/* All the routes defined here */}
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/allDepartments" element={<AllDepartmentsPage />} />
@@ -52,13 +61,11 @@ function App() {
           </Container>
         </main>
 
-        <footer className="text-center">
-          Copyright &copy; 2023 Best True Value Hardware || Designed by Joshi &
-          Acharya
-        </footer>
+        {/* Footer */}
+        <Footer />
       </div>
     </BrowserRouter>
   );
-}
+};
 
 export default App;

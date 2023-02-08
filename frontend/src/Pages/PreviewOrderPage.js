@@ -4,10 +4,13 @@ import { Helmet } from 'react-helmet-async';
 export default function PreviewOrderPage() {
   return (
     <div>
+      {/* Setting the page title using react-helmet-async */}
       <Helmet>
         <title>Preview Order</title>
       </Helmet>
-      <h1>Preview Order Page goes</h1>
+
+      {/* Displaying the page header */}
+      <h1>Preview Order Page</h1>
     </div>
   );
 }
