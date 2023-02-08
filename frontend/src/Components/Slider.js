@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Carousel } from 'react-bootstrap';
+import LoadingComponent from './LoadingComponent';
+import MessageComponent from './MessageComponent';
 
 const Slider = () => {
   const [sliderImages, setSliderImages] = useState([]);
@@ -25,9 +27,9 @@ const Slider = () => {
   return (
     <>
       {loading ? (
-        <div>Loading...</div>
+        <LoadingComponent />
       ) : error ? (
-        <div>{error}</div>
+        <MessageComponent variant="danger">{error}</MessageComponent>
       ) : (
         <div style={{ marginBottom: '2rem' }}>
           <Carousel>
