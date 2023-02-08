@@ -26,8 +26,8 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    category: {
-      // Define the category field with a string type, and set it as a required field
+    department: {
+      // Define the department field with a string type, and set it as a required field
       type: String,
       required: true,
     },

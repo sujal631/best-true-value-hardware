@@ -1,63 +1,62 @@
 import axios from 'axios';
-import React, { useEffect, useReducer } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Col, ListGroup, Badge, Card, Button, Row } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import Rating from '../Components/Rating';
-import LoadingComponent from '../Components/LoadingComponent';
-import MessageComponent from '../Components/MessageComponent';
 import { Helmet } from 'react-helmet-async';
 import { getErrorMessage } from '../utils';
+import LoadingSpinner from '../Components/LoadingComponent';
+import Message from '../Components/MessageComponent';
 
 const ProductPage = () => {
-  const params = useParams();
-  const [state, dispatch] = useReducer(
-    (state, action) => {
-      switch (action.type) {
-        case 'FETCH_START':
-          return { ...state, loading: true };
-        case 'FETCH_SUCCESS':
-          return { ...state, product: action.payload, loading: false };
-        case 'FETCH_ERROR':
-          return { ...state, error: action.payload, loading: false };
-        default:
-          return state;
-      }
-    },
-    { product: [], loading: true, error: '' }
-  );
+  // useParams hook to retrieve the product's slug from the URL
+  const { slug } = useParams();
+  // useState hook to store the product data, loading state, and error message
+  const [product, setProduct] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
+  // useEffect hook to fetch the product data based on the slug
   useEffect(() => {
-    dispatch({ type: 'FETCH_START' });
+    setLoading(true);
     axios
-      .get(`/api/products/slug/${params.slug}`)
-      .then((res) => dispatch({ type: 'FETCH_SUCCESS', payload: res.data }))
-      .catch((err) =>
-        dispatch({ type: 'FETCH_ERROR', payload: getErrorMessage(err) })
-      );
-  }, [params.slug]);
+      .get(`/api/products/slug/${slug}`)
+      .then((res) => {
+        setProduct(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(getErrorMessage(err));
+        setLoading(false);
+      });
+  }, [slug]);
 
-  const { loading, error, product } = state;
-  if (loading) return <LoadingComponent />;
-  if (error)
-    return <MessageComponent variant="danger">{error}</MessageComponent>;
+  // Conditionally render the LoadingComponent, MessageComponent, or the product details
+  if (loading) return <LoadingSpinner />;
+  if (error) return <Message variant="danger">{error}</Message>;
 
   return (
     <>
+      {/* Update the page title with the product name */}
       <Helmet>
         <title>{product.name}</title>
       </Helmet>
       <Row>
-        <Col md={6}>
+        <Col md={5}>
+          {/* Display the product image */}
           <img className="img-large" src={product.image} alt={product.name} />
         </Col>
-        <Col md={6}>
+        <Col md={7}>
           <ListGroup variant="flush">
             <ListGroup.Item>
+              {/* Display the product name and rating */}
               <h3>{product.name}</h3>
               <Rating rating={product.rating} numReviews={product.numReviews} />
               <br />
+              {/* Display the product price */}
               <strong>Price: ${product.price}</strong>
               <br />
+              {/* Display the product description */}
               <strong>Description:</strong>
               <p>{product.description}</p>
             </ListGroup.Item>
@@ -65,23 +64,26 @@ const ProductPage = () => {
           <Card>
             <Card.Body>
               <ListGroup variant="flush">
+                {/* Display the product price */}
                 <ListGroup.Item>
                   <strong>Price: ${product.price}</strong>
                 </ListGroup.Item>
+                {/* Display the product availability */}
                 <ListGroup.Item>
-                  <strong>
-                    Availability:
-                    {product.countInStock > 0 ? (
-                      <Badge bg="success"> In Stock</Badge>
-                    ) : (
-                      <Badge bg="danger"> Out of Stock</Badge>
-                    )}
-                  </strong>
+                  <strong>Availability: </strong>
+                  {/* Conditionally render the availability badge based on product stock */}
+                  {product.countInStock > 0 ? (
+                    <Badge bg="success">In Stock</Badge>
+                  ) : (
+                    <Badge bg="danger">Out of Stock</Badge>
+                  )}
                 </ListGroup.Item>
+                {/* Only show the add to cart button if there is stock */}
                 {product.countInStock > 0 && (
                   <ListGroup.Item>
-                    <div className="d-grid">
-                      <Button variant="primary"> Add to Cart</Button>
+                    <div className="d-flex justify-content-center">
+                      {/* Add to Cart button */}
+                      <Button variant="primary">Add to Cart</Button>
                     </div>
                   </ListGroup.Item>
                 )}

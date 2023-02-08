@@ -6,7 +6,6 @@ import Container from 'react-bootstrap/Container';
 import Navigation from './Components/Navigation';
 import ShoppingCartPage from './Pages/ShoppingCartPage';
 import LogInPage from './Pages/LogInPage';
-import AllProductsPage from './Pages/AllProductsPage';
 import ShippingInfoPage from './Pages/ShippingInfoPage';
 import RegistrationPage from './Pages/RegistrationPage';
 import PaymentPage from './Pages/PaymentPage';
@@ -19,6 +18,7 @@ import ListProductsPage from './Pages/ListProductsPage';
 import ListOrdersPage from './Pages/ListOrdersPage';
 import ListUsersPage from './Pages/ListUsersPage';
 import EditProductPage from './Pages/EditProductPage';
+import AllDepartmentsPage from './Pages/AllDepartmentsPage';
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
           <Container>
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/products" element={<AllProductsPage />} />
+              <Route path="/allDepartments" element={<AllDepartmentsPage />} />
               <Route path="/product/:slug" element={<ProductPage />} />
               <Route path="/cart" element={<ShoppingCartPage />} />
               <Route path="/login" element={<LogInPage />} />

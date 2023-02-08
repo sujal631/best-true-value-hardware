@@ -41,8 +41,8 @@ export default function Navigation() {
               </LinkContainer>
 
               {/* Products Link */}
-              <LinkContainer to="/products">
-                <Nav.Link>Products</Nav.Link>
+              <LinkContainer to="/allDepartments">
+                <Nav.Link>All Departments</Nav.Link>
               </LinkContainer>
 
               {/* About Link */}
@@ -53,11 +53,6 @@ export default function Navigation() {
               {/* Cart Link */}
               <LinkContainer to="/cart">
                 <Nav.Link>Cart</Nav.Link>
-              </LinkContainer>
-
-              {/* Login Link */}
-              <LinkContainer to="/login">
-                <Nav.Link>Log In</Nav.Link>
               </LinkContainer>
 
               {/* Customer Dropdown */}
