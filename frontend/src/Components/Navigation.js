@@ -12,22 +12,21 @@ export default function Navigation() {
       <Navbar bg="black" variant="dark" expand="lg" fixed="top">
         <Container>
           {/* Navbar Brand */}
-          <LinkContainer to="/">
-            <Navbar.Brand className="brand">
-              {/* Logo */}
-              <img
-                src={require('../logo.png')}
-                alt="Logo"
-                style={{
-                  width: '60px',
-                  height: '50px',
-                  marginRight: '10px',
-                }}
-              />
-              {/* Brand Name */}
-              Best True Value Hardware
-            </Navbar.Brand>
-          </LinkContainer>
+
+          <Navbar.Brand className="brand">
+            {/* Logo */}
+            <img
+              src={require('../logo.png')}
+              alt="Logo"
+              style={{
+                width: '60px',
+                height: '50px',
+                marginRight: '10px',
+              }}
+            />
+            {/* Brand Name */}
+            Best True Value Hardware
+          </Navbar.Brand>
 
           {/* Navbar Toggler */}
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -47,7 +46,7 @@ export default function Navigation() {
 
               {/* About Link */}
               <LinkContainer to="/about">
-                <Nav.Link>About</Nav.Link>
+                <Nav.Link>About Us</Nav.Link>
               </LinkContainer>
 
               {/* Cart Link */}

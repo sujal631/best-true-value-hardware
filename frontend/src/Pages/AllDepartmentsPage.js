@@ -63,7 +63,7 @@ export default function AllDepartmentsPage() {
             onChange={(event) => handleDepartmentChange(event.target.value)}
           >
             <option value="">All Departments</option>
-            {allDepartments.map((department) => (
+            {allDepartments.sort().map((department) => (
               <option key={department} value={department}>
                 {department}
               </option>

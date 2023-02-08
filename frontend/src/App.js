@@ -21,6 +21,7 @@ import ListOrdersPage from './Pages/ListOrdersPage';
 import ListUsersPage from './Pages/ListUsersPage';
 import EditProductPage from './Pages/EditProductPage';
 import AllDepartmentsPage from './Pages/AllDepartmentsPage';
+import AboutPage from './Pages/AboutPage';
 
 // Components
 import Navigation from './Components/Navigation';
@@ -41,6 +42,7 @@ const App = () => {
             {/* All the routes defined here */}
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/allDepartments" element={<AllDepartmentsPage />} />
               <Route path="/product/:slug" element={<ProductPage />} />
               <Route path="/cart" element={<ShoppingCartPage />} />
