@@ -1,32 +1,37 @@
+// Import necessary modules
 import express from 'express';
-import images from './images.js';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import { connect } from 'mongoose';
+import { config } from 'dotenv';
 import routeSeed from './routes/routeSeed.js';
 import routeProduct from './routes/routeProduct.js';
 import routeSliderImage from './routes/routeSliderImage.js';
 
-dotenv.config();
+// Load environment variables from .env file
+config();
 
-mongoose
-  .connect(process.env.MONGODB_URI)
+// Connect to MongoDB
+connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
   .then(() => {
-    console.log('Succeeded to connect to MongoDB');
+    console.log('Successfully connected to MongoDB.');
   })
   .catch((error) => {
-    console.log(error.message);
+    console.log('Error connecting to MongoDB: ', error.message);
   });
 
+// Create Express application
 const app = express();
 
+// Use routes for seed, products, and slider images
 app.use('/api/seed', routeSeed);
 app.use('/api/products', routeProduct);
 app.use('/api/sliderImages', routeSliderImage);
 
-/* app.get('/api/sliderImages', (req, res) => {
-  res.send(images.sliderImages);
-}); */
-
+// Start the Express application
+// Listen on the specified port or 3000 if none is provided
+// Log a message on the console to indicate the server is running and on which port.
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(

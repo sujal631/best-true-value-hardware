@@ -4,8 +4,8 @@ const data = {
   products: [
     {
       //productNumber: 1001,
-      name: 'Dewalt 20V Cordless Drill',
-      slug: 'dewalt-20v-cordless-drill',
+      name: 'Dewalt123 ',
+      slug: 'dewalt-123',
       category: 'Power Tools',
       image: '/images/p1.png',
       price: 149.99,
@@ -25,7 +25,7 @@ const data = {
       price: 199.99,
       countInStock: 15,
       brand: 'Milwaukee',
-      rating: 4.9,
+      rating: 3.2,
       numReviews: 300,
       description:
         'The Milwaukee M18 Cordless Impact Wrench is a powerful and durable tool for heavy-duty projects. With a M18 lithium-ion battery, this impact wrench offers maximum power and a long-lasting charge.',
@@ -82,8 +82,8 @@ const data = {
       price: 399.99,
       countInStock: 5,
       brand: 'Milwaukee',
-      rating: 4.9,
-      numReviews: 36,
+      rating: 0,
+      numReviews: 0,
       description:
         'The Milwaukee M18 FUEL 18-Volt Lithium-Ion Brushless Cordless Hammer Drill/Impact Driver Combo Kit is a powerful and versatile tool set that is perfect for a wide range of drilling and driving applications. It features a high-performance brushless motor and a compact, lightweight design for easy maneuverability and control.',
     },
@@ -96,7 +96,7 @@ const data = {
       price: 99.99,
       countInStock: 25,
       brand: 'Bosch',
-      rating: 4.5,
+      rating: 2,
       numReviews: 30,
       description:
         'The Bosch Jigsaw JS470E is a powerful and versatile tool for cutting a variety of materials. It features a precision guidance system for straight cuts and a comfortable grip for extended use.',
@@ -145,8 +145,8 @@ const data = {
     },
     {
       //productNumber: 1011,
-      name: 'Makita 18V LXT Cordless Impact Driver',
-      slug: 'makita-18v-lxt-cordless-impact-driver',
+      name: 'Makita',
+      slug: 'makita',
       category: 'Power Tools',
       image: '/images/p11.png',
       price: 139.99,
