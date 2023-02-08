@@ -11,6 +11,7 @@ export default function AllDepartmentsPage() {
   const [error, setError] = useState('');
   const [products, setProducts] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [allDepartments, setAllDepartments] = useState([]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -18,6 +19,9 @@ export default function AllDepartmentsPage() {
       try {
         const result = await axios.get('/api/products');
         setProducts(result.data);
+        setAllDepartments(
+          Array.from(new Set(result.data.map((item) => item.department)))
+        );
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -45,24 +49,16 @@ export default function AllDepartmentsPage() {
       <div className="product-container">
         <div className="mb-3">
           <select
-            className="form-control"
+            className="all-departments-btn"
             value={selectedDepartment}
             onChange={(event) => handleDepartmentChange(event.target.value)}
           >
             <option value="">All Departments</option>
-            {products
-              .reduce(
-                (uniqueDepartments, product) =>
-                  uniqueDepartments.includes(product.department)
-                    ? uniqueDepartments
-                    : [...uniqueDepartments, product.department],
-                []
-              )
-              .map((department) => (
-                <option key={department} value={department}>
-                  {department}
-                </option>
-              ))}
+            {allDepartments.map((department) => (
+              <option key={department} value={department}>
+                {department}
+              </option>
+            ))}
           </select>
         </div>
 
