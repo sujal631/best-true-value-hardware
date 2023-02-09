@@ -99,7 +99,8 @@ body {
   text-align: center;
 }
 
-.all-departments-btn {
+.all-departments-btn,
+.btn-pagination {
   appearance: none;
   outline: 0;
   background-color: #bb0000;
@@ -115,7 +116,8 @@ body {
 }
 
 .btn-primary:hover,
-.all-departments-btn:hover {
+.all-departments-btn:hover,
+.btn-pagination:hover {
   transform: scale(1.05);
   background-color: #dd2222;
   cursor: pointer;
@@ -135,4 +137,16 @@ body {
 
 .list-inline-item {
   gap: 1rem;
+}
+
+.btn-pagination-black,
+.btn-pagination-black:hover {
+  background-color: #000000;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.btn-red {
+  color: #bb0000;
+  color: #ffffff;
 }
