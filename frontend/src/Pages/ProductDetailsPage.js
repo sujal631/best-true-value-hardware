@@ -8,7 +8,7 @@ import { getErrorMessage } from '../utils';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 
-const ProductPage = () => {
+const ProductDetailsPage = () => {
   // useParams hook to retrieve the product's slug from the URL
   const { slug } = useParams();
   // useState hook to store the product data, loading state, and error message
@@ -95,4 +95,4 @@ const ProductPage = () => {
     </>
   );
 };
-export default ProductPage;
+export default ProductDetailsPage;

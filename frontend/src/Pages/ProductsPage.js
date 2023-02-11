@@ -8,7 +8,7 @@ import Message from '../Components/MessageComponent';
 import Product from '../Components/Product';
 
 // AllDepartmentsPage component
-export default function AllDepartmentsPage() {
+export default function ProductsPage() {
   // State variables to manage loading status, error message, products, selected department, and all departments
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -50,7 +50,7 @@ export default function AllDepartmentsPage() {
     <div>
       {/* Setting the page title */}
       <Helmet>
-        <title>All Departments</title>
+        <title>Products</title>
       </Helmet>
 
       {/* Container for products */}

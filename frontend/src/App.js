@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container';
 
 // Pages
 import HomePage from './Pages/HomePage';
-import ProductPage from './Pages/ProductPage';
+import ProductDetailsPage from './Pages/ProductDetailsPage';
 import ShoppingCartPage from './Pages/ShoppingCartPage';
 import LogInPage from './Pages/LogInPage';
 import RegistrationPage from './Pages/RegistrationPage';
@@ -20,12 +20,12 @@ import ListProductsPage from './Pages/ListProductsPage';
 import ListOrdersPage from './Pages/ListOrdersPage';
 import ListUsersPage from './Pages/ListUsersPage';
 import EditProductPage from './Pages/EditProductPage';
-import AllDepartmentsPage from './Pages/AllDepartmentsPage';
 import AboutPage from './Pages/AboutPage';
 
 // Components
 import Navigation from './Components/Navigation';
 import Footer from './Components/Footer';
+import ProductsPage from './Pages/ProductsPage';
 
 // Main App component that contains all the routes
 const App = () => {
@@ -39,12 +39,12 @@ const App = () => {
         {/* Main content section */}
         <main className="main-section">
           <Container>
-            {/* All the routes defined here */}
+            {/* All the routes are defined here */}
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<AboutPage />} />
-              <Route path="/allDepartments" element={<AllDepartmentsPage />} />
-              <Route path="/product/:slug" element={<ProductPage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/product/:slug" element={<ProductDetailsPage />} />
               <Route path="/cart" element={<ShoppingCartPage />} />
               <Route path="/login" element={<LogInPage />} />
               <Route path="/registration" element={<RegistrationPage />} />
