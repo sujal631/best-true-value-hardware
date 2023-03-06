@@ -13,7 +13,9 @@ export default function Navigation() {
   const logout = () => {
     ctxDispatch({ type: 'LOGOUT' });
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('shippingInfo');
   };
+
   return (
     <div>
       {/* Dark themed navbar fixed to the top of the page */}
@@ -68,15 +70,15 @@ export default function Navigation() {
               </Link>
 
               {userInfo ? (
-                <NavDropdown title={userInfo.name} id="basic-nav-dropdown">
+                <NavDropdown title={userInfo.firstName} id="basic-nav-dropdown">
                   <LinkContainer to="/profile">
                     <NavDropdown.Item>User Profile</NavDropdown.Item>
                   </LinkContainer>
-                  <LinkContainer to="/orderhistory">
+                  <LinkContainer to="/orderHistory">
                     <NavDropdown.Item>Order History</NavDropdown.Item>
                   </LinkContainer>
                   <NavDropdown.Divider />
-                  <Link className="dropdown-item" to="logout" onClick={logout}>
+                  <Link className="dropdown-item" to="/" onClick={logout}>
                     Log Out
                   </Link>
                 </NavDropdown>

@@ -40,7 +40,7 @@ export default function LogInPage() {
   }, [navigate, redirect, userInfo]);
   return (
     <div>
-      <Container className="small-container">
+      <Container className="container small-container">
         {/* Setting the page title using react-helmet-async */}
         <Helmet>
           <title>Log In</title>

@@ -5,7 +5,8 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema(
   {
     // Define the name field with type String and required property set to true
-    name: { type: String, required: true },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
 
     // Define the email field with type String, required set to true, and unique set to true
     email: { type: String, required: true, unique: true },

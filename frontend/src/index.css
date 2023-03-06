@@ -159,3 +159,14 @@ body {
 .small-container {
   max-width: 600px;
 }
+
+.checkout-steps > div {
+  font-weight: 800;
+  border-bottom: 0.25rem solid #828282;
+  color: #828282;
+}
+
+.checkout-steps > div.active {
+  border-bottom: 0.25rem solid #ff0000;
+  color: #ff0000;
+}
