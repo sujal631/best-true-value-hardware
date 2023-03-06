@@ -14,6 +14,7 @@ export default function Navigation() {
     ctxDispatch({ type: 'LOGOUT' });
     localStorage.removeItem('userInfo');
     localStorage.removeItem('shippingInfo');
+    localStorage.removeItem('paymentMethod');
   };
 
   return (

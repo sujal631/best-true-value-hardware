@@ -6,6 +6,7 @@ import routeSeed from './routes/routeSeed.js';
 import routeProduct from './routes/routeProduct.js';
 import routeSliderImage from './routes/routeSliderImage.js';
 import routeUser from './routes/routeUser.js';
+import routeOrder from './routes/routeOrder.js';
 
 // Load environment variables from .env file
 config();
@@ -33,6 +34,7 @@ app.use('/api/seed', routeSeed);
 app.use('/api/products', routeProduct);
 app.use('/api/sliderImages', routeSliderImage);
 app.use('/api/users', routeUser);
+app.use('/api/orders', routeOrder);
 
 app.use((error, req, res, next) => {
   res.status(500).send({ message: error.message });
