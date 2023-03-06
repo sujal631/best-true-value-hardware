@@ -24,11 +24,17 @@ connect(process.env.MONGODB_URI, {
 // Create Express application
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Use routes for seed, products, and slider images
 app.use('/api/seed', routeSeed);
 app.use('/api/products', routeProduct);
 app.use('/api/sliderImages', routeSliderImage);
 
+app.use((error, req, res, next) => {
+  res.status(500).send({ message: error.message });
+});
 // Start the Express application
 // Listen on the specified port or 3000 if none is provided
 // Log a message on the console to indicate the server is running and on which port.

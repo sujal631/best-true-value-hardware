@@ -1,11 +1,14 @@
 // Import React and the required UI components from react-bootstrap library
-import React from 'react';
-import { Container, Navbar, NavDropdown } from 'react-bootstrap';
+import React, { useContext } from 'react';
+import { Badge, Container, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Nav from 'react-bootstrap/Nav';
+import { Store } from '../Store';
 
 // This component returns the navigation bar for the website
 export default function Navigation() {
+  const { state } = useContext(Store);
+  const { cart } = state;
   return (
     <div>
       {/* Dark themed navbar fixed to the top of the page */}
@@ -51,7 +54,14 @@ export default function Navigation() {
 
               {/* Cart Link */}
               <LinkContainer to="/cart">
-                <Nav.Link>Cart</Nav.Link>
+                <Nav.Link>
+                  Cart
+                  {cart.cartItems.length > 0 && (
+                    <Badge pill bg="danger">
+                      {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                    </Badge>
+                  )}
+                </Nav.Link>
               </LinkContainer>
 
               {/* Customer Dropdown */}

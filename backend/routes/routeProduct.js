@@ -14,7 +14,7 @@ productRouter.get('/', async (req, res) => {
   } catch (error) {
     // If there was an error while retrieving products, send a server error response
     res.status(500).send({
-      message: 'Error occured while fetching products. Please try again later',
+      message: 'Error occurred while fetching products. Please try again later',
     });
   }
 });
@@ -38,7 +38,27 @@ productRouter.get('/slug/:slug', async (req, res) => {
     // If there was an error while retrieving the product details, send a server error response
     res.status(500).send({
       message:
-        'Error occured while fetching product details. Please try again later',
+        'Error occurred while fetching product details. Please try again later',
+    });
+  }
+});
+
+productRouter.get('/:id', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (product) {
+      res.send(product);
+    } else {
+      // If the product does not exist, send a not found response
+      res.status(404).send({
+        message: 'Sorry, the product you are looking for cannot be found.',
+      });
+    }
+  } catch (error) {
+    // If there was an error while retrieving the product details, send a server error response
+    res.status(500).send({
+      message:
+        'Error occurred while fetching product details. Please try again later',
     });
   }
 });

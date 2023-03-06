@@ -1,14 +1,16 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Col, ListGroup, Badge, Card, Button, Row } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Rating from '../Components/Rating';
 import { Helmet } from 'react-helmet-async';
 import { getErrorMessage } from '../utils';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
+import { Store } from '../Store';
 
 const ProductPage = () => {
+  const navigate = useNavigate();
   // useParams hook to retrieve the product's slug from the URL
   const { slug } = useParams();
   // useState hook to store the product data, loading state, and error message
@@ -30,6 +32,20 @@ const ProductPage = () => {
         setLoading(false);
       });
   }, [slug]);
+
+  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const { cart } = state;
+  const addToCart = async () => {
+    const existItem = cart.cartItems.find((x) => x._id === product._id);
+    const quantity = existItem ? existItem.quantity + 1 : 1;
+    const { data } = await axios.get(`/api/products/${product._id}`);
+    if (data.countInStock < quantity) {
+      window.alert('Sorry, this product is out of stock');
+      return;
+    }
+    ctxDispatch({ type: 'ADD_ITEM', payload: { ...product, quantity } });
+    navigate('/cart');
+  };
 
   // Conditionally render the LoadingComponent, MessageComponent, or the product details
   if (loading) return <LoadingSpinner />;
@@ -83,7 +99,9 @@ const ProductPage = () => {
                   <ListGroup.Item>
                     <div className="d-flex justify-content-center">
                       {/* Add to Cart button */}
-                      <Button variant="primary">Add to Cart</Button>
+                      <Button onClick={addToCart} variant="primary">
+                        Add to Cart
+                      </Button>
                     </div>
                   </ListGroup.Item>
                 )}
