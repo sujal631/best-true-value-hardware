@@ -42,7 +42,7 @@ export default function ShoppingCartPage() {
         <Col md={9}>
           {cartItems.length === 0 ? (
             <Message>
-              Your cart is empty. Want to <Link to="/">GO SHOPPING</Link>
+              Your cart is empty. Want to <Link to="/">GO SHOPPING</Link>?
             </Message>
           ) : (
             <ListGroup>
@@ -76,10 +76,7 @@ export default function ShoppingCartPage() {
                     </Col>
                     <Col md={2}>{item.price}</Col>
                     <Col md={1}>
-                      <Button
-                        onClick={() => removeItem(item)}
-                        variant="primary"
-                      >
+                      <Button onClick={() => removeItem(item)} variant="light">
                         <i className="fas fa-trash"></i>
                       </Button>
                     </Col>

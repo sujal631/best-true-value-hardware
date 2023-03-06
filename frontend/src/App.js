@@ -2,6 +2,8 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Pages
 import HomePage from './Pages/HomePage';
@@ -32,6 +34,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="site-container">
+        <ToastContainer position="bottom-center" limit={1} />
         {/* Header with Navbar as Navigation */}
         <header>
           <Navigation />

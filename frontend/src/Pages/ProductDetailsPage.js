@@ -9,12 +9,8 @@ import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import { Store } from '../Store';
 
-<<<<<<< HEAD:frontend/src/Pages/ProductPage.js
-const ProductPage = () => {
-  const navigate = useNavigate();
-=======
 const ProductDetailsPage = () => {
->>>>>>> 112bb61e403e2596c7dc855cff568a199fd9b086:frontend/src/Pages/ProductDetailsPage.js
+  const navigate = useNavigate();
   // useParams hook to retrieve the product's slug from the URL
   const { slug } = useParams();
   // useState hook to store the product data, loading state, and error message
@@ -117,4 +113,5 @@ const ProductDetailsPage = () => {
     </>
   );
 };
+
 export default ProductDetailsPage;

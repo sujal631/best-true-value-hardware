@@ -1,14 +1,19 @@
-// Import React and the required UI components from react-bootstrap library
 import React, { useContext } from 'react';
 import { Badge, Container, Navbar, NavDropdown } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Nav from 'react-bootstrap/Nav';
 import { Store } from '../Store';
+import { Link } from 'react-router-dom';
 
 // This component returns the navigation bar for the website
 export default function Navigation() {
-  const { state } = useContext(Store);
-  const { cart } = state;
+  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const { cart, userInfo } = state;
+
+  const logout = () => {
+    ctxDispatch({ type: 'LOGOUT' });
+    localStorage.removeItem('userInfo');
+  };
   return (
     <div>
       {/* Dark themed navbar fixed to the top of the page */}
@@ -38,91 +43,48 @@ export default function Navigation() {
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="right-nav">
               {/* Home Link */}
-              <LinkContainer to="/">
-                <Nav.Link>Home</Nav.Link>
-              </LinkContainer>
+              <Link to="/" className="nav-link">
+                Home
+              </Link>
 
               {/* Products Link */}
-              <LinkContainer to="/products">
-                <Nav.Link>Products</Nav.Link>
-              </LinkContainer>
+              <Link to="/products" className="nav-link">
+                Products
+              </Link>
 
               {/* About Link */}
-              <LinkContainer to="/about">
-                <Nav.Link>About Us</Nav.Link>
-              </LinkContainer>
+              <Link to="/about" className="nav-link">
+                About Us
+              </Link>
 
               {/* Cart Link */}
-              <LinkContainer to="/cart">
-                <Nav.Link>
-                  Cart
-                  {cart.cartItems.length > 0 && (
-                    <Badge pill bg="danger">
-                      {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
-                    </Badge>
-                  )}
-                </Nav.Link>
-              </LinkContainer>
+              <Link to="/cart" className="nav-link">
+                Cart
+                {cart.cartItems.length > 0 && (
+                  <Badge pill bg="danger">
+                    {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                  </Badge>
+                )}
+              </Link>
 
-              {/* Log In Link */}
-              <LinkContainer to="/login">
-                <Nav.Link>Log In</Nav.Link>
-              </LinkContainer>
-
-              {/* Customer Dropdown */}
-              <NavDropdown title="Customer" id="basic-nav-dropdown">
-                {/* Profile Link */}
-                <LinkContainer to="/profile">
-                  <NavDropdown.Item className="nav-dropdown">
-                    Profile
-                  </NavDropdown.Item>
+              {userInfo ? (
+                <NavDropdown title={userInfo.name} id="basic-nav-dropdown">
+                  <LinkContainer to="/profile">
+                    <NavDropdown.Item>User Profile</NavDropdown.Item>
+                  </LinkContainer>
+                  <LinkContainer to="/orderhistory">
+                    <NavDropdown.Item>Order History</NavDropdown.Item>
+                  </LinkContainer>
+                  <NavDropdown.Divider />
+                  <Link className="dropdown-item" to="logout" onClick={logout}>
+                    Log Out
+                  </Link>
+                </NavDropdown>
+              ) : (
+                <LinkContainer to="/login">
+                  <Nav.Link>Log In</Nav.Link>
                 </LinkContainer>
-
-                {/* Order History Link */}
-                <LinkContainer to="/orderHistory">
-                  <NavDropdown.Item className="nav-dropdown">
-                    Order History
-                  </NavDropdown.Item>
-                </LinkContainer>
-              </NavDropdown>
-
-              {/* Admin Dropdown */}
-              <NavDropdown title="Admin" id="basic-nav-dropdown">
-                {/* Dashboard Link */}
-                <LinkContainer to="/dashboard">
-                  <NavDropdown.Item className="nav-dropdown">
-                    Dashboard
-                  </NavDropdown.Item>
-                </LinkContainer>
-
-                {/* List Products Link */}
-                <LinkContainer to="/listProducts">
-                  <NavDropdown.Item className="nav-dropdown">
-                    List Products
-                  </NavDropdown.Item>
-                </LinkContainer>
-
-                {/* Edit Product Link */}
-                <LinkContainer to="/editProduct">
-                  <NavDropdown.Item className="nav-dropdown">
-                    Edit Product
-                  </NavDropdown.Item>
-                </LinkContainer>
-
-                {/* List Orders Link */}
-                <LinkContainer to="/listOrders">
-                  <NavDropdown.Item className="nav-dropdown">
-                    Orders
-                  </NavDropdown.Item>
-                </LinkContainer>
-
-                {/* List Users Link */}
-                <LinkContainer to="/listUsers">
-                  <NavDropdown.Item className="nav-dropdown">
-                    Users
-                  </NavDropdown.Item>
-                </LinkContainer>
-              </NavDropdown>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>

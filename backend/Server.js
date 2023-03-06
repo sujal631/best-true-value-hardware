@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 import routeSeed from './routes/routeSeed.js';
 import routeProduct from './routes/routeProduct.js';
 import routeSliderImage from './routes/routeSliderImage.js';
+import routeUser from './routes/routeUser.js';
 
 // Load environment variables from .env file
 config();
@@ -31,10 +32,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/seed', routeSeed);
 app.use('/api/products', routeProduct);
 app.use('/api/sliderImages', routeSliderImage);
+app.use('/api/users', routeUser);
 
 app.use((error, req, res, next) => {
   res.status(500).send({ message: error.message });
 });
+
 // Start the Express application
 // Listen on the specified port or 3000 if none is provided
 // Log a message on the console to indicate the server is running and on which port.

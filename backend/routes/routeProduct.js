@@ -1,10 +1,10 @@
 import express from 'express';
 import Product from '../models/productModel.js';
 
-const productRouter = express.Router();
+const routeProduct = express.Router();
 
 // Route handler to fetch all products from the database
-productRouter.get('/', async (req, res) => {
+routeProduct.get('/', async (req, res) => {
   try {
     // Retrieve all products from the database
     const products = await Product.find();
@@ -20,7 +20,7 @@ productRouter.get('/', async (req, res) => {
 });
 
 // Route handler to fetch a specific product by its slug
-productRouter.get('/slug/:slug', async (req, res) => {
+routeProduct.get('/slug/:slug', async (req, res) => {
   try {
     // Retrieve the product with the matching slug from the database
     const product = await Product.findOne({ slug: req.params.slug });
@@ -43,7 +43,7 @@ productRouter.get('/slug/:slug', async (req, res) => {
   }
 });
 
-productRouter.get('/:id', async (req, res) => {
+routeProduct.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (product) {
@@ -63,4 +63,4 @@ productRouter.get('/:id', async (req, res) => {
   }
 });
 
-export default productRouter;
+export default routeProduct;
