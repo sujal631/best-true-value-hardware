@@ -14,6 +14,7 @@ import RegistrationPage from './Pages/RegistrationPage';
 import ShippingInfoPage from './Pages/ShippingInfoPage';
 import PaymentPage from './Pages/PaymentPage';
 import PreviewOrderPage from './Pages/PreviewOrderPage';
+import OrderPage from './Pages/OrderPage';
 import OrderHistoryPage from './Pages/OrderHistoryPage';
 import ProfilePage from './Pages/ProfilePage';
 import SearchPage from './Pages/SearchPage';
@@ -54,6 +55,7 @@ const App = () => {
               <Route path="/shippingInfo" element={<ShippingInfoPage />} />
               <Route path="/paymentMethod" element={<PaymentPage />} />
               <Route path="/previewOrder" element={<PreviewOrderPage />} />
+              <Route path="/order/:id" element={<OrderPage />} />
               <Route path="/orderHistory" element={<OrderHistoryPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/search" element={<SearchPage />} />
