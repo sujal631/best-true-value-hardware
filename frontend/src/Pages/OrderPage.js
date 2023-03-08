@@ -11,6 +11,8 @@ import LoadingSpinner from '../Components/LoadingComponent.js';
 import Message from '../Components/MessageComponent.js';
 import { Store } from '../Store';
 import { getErrorMessage } from '../utils';
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import { toast } from 'react-toastify';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -20,11 +22,19 @@ function reducer(state, action) {
       return { ...state, loading: false, order: action.payload, error: '' };
     case 'FAILURE':
       return { ...state, loading: false, error: action.payload };
+    case 'PAY_REQUEST':
+      return { ...state, loadingPay: true };
+    case 'PAY_SUCCESS':
+      return { ...state, loadingPay: false, successPay: true };
+    case 'PAY_FAIL':
+      return { ...state, loadingPay: false };
+    case 'PAY_RESET':
+      return { ...state, loadingPay: false, successPay: false };
+
     default:
       return state;
   }
 }
-
 export default function OrderScreen() {
   const { state } = useContext(Store);
   const { userInfo } = state;
@@ -33,11 +43,53 @@ export default function OrderScreen() {
   const { id: orderId } = params;
   const navigate = useNavigate();
 
-  const [{ loading, error, order }, dispatch] = useReducer(reducer, {
-    loading: true,
-    order: {},
-    error: '',
-  });
+  const [{ loading, error, order, successPay, loadingPay }, dispatch] =
+    useReducer(reducer, {
+      loading: true,
+      order: {},
+      error: '',
+      successPay: false,
+      loadingPay: false,
+    });
+
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+
+  function createOrder(data, actions) {
+    return actions.order
+      .create({
+        purchase_units: [
+          {
+            amount: { value: order.totalPrice.toFixed(2) },
+          },
+        ],
+      })
+      .then((orderID) => {
+        return orderID;
+      });
+  }
+
+  function onApprove(data, actions) {
+    return actions.order.capture().then(async function (details) {
+      try {
+        dispatch({ type: 'PAY_REQUEST' });
+        const { data } = await axios.put(
+          `/api/orders/${order._id}/pay`,
+          details,
+          {
+            headers: { authorization: `Bearer ${userInfo.token}` },
+          }
+        );
+        dispatch({ type: 'PAY_SUCCESS', payload: data });
+        toast.success('Payment successful! Your order has been placed.');
+      } catch (err) {
+        dispatch({ type: 'PAY_FAIL', payload: getErrorMessage(err) });
+        toast.error(getErrorMessage(err));
+      }
+    });
+  }
+  function onError(err) {
+    toast.error(getErrorMessage(err));
+  }
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -55,10 +107,28 @@ export default function OrderScreen() {
     if (!userInfo) {
       return navigate('/login');
     }
-    if (!order._id || (order._id && order._id !== orderId)) {
+    if (!order._id || successPay || (order._id && order._id !== orderId)) {
       fetchOrder();
+      if (successPay) {
+        dispatch({ type: 'PAY_RESET' });
+      }
+    } else {
+      const loadPaypalScript = async () => {
+        const { data: clientId } = await axios.get('/api/keys/paypal', {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        });
+        paypalDispatch({
+          type: 'resetOptions',
+          value: {
+            'client-id': clientId,
+            currency: 'USD',
+          },
+        });
+        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+      };
+      loadPaypalScript();
     }
-  }, [order, userInfo, orderId, navigate]);
+  }, [order, userInfo, orderId, navigate, paypalDispatch, successPay]);
   return loading ? (
     <LoadingSpinner></LoadingSpinner>
   ) : error ? (
@@ -73,7 +143,7 @@ export default function OrderScreen() {
         <Col md={8}>
           <Card className="mb-3">
             <Card.Body>
-              <Card.Title>Shipping Info</Card.Title>
+              <Card.Title>Your Information</Card.Title>
               <Card.Text>
                 <strong>Name:</strong> {order.shippingInfo.firstName}{' '}
                 {order.shippingInfo.lastName} <br />
@@ -92,7 +162,7 @@ export default function OrderScreen() {
                 <strong>Method:</strong> {order.paymentMethod}
               </Card.Text>
               {order.isPaid ? (
-                <Message variant="success">Paid at{order.paidAt}</Message>
+                <Message variant="success">Paid at {order.paidAt}</Message>
               ) : (
                 <Message variant="danger">Not Paid</Message>
               )}
@@ -110,9 +180,14 @@ export default function OrderScreen() {
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="img-fluid rounded img-thumbnail"
+                          className="img-fluid rounded img-thumbnail mx-1"
                         ></img>{' '}
-                        <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                        <Link
+                          className="remove-link-style"
+                          to={`/product/${item.slug}`}
+                        >
+                          {item.name}
+                        </Link>
                       </Col>
                       <Col md={1}>
                         <span>{item.quantity}</span>
@@ -158,6 +233,22 @@ export default function OrderScreen() {
                     </Col>
                   </Row>
                 </ListGroup.Item>
+                {!order.isPaid && (
+                  <ListGroup.Item>
+                    {isPending ? (
+                      <LoadingSpinner />
+                    ) : (
+                      <div>
+                        <PayPalButtons
+                          createOrder={createOrder}
+                          onApprove={onApprove}
+                          onError={onError}
+                        ></PayPalButtons>
+                      </div>
+                    )}
+                    {loadingPay && <LoadingSpinner></LoadingSpinner>}
+                  </ListGroup.Item>
+                )}
               </ListGroup>
             </Card.Body>
           </Card>
