@@ -18,7 +18,6 @@ body {
   display: flex;
   justify-content: flex-end;
   margin-left: auto;
-  gap: 0.25rem;
 }
 
 .right-nav .nav-link {
@@ -131,6 +130,7 @@ body {
   transform: scale(1.05);
   background-color: #dd2222;
   cursor: pointer;
+  color: #ffffff;
   border: none;
 }
 
@@ -199,7 +199,8 @@ body {
 }
 
 .search-form {
-  width: 250px;
+  width: 400px;
+  min-width: 200px;
 }
 
 .search-input {
