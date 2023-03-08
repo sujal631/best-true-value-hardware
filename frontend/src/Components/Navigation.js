@@ -4,6 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Nav from 'react-bootstrap/Nav';
 import { Store } from '../Store';
 import { Link } from 'react-router-dom';
+import Search from './Search';
 
 // This component returns the navigation bar for the website
 export default function Navigation() {
@@ -15,6 +16,7 @@ export default function Navigation() {
     localStorage.removeItem('userInfo');
     localStorage.removeItem('shippingInfo');
     localStorage.removeItem('paymentMethod');
+    window.location.href = 'login';
   };
 
   return (
@@ -24,27 +26,28 @@ export default function Navigation() {
         <Container>
           {/* Navbar Brand */}
 
-          <Navbar.Brand className="brand">
+          <Navbar.Brand className="brand d-flex align-items-center">
             {/* Logo */}
             <img
               src={require('../logo.png')}
               alt="Logo"
               style={{
-                width: '60px',
-                height: '50px',
-                marginRight: '10px',
+                width: '90px',
+                height: '75px',
               }}
             />
             {/* Brand Name */}
-            Best True Value Hardware
+            <span className="d-none d-lg-block">Best True Value Hardware</span>
           </Navbar.Brand>
-
+          <div className="d-flex justify-content-center ">
+            <Search />
+          </div>
           {/* Navbar Toggler */}
-          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
           {/* Navbar Collapse */}
-          <Navbar.Collapse id="responsive-navbar-nav">
-            <Nav className="right-nav">
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="right-nav col-md-12">
               {/* Home Link */}
               <Link to="/" className="nav-link">
                 Home
@@ -57,17 +60,7 @@ export default function Navigation() {
 
               {/* About Link */}
               <Link to="/about" className="nav-link">
-                About Us
-              </Link>
-
-              {/* Cart Link */}
-              <Link to="/cart" className="nav-link">
-                Cart
-                {cart.cartItems.length > 0 && (
-                  <Badge pill bg="danger">
-                    {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
-                  </Badge>
-                )}
+                About
               </Link>
 
               {userInfo ? (
@@ -88,6 +81,16 @@ export default function Navigation() {
                   <Nav.Link>Log In</Nav.Link>
                 </LinkContainer>
               )}
+
+              {/* Cart Link */}
+              <Link to="/cart" className="nav-link">
+                <i className="fa fa-shopping-cart"></i>
+                {cart.cartItems.length > 0 && (
+                  <Badge pill bg="danger">
+                    {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                  </Badge>
+                )}
+              </Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

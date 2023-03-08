@@ -96,10 +96,15 @@ export default function PreviewOrderPage() {
                 <br />
                 <strong>Address: </strong>
                 {cart.shippingInfo.address}, {cart.shippingInfo.city},{' '}
-                {cart.shippingInfo.region}, {cart.shippingInfo.zip},{' '}
-                {cart.shippingInfo.country}
+                {cart.shippingInfo.region}, {cart.shippingInfo.zip}{' '}
+                {/*{cart.shippingInfo.country}*/}
               </Card.Text>
-              <Link to="/shippingInfo">Edit</Link>
+              <Button
+                variant="secondary"
+                onClick={() => navigate('/shippingInfo')}
+              >
+                Edit
+              </Button>{' '}
             </Card.Body>
           </Card>
           <Card className="mb-3">
@@ -109,7 +114,9 @@ export default function PreviewOrderPage() {
                 <strong>Method: </strong>
                 {cart.paymentMethod}
               </Card.Text>
-              <Link to="/payment">Edit</Link>
+              <Button variant="secondary" onClick={() => navigate('/payment')}>
+                Edit
+              </Button>{' '}
             </Card.Body>
           </Card>
           <Card className="mb-3">
@@ -118,8 +125,8 @@ export default function PreviewOrderPage() {
               <ListGroup variant="flush">
                 {cart.cartItems.map((item) => (
                   <ListGroup.Item key={item._id}>
-                    <Row className="align-items-center">
-                      <Col md={8}>
+                    <Row className="align-items-center ">
+                      <Col md={9}>
                         <img
                           src={item.image}
                           alt={item.name}
@@ -127,7 +134,7 @@ export default function PreviewOrderPage() {
                         ></img>
                         <Link to={`/product/${item.slug}`}>{item.name}</Link>
                       </Col>
-                      <Col md={2}>
+                      <Col md={1}>
                         <span>{item.quantity}</span>
                       </Col>
                       <Col md={2}>${item.price}</Col>
@@ -135,7 +142,13 @@ export default function PreviewOrderPage() {
                   </ListGroup.Item>
                 ))}
               </ListGroup>
-              <Link to="/cart">Edit</Link>
+              <Button
+                variant="secondary"
+                className="mt-4"
+                onClick={() => navigate('/cart')}
+              >
+                Edit
+              </Button>{' '}
             </Card.Body>
           </Card>
         </Col>

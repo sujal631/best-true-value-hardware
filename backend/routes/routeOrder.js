@@ -23,7 +23,14 @@ routeOrder.post(
     res.status(201).send({ message: 'Order added successfully', order });
   })
 );
-
+routeOrder.get(
+  '/mine',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const orders = await Order.find({ user: req.user._id });
+    res.send(orders);
+  })
+);
 routeOrder.get(
   '/:id',
   isAuth,
@@ -34,7 +41,6 @@ routeOrder.get(
     } else {
       res.status(404).send({ message: 'Order Not Found' });
     }
-    X;
   })
 );
 

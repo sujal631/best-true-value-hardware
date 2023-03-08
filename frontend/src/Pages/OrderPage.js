@@ -79,17 +79,10 @@ export default function OrderScreen() {
                 {order.shippingInfo.lastName} <br />
                 <strong>Phone Number:</strong> {order.shippingInfo.phoneNumber}{' '}
                 <br />
-                <strong>Address: </strong> {order.shippingInfo.address},
+                <strong>Address: </strong> {order.shippingInfo.address},{' '}
                 {order.shippingInfo.city}, {order.shippingInfo.region},{' '}
-                {order.shippingInfo.zip}, {order.shippingInfo.country}
+                {order.shippingInfo.zip} {/*{order.shippingInfo.country}*/}
               </Card.Text>
-              {order.isDelivered ? (
-                <Message variant="success">
-                  Delivered at {order.deliveredAt}
-                </Message>
-              ) : (
-                <Message variant="danger">Not Delivered</Message>
-              )}
             </Card.Body>
           </Card>
           <Card className="mb-3">
@@ -113,7 +106,7 @@ export default function OrderScreen() {
                 {order.orderItems.map((item) => (
                   <ListGroup.Item key={item._id}>
                     <Row className="align-items-center">
-                      <Col md={6}>
+                      <Col md={9}>
                         <img
                           src={item.image}
                           alt={item.name}
@@ -121,10 +114,10 @@ export default function OrderScreen() {
                         ></img>{' '}
                         <Link to={`/product/${item.slug}`}>{item.name}</Link>
                       </Col>
-                      <Col md={3}>
+                      <Col md={1}>
                         <span>{item.quantity}</span>
                       </Col>
-                      <Col md={3}>${item.price}</Col>
+                      <Col md={2}>${item.price}</Col>
                     </Row>
                   </ListGroup.Item>
                 ))}

@@ -39,7 +39,7 @@ export default function ShoppingCartPage() {
       {/* Displaying the page header */}
       <h1>Shopping Cart</h1>
       <Row>
-        <Col md={9}>
+        <Col md={8}>
           {cartItems.length === 0 ? (
             <Message>
               Your cart is empty. Want to <Link to="/">GO SHOPPING</Link>?
@@ -86,7 +86,7 @@ export default function ShoppingCartPage() {
             </ListGroup>
           )}
         </Col>
-        <Col md={3}>
+        <Col md={4}>
           <Card>
             <Card.Body>
               <ListGroup variant="flush">
@@ -94,7 +94,9 @@ export default function ShoppingCartPage() {
                   <h4>
                     Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}{' '}
                     items) : $
-                    {cartItems.reduce((a, c) => a + c.price * c.quantity, 0)}
+                    {cartItems
+                      .reduce((a, c) => a + c.price * c.quantity, 0)
+                      .toFixed(2)}
                   </h4>
                 </ListGroup.Item>
                 <ListGroup.Item>

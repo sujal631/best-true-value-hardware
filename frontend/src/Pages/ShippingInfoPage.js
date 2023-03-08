@@ -6,6 +6,60 @@ import CheckoutSteps from '../Components/CheckoutSteps';
 import { Store } from '../Store';
 
 export default function ShippingInfoPage() {
+  const stateOptions = [
+    'Select...',
+    'Alabama',
+    'Alaska',
+    'Arizona',
+    'Arkansas',
+    'California',
+    'Colorado',
+    'Connecticut',
+    'Delaware',
+    'Florida',
+    'Georgia',
+    'Hawaii',
+    'Idaho',
+    'Illinois',
+    'Indiana',
+    'Iowa',
+    'Kansas',
+    'Kentucky',
+    'Louisiana',
+    'Maine',
+    'Maryland',
+    'Massachusetts',
+    'Michigan',
+    'Minnesota',
+    'Mississippi',
+    'Missouri',
+    'Montana',
+    'Nebraska',
+    'Nevada',
+    'New Hampshire',
+    'New Jersey',
+    'New Mexico',
+    'New York',
+    'North Carolina',
+    'North Dakota',
+    'Ohio',
+    'Oklahoma',
+    'Oregon',
+    'Pennsylvania',
+    'Rhode Island',
+    'South Carolina',
+    'South Dakota',
+    'Tennessee',
+    'Texas',
+    'Utah',
+    'Vermont',
+    'Virginia',
+    'Washington',
+    'West Virginia',
+    'Wisconsin',
+    'Wyoming',
+  ];
+
   const navigate = useNavigate();
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const {
@@ -21,7 +75,7 @@ export default function ShippingInfoPage() {
   const [city, setCity] = useState(shippingInfo.city || '');
   const [region, setRegion] = useState(shippingInfo.region || '');
   const [zip, setZip] = useState(shippingInfo.zip || '');
-  const [country, setCountry] = useState(shippingInfo.country || '');
+  /*const [country, setCountry] = useState(shippingInfo.country || ''); */
 
   useEffect(() => {
     if (!userInfo) {
@@ -40,7 +94,7 @@ export default function ShippingInfoPage() {
         city,
         region,
         zip,
-        country,
+        //country,
       },
     });
     localStorage.setItem(
@@ -53,7 +107,7 @@ export default function ShippingInfoPage() {
         city,
         region,
         zip,
-        country,
+        //country,
       })
     );
     navigate('/paymentMethod');
@@ -111,11 +165,17 @@ export default function ShippingInfoPage() {
           </Form.Group>
           <Form.Group className="mb-3" controlId="region">
             <Form.Label>State</Form.Label>
-            <Form.Control
+            <Form.Select
               value={region}
               onChange={(e) => setRegion(e.target.value)}
               required
-            />
+            >
+              {stateOptions.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3" controlId="zip">
             <Form.Label>Zip Code</Form.Label>
@@ -125,14 +185,14 @@ export default function ShippingInfoPage() {
               required
             />
           </Form.Group>
-          <Form.Group className="mb-3" controlId="country">
+          {/*<Form.Group className="mb-3" controlId="country">
             <Form.Label>Country</Form.Label>
             <Form.Control
               value={country}
               onChange={(e) => setCountry(e.target.value)}
               required
             />
-          </Form.Group>
+              </Form.Group>*/}
           <div className="d-grid gap-2 mb-3">
             <Button type="submit">CONTINUE</Button>
           </div>
