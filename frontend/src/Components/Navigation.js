@@ -25,7 +25,6 @@ export default function Navigation() {
       <Navbar bg="black" variant="dark" expand="lg" fixed="top">
         <Container>
           {/* Navbar Brand */}
-
           <Navbar.Brand className="brand d-flex align-items-center">
             {/* Logo */}
             <img
@@ -36,12 +35,14 @@ export default function Navigation() {
                 height: '75px',
               }}
             />
+
             {/* Brand Name */}
             <span className="d-none d-lg-block">Best True Value Hardware</span>
           </Navbar.Brand>
-          <div className="d-flex justify-content-center ">
+          <div>
             <Search />
           </div>
+
           {/* Navbar Toggler */}
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
