@@ -20,11 +20,11 @@ function reducer(state, action) {
       return { ...state, loading: false, order: action.payload, error: '' };
     case 'FAILURE':
       return { ...state, loading: false, error: action.payload };
-
     default:
       return state;
   }
 }
+
 export default function OrderScreen() {
   const { state } = useContext(Store);
   const { userInfo } = state;
@@ -92,7 +92,7 @@ export default function OrderScreen() {
                 <strong>Method:</strong> {order.paymentMethod}
               </Card.Text>
               {order.isPaid ? (
-                <Message variant="success">Paid at {order.paidAt}</Message>
+                <Message variant="success">Paid at{order.paidAt}</Message>
               ) : (
                 <Message variant="danger">Not Paid</Message>
               )}

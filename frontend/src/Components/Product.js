@@ -48,7 +48,7 @@ const Product = ({ product }) => {
 
         {/* Add to cart button */}
         {product.countInStock === 0 ? (
-          <Button variant="light" disabled>
+          <Button variant="primary" disabled>
             OUT OF STOCK
           </Button>
         ) : (

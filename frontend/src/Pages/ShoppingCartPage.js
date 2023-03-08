@@ -41,23 +41,31 @@ export default function ShoppingCartPage() {
       <Row>
         <Col md={8}>
           {cartItems.length === 0 ? (
-            <Message>
-              Your cart is empty. Want to <Link to="/">GO SHOPPING</Link>?
+            <Message variant="warning">
+              Your cart is empty. Want to{' '}
+              <Button variant="warning" onClick={() => navigate('/')}>
+                GO SHOPPING ?
+              </Button>{' '}
             </Message>
           ) : (
             <ListGroup>
               {cartItems.map((item) => (
                 <ListGroup.Item key={item._id}>
                   <Row className="align-items-center">
-                    <Col md={7}>
+                    <Col md={12} className="mb-3">
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="img-fluid rounded img-thumbnail"
+                        className="img-fluid rounded img-thumbnail mx-1 "
                       ></img>{' '}
-                      <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                      <Link
+                        className="remove-link-style"
+                        to={`/product/${item.slug}`}
+                      >
+                        {item.name}
+                      </Link>
                     </Col>
-                    <Col md={2}>
+                    <Col md={4} className="mb-3">
                       <Button
                         variant="light"
                         disabled={item.quantity === 1}
@@ -74,8 +82,10 @@ export default function ShoppingCartPage() {
                         <i className="fas fa-plus-circle"></i>
                       </Button>{' '}
                     </Col>
-                    <Col md={2}>{item.price}</Col>
-                    <Col md={1}>
+                    <Col md={4} className="mb-3">
+                      {item.price}
+                    </Col>
+                    <Col md={4} className="mb-3">
                       <Button onClick={() => removeItem(item)} variant="light">
                         <i className="fas fa-trash"></i>
                       </Button>
@@ -93,7 +103,7 @@ export default function ShoppingCartPage() {
                 <ListGroup.Item>
                   <h4>
                     Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}{' '}
-                    items) : $
+                    items) : <br />$
                     {cartItems
                       .reduce((a, c) => a + c.price * c.quantity, 0)
                       .toFixed(2)}

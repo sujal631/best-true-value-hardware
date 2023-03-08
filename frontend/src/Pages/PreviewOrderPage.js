@@ -86,7 +86,7 @@ export default function PreviewOrderPage() {
         <Col md={8}>
           <Card className="mb-3">
             <Card.Body>
-              <Card.Title>Shipping Info</Card.Title>
+              <Card.Title>Your Information</Card.Title>
               <Card.Text>
                 <strong>Name: </strong>
                 {cart.shippingInfo.firstName} {cart.shippingInfo.lastName}
@@ -130,9 +130,14 @@ export default function PreviewOrderPage() {
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="img-fluid rounded img-thumbnail"
+                          className="img-fluid rounded img-thumbnail mx-1"
                         ></img>
-                        <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                        <Link
+                          className="remove-link-style"
+                          to={`/product/${item.slug}`}
+                        >
+                          {item.name}
+                        </Link>
                       </Col>
                       <Col md={1}>
                         <span>{item.quantity}</span>

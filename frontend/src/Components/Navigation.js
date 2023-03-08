@@ -60,11 +60,11 @@ export default function Navigation() {
             {/* Links Column */}
             <Col xs={4} className="d-flex justify-content-end">
               {/* Navbar Toggler */}
-              <Navbar.Toggle aria-controls="basic-navbar-nav" />
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
 
               {/* Navbar Collapse */}
-              <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="right-nav">
+              <Navbar.Collapse id="responsive-navbar-nav">
+                <Nav className="right-nav d-flex ">
                   {/* Home Link */}
                   <Link to="/" className="nav-link">
                     Home
