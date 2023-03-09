@@ -1,3 +1,4 @@
+// Importing necessary packages from react-bootstrap and react-router
 import React, { useContext } from 'react';
 import {
   Badge,
@@ -15,17 +16,22 @@ import Search from './Search';
 
 // This component returns the navigation bar for the website
 export default function Navigation() {
+  // Using the useContext hook to access the global state and dispatch functions from the Store component
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
 
+  // Function to handle user logout
   const logout = () => {
+    // Dispatching the LOGOUT action to the global state
     ctxDispatch({ type: 'LOGOUT' });
-    localStorage.removeItem('userInfo');
-    localStorage.removeItem('shippingInfo');
-    localStorage.removeItem('paymentMethod');
+    ['userInfo', 'shippingInfo', 'paymentMethod'].forEach((key) =>
+      localStorage.removeItem(key)
+    );
+    // Redirecting to the login page
     window.location.href = 'login';
   };
 
+  // Rendering the navigation bar
   return (
     <div>
       {/* Dark themed navbar fixed to the top of the page */}
@@ -34,6 +40,7 @@ export default function Navigation() {
           <Row className="w-100 align-items-center">
             {/* Brand Column */}
             <Col xs={4} className="d-flex align-items-center">
+              {/* Displaying the website logo and brand name */}
               <Navbar.Brand className="brand d-flex align-items-center">
                 {/* Logo */}
                 <img
@@ -44,7 +51,6 @@ export default function Navigation() {
                     height: '75px',
                   }}
                 />
-
                 {/* Brand Name */}
                 <span className="d-none d-lg-block">
                   Best True Value Hardware
@@ -80,6 +86,7 @@ export default function Navigation() {
                     About
                   </Link>
 
+                  {/* Rendering user related dropdown menu if the user is logged in, else rendering the login link */}
                   {userInfo ? (
                     <NavDropdown
                       title={userInfo.firstName}
