@@ -59,12 +59,12 @@ export default function Navigation() {
             </Col>
 
             {/* Search Column */}
-            <Col xs={4} className="d-flex justify-content-center">
+            <Col xs={3} className="d-flex justify-content-center">
               <Search />
             </Col>
 
             {/* Links Column */}
-            <Col xs={4} className="d-flex justify-content-end">
+            <Col xs={5} className="d-flex justify-content-end">
               {/* Navbar Toggler */}
               <Navbar.Toggle aria-controls="responsive-navbar-nav" />
 

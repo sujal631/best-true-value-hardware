@@ -162,9 +162,21 @@ export default function OrderScreen() {
                 <strong>Method:</strong> {order.paymentMethod}
               </Card.Text>
               {order.isPaid ? (
-                <Message variant="success">Paid at {order.paidAt}</Message>
+                <Message variant="success">
+                  Thank you for your payment. Please note that your order will
+                  be ready for pickup at the store. A representative from the
+                  store will contact you at the phone number you provided to
+                  arrange for <strong>STORE PICKUP</strong> process. We
+                  appreciate your business and thank you for shopping with us.
+                </Message>
               ) : (
-                <Message variant="danger">Not Paid</Message>
+                <Message variant="danger">
+                  Your order has not been paid for. Please proceed to make
+                  payment for your item(s). Once payment has been received, a
+                  representative from the store will contact you at the phone
+                  number provided to arrange for <strong>STORE PICKUP</strong>{' '}
+                  process.
+                </Message>
               )}
             </Card.Body>
           </Card>

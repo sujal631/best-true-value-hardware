@@ -48,7 +48,7 @@ const Slider = () => {
         <MessageComponent variant="danger">{error}</MessageComponent>
       ) : (
         // Rendering the Carousel component if the data is successfully fetched
-        <div style={{ marginBottom: '2rem' }}>
+        <div style={{ marginBottom: '1rem' }}>
           <Carousel>
             {sliderImages.map((image) => (
               <Carousel.Item key={image._id}>
@@ -56,7 +56,7 @@ const Slider = () => {
                   className="d-block w-100 mx-auto"
                   src={image.url}
                   alt={image.name}
-                  style={{ height: '300px' }}
+                  style={{ height: '260px' }}
                 />
               </Carousel.Item>
             ))}
