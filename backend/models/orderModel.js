@@ -33,7 +33,7 @@ const orderSchema = Schema(
       zip: { type: String, required: true },
     },
 
-    // Payment method and payment result details of the order
+    // Payment method details of the order
     paymentMethod: { type: String, required: true },
     paymentResult: {
       id: String,
@@ -48,12 +48,10 @@ const orderSchema = Schema(
     taxPrice: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
 
-    // User and delivery details of the order
+    // User details and payment result of the order
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
-    isDelivered: { type: Boolean, default: false },
-    deliveredAt: { type: Date },
   },
   // Enabling timestamps for order creation and updates
   {

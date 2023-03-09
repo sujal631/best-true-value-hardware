@@ -9,40 +9,47 @@ const routeUser = express.Router();
 routeUser.post(
   '/login',
   expressAsyncHandler(async (req, res) => {
-    const user = await User.findOne({ email: req.body.email });
-    if (user) {
-      if (bcrypt.compareSync(req.body.password, user.password)) {
-        res.send({
-          _id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          isAdmin: user.isAdmin,
-          token: generateToken(user),
-        });
-        return;
-      }
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (user && bcrypt.compareSync(password, user.password)) {
+      const { _id, firstName, lastName, email: userEmail, isAdmin } = user;
+      res.send({
+        _id,
+        firstName,
+        lastName,
+        email: userEmail,
+        isAdmin,
+        token: generateToken(user),
+      });
+    } else {
+      res.status(401).send({ message: 'Invalid email or password' });
     }
-    res.status(401).send({ message: 'Invalid email or password' });
   })
 );
 
 routeUser.post(
   '/registration',
   expressAsyncHandler(async (req, res) => {
-    const newUser = new User({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: bcrypt.hashSync(req.body.password),
+    const { firstName, lastName, email, password } = req.body;
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password: bcrypt.hashSync(password),
     });
-    const user = await newUser.save();
+    const {
+      _id,
+      firstName: userFirstName,
+      lastName: userLastName,
+      email: userEmail,
+      isAdmin,
+    } = user;
     res.send({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      isAdmin: user.isAdmin,
+      _id,
+      firstName: userFirstName,
+      lastName: userLastName,
+      email: userEmail,
+      isAdmin,
       token: generateToken(user),
     });
   })
@@ -54,20 +61,30 @@ routeUser.put(
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (user) {
-      user.firstName = req.body.firstName || user.firstName;
-      user.lastName = req.body.lastName || user.lastName;
-      user.email = req.body.email || user.email;
-      if (req.body.password) {
-        user.password = bcrypt.hashSync(req.body.password, 8);
-      }
-
+      const {
+        firstName = user.firstName,
+        lastName = user.lastName,
+        email = user.email,
+        password,
+      } = req.body;
+      user.firstName = firstName;
+      user.lastName = lastName;
+      user.email = email;
+      if (password) user.password = bcrypt.hashSync(password, 8);
       const updatedUser = await user.save();
+      const {
+        _id,
+        firstName: userFirstName,
+        lastName: userLastName,
+        email: userEmail,
+        isAdmin,
+      } = updatedUser;
       res.send({
-        _id: updatedUser._id,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        email: updatedUser.email,
-        isAdmin: updatedUser.isAdmin,
+        _id,
+        firstName: userFirstName,
+        lastName: userLastName,
+        email: userEmail,
+        isAdmin,
         token: generateToken(updatedUser),
       });
     } else {
