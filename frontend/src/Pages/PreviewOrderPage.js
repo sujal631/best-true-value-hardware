@@ -114,7 +114,10 @@ export default function PreviewOrderPage() {
                 <strong>Method: </strong>
                 {cart.paymentMethod}
               </Card.Text>
-              <Button variant="secondary" onClick={() => navigate('/payment')}>
+              <Button
+                variant="secondary"
+                onClick={() => navigate('/paymentMethod')}
+              >
                 Edit
               </Button>{' '}
             </Card.Body>
