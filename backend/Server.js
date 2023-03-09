@@ -16,29 +16,29 @@ connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then(() => {
-    console.log('Successfully connected to MongoDB.');
-  })
-  .catch((error) => {
-    console.log('Error connecting to MongoDB: ', error.message);
-  });
+  .then(() => console.log('Successfully connected to MongoDB.'))
+  .catch((error) =>
+    console.log(`Error connecting to MongoDB: ${error.message}`)
+  );
 
 // Create Express application
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.get('/api/keys/paypal', (req, res) => {
-  res.send(`${process.env.PAYPAL_CLIENT_ID}` || 'sb');
-});
+app.use(express.json(), express.urlencoded({ extended: true }));
 
-// Use routes for seed, products, and slider images
+// Route to retrieve PayPal client ID
+app.get('/api/keys/paypal', (req, res) =>
+  res.send(`${process.env.PAYPAL_CLIENT_ID || 'sb'}`)
+);
+
+// Use routes for seed, products, slider images, users, and orders
 app.use('/api/seed', routeSeed);
 app.use('/api/products', routeProduct);
 app.use('/api/sliderImages', routeSliderImage);
 app.use('/api/users', routeUser);
 app.use('/api/orders', routeOrder);
 
+// Error handling middleware
 app.use((error, req, res, next) => {
   res.status(500).send({ message: error.message });
 });

@@ -1,33 +1,32 @@
+// Import the JSON Web Token library
 import jwt from 'jsonwebtoken';
 
-export const generateToken = (user) => {
-  return jwt.sign(
-    {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    },
-    `${process.env.JWT_SECRET_KEY}`,
-    {
-      expiresIn: '30d',
-    }
-  );
-};
+// Store the secret key in a variable
+const secretKey = `${process.env.JWT_SECRET_KEY}`;
 
+// Create a function to generate a token based on a user's information
+export const generateToken = ({ _id, name, email, isAdmin }) =>
+  // Use the sign() method to create a token
+  jwt.sign({ _id, name, email, isAdmin }, secretKey, { expiresIn: '30d' });
+
+// Create a middleware function to authenticate user requests
 export const isAuth = (req, res, next) => {
   const authorization = req.headers.authorization;
-  if (authorization) {
-    const token = authorization.slice(7, authorization.length);
-    jwt.verify(token, `${process.env.JWT_SECRET_KEY}`, (error, decode) => {
-      if (error) {
-        res.status(401).send({ message: 'Invalid Token' });
-      } else {
-        req.user = decode;
-        next();
-      }
-    });
-  } else {
-    res.status(401).send({ message: 'No Token' });
+  // Check if there is an authorization header
+  if (!authorization) {
+    return res.status(401).send({ message: 'No Token' });
   }
+
+  // Extract the token from the authorization header
+  const token = authorization.slice(7);
+  // Verify the token using the secret key
+  jwt.verify(token, secretKey, (error, decode) => {
+    if (error) {
+      return res.status(401).send({ message: 'Invalid Token' });
+    }
+
+    // If the token is valid, attach the decoded user information to the request object and proceed to the next middleware
+    req.user = decode;
+    next();
+  });
 };
