@@ -1,7 +1,13 @@
+// Importing Mongoose module for creating MongoDB schema
 import mongoose from 'mongoose';
 
-const orderSchema = new mongoose.Schema(
+// Destructuring the schema and model classes from the mongoose module
+const { Schema, model } = mongoose;
+
+// Defining a new Mongoose schema for Order
+const orderSchema = Schema(
   {
+    // Order items with their details
     orderItems: [
       {
         slug: { type: String, required: true },
@@ -10,12 +16,13 @@ const orderSchema = new mongoose.Schema(
         image: { type: String, required: true },
         price: { type: Number, required: true },
         product: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: Schema.Types.ObjectId,
           ref: 'Product',
           required: true,
         },
       },
     ],
+    // Shipping details of the order
     shippingInfo: {
       firstName: { type: String, required: true },
       lastName: { type: String, required: true },
@@ -24,8 +31,9 @@ const orderSchema = new mongoose.Schema(
       city: { type: String, required: true },
       region: { type: String, required: true },
       zip: { type: String, required: true },
-      //country: { type: String, required: true },
     },
+
+    // Payment method and payment result details of the order
     paymentMethod: { type: String, required: true },
     paymentResult: {
       id: String,
@@ -33,20 +41,26 @@ const orderSchema = new mongoose.Schema(
       update_time: String,
       email_address: String,
     },
+
+    // Price details of the order
     itemsPrice: { type: Number, required: true },
     shippingPrice: { type: Number, required: true },
     taxPrice: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
+    // User and delivery details of the order
+    user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
     isDelivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
   },
+  // Enabling timestamps for order creation and updates
   {
     timestamps: true,
   }
 );
 
-const Order = mongoose.model('Order', orderSchema);
+// Creating a new Mongoose model named 'Order' from the schema and exporting it
+const Order = model('Order', orderSchema);
 export default Order;

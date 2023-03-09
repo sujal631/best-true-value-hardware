@@ -1,55 +1,67 @@
+// Import required modules
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import { isAuth } from '../utils.js';
 import Order from '../models/orderModel.js';
 
+// Create a new router instance
 const routeOrder = express.Router();
-routeOrder.post(
-  '/',
-  isAuth,
-  expressAsyncHandler(async (req, res) => {
-    const newOrder = new Order({
-      orderItems: req.body.orderItems.map((x) => ({ ...x, product: x._id })),
-      shippingInfo: req.body.shippingInfo,
-      paymentMethod: req.body.paymentMethod,
-      itemsPrice: req.body.itemsPrice,
-      shippingPrice: req.body.shippingPrice,
-      taxPrice: req.body.taxPrice,
-      totalPrice: req.body.totalPrice,
-      user: req.user._id,
-    });
 
-    const order = await newOrder.save();
+// Define routes for handling order-related requests
+// Create a new order
+routeOrder.route('/').post(
+  isAuth, // Middleware for checking if user is authenticated
+  expressAsyncHandler(async (req, res) => {
+    // Async function to handle the request
+    // Create a new order from the request body
+    const order = await Order.create({
+      ...req.body,
+      user: req.user._id, // Add user ID from request to the new order
+      orderItems: req.body.orderItems.map((x) => ({ ...x, product: x._id })), // Add product ID to each order item
+    });
+    // Send success response with status code 201 and the new order object
     res.status(201).send({ message: 'Order added successfully', order });
   })
 );
-routeOrder.get(
-  '/mine',
-  isAuth,
+
+// Get orders of the authenticated user
+routeOrder.route('/mine').get(
+  isAuth, // Middleware for checking if user is authenticated
   expressAsyncHandler(async (req, res) => {
+    // Async function to handle the request
+    // Find all orders with user ID from the request
     const orders = await Order.find({ user: req.user._id });
+    // Send success response with the orders array
     res.send(orders);
   })
 );
-routeOrder.get(
-  '/:id',
-  isAuth,
+
+// Get a specific order by ID
+routeOrder.route('/:id').get(
+  isAuth, // Middleware for checking if user is authenticated
   expressAsyncHandler(async (req, res) => {
+    // Async function to handle the request
+    // Find order with ID from the request
     const order = await Order.findById(req.params.id);
     if (order) {
+      // If order exists, send success response with the order object
       res.send(order);
     } else {
+      // If order does not exist, send error response with status code 404 and error message
       res.status(404).send({ message: 'Order Not Found' });
     }
   })
 );
 
-routeOrder.put(
-  '/:id/pay',
-  isAuth,
+// Update payment status of a specific order by ID
+routeOrder.route('/:id/pay').put(
+  isAuth, // Middleware for checking if user is authenticated
   expressAsyncHandler(async (req, res) => {
+    // Async function to handle the request
+    // Find order with ID from the request
     const order = await Order.findById(req.params.id);
     if (order) {
+      // If order exists, update payment status and payment details
       order.isPaid = true;
       order.paidAt = Date.now();
       order.paymentResult = {
@@ -58,13 +70,15 @@ routeOrder.put(
         update_time: req.body.update_time,
         email_address: req.body.email_address,
       };
-
       const updatedOrder = await order.save();
+      // Send success response with updated order object
       res.send({ message: 'Order Paid', order: updatedOrder });
     } else {
+      // If order does not exist, send error response with status code 404 and error message
       res.status(404).send({ message: 'Order Not Found' });
     }
   })
 );
 
+// Export the router instance
 export default routeOrder;
