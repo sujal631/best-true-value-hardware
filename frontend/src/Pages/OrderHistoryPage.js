@@ -1,6 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useReducer } from 'react';
-import { useContext } from 'react';
+import React, { useEffect, useReducer, useContext } from 'react';
 import { Button } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
@@ -23,13 +22,15 @@ const reducer = (state, action) => {
 };
 
 export default function OrderHistoryPage() {
-  const { state } = useContext(Store);
-  const { userInfo } = state;
+  const {
+    state: { userInfo },
+  } = useContext(Store);
   const navigate = useNavigate();
   const [{ loading, error, orders }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
   });
+
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'REQUEST' });
@@ -39,24 +40,22 @@ export default function OrderHistoryPage() {
         });
         dispatch({ type: 'SUCCESS', payload: data });
       } catch (error) {
-        dispatch({
-          type: 'FAILURE',
-          payload: getErrorMessage(error),
-        });
+        dispatch({ type: 'FAILURE', payload: getErrorMessage(error) });
       }
     };
     fetchData();
   }, [userInfo]);
+
+  const handleDetailsClick = (id) => navigate(`/order/${id}`);
+
   return (
     <div>
-      {/* Setting the page title using react-helmet-async */}
       <Helmet>
         <title>Order History</title>
       </Helmet>
-      {/* Displaying the page header */}
       <h1 className="my-3">Order History</h1>
       {loading ? (
-        <LoadingSpinner></LoadingSpinner>
+        <LoadingSpinner />
       ) : error ? (
         <Message variant="danger">{error}</Message>
       ) : (
@@ -66,7 +65,8 @@ export default function OrderHistoryPage() {
               <th>ID</th>
               <th>DATE</th>
               <th>TOTAL</th>
-              <th>PAID</th>
+              <th>PAID ON</th>
+              <th>PICKUP READY</th>
               <th>ACTIONS</th>
             </tr>
           </thead>
@@ -81,13 +81,12 @@ export default function OrderHistoryPage() {
                   <td>
                     {order.isPaid ? order.paidAt?.substring(0, 10) : 'No'}
                   </td>
+                  <td>{order.isPickupReady ? 'Yes' : 'No'}</td>
                   <td>
                     <Button
                       type="button"
                       variant="secondary"
-                      onClick={() => {
-                        navigate(`/order/${order._id}`);
-                      }}
+                      onClick={() => handleDetailsClick(order._id)}
                     >
                       Details
                     </Button>

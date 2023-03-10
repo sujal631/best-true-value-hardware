@@ -153,6 +153,21 @@ export default function OrderScreen() {
                 {order.shippingInfo.city}, {order.shippingInfo.region},{' '}
                 {order.shippingInfo.zip} {/*{order.shippingInfo.country}*/}
               </Card.Text>
+              {order.isPickupReady ? (
+                <Message variant="success">
+                  Your order is now <strong>AVAILABLE FOR STORE PICKUP</strong>{' '}
+                  Kindly come to the store and present a valid photo ID to
+                  collect your items. Thank you.
+                </Message>
+              ) : (
+                <Message variant="danger">
+                  Your item is{' '}
+                  <strong>NOT CURRENTLY AVAILABLE FOR STORE PICKUP</strong>. A
+                  representative from the store will contact you at the phone
+                  number provided as soon as the item(s) become available for
+                  collection.
+                </Message>
+              )}
             </Card.Body>
           </Card>
           <Card className="mb-3">

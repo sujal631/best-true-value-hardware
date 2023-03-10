@@ -52,6 +52,7 @@ const orderSchema = Schema(
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
+    isPickupReady: { type: Boolean, default: false },
   },
   // Enabling timestamps for order creation and updates
   {
