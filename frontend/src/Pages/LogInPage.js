@@ -1,6 +1,6 @@
 //Importing necessary dependencies
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Container, Form } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Axios from 'axios';
@@ -23,21 +23,20 @@ export default function LogInPage() {
   } = useContext(Store);
 
   // Handling the form submission event
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Preventing default form submission
-    try {
-      // Sending a login request to server using Axios
-      const { data } = await Axios.post('/api/users/login', {
-        email,
-        password,
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Sending a login request to server using Axios
+    Axios.post('/api/users/login', { email, password })
+      .then(({ data }) => {
+        // Updating global context API state with logged-in user info
+        dispatch({ type: 'LOGIN', payload: data });
+        localStorage.setItem('userInfo', JSON.stringify(data));
+        navigate(redirect); // Navigating to the redirected URL after successful login
+      })
+      .catch((error) => {
+        toast.error(getErrorMessage(error));
       });
-      // Updating global context API state with logged-in user info
-      dispatch({ type: 'LOGIN', payload: data });
-      localStorage.setItem('userInfo', JSON.stringify(data));
-      navigate(redirect); // Navigating to the redirected URL after successful login
-    } catch (error) {
-      toast.error(getErrorMessage(error));
-    }
   };
 
   // Checking if user is already logged in
@@ -57,34 +56,48 @@ export default function LogInPage() {
           <title>Log In</title>
         </Helmet>
         <h1 className="my-3">Log In</h1>
-
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="email">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
+        {/* Form component that allows user to log in */}
+        <form onSubmit={handleSubmit}>
+          {/* Email input */}
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
               type="email"
+              className="form-control"
+              id="email"
               required
               onChange={(e) => setEmail(e.target.value)}
             />
-          </Form.Group>
-          <Form.Group className="mb-3" controlId="password">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
+          </div>
+          {/* Password input */}
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <input
               type="password"
+              className="form-control"
+              id="password"
               required
               onChange={(e) => setPassword(e.target.value)}
             />
-          </Form.Group>
-          <div className="d-grid gap-2 mb-3">
-            <Button type="submit">Log In</Button>
           </div>
+          {/* Log in button */}
+          <div className="d-grid gap-2 mb-3">
+            <button type="submit" className="btn btn-primary">
+              Log In
+            </button>
+          </div>
+          {/* Link to registration page */}
           <div className="mb-3">
             New Customer?{' '}
             <Link to={`/registration?redirect=${redirect}`}>
               Register Here!
             </Link>
           </div>
-        </Form>
+        </form>
       </Container>
     </div>
   );
