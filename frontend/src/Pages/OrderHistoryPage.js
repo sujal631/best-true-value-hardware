@@ -42,6 +42,21 @@ export default function OrderHistoryPage() {
   // Function to handle click event and navigate to order details page
   const handleDetailsClick = (id) => navigate(`/order/${id}`);
 
+  // Function to format date string to show only the first 10 characters
+  function formatDate(dateString) {
+    return dateString.substring(0, 10);
+  }
+
+  // Function to determine if order is paid
+  function isOrderPaid(order) {
+    return order.paidAt || order.isPaid;
+  }
+
+  // Function to determine if order is ready for pickup
+  function isOrderReadyForPickup(order) {
+    return order.isPickupReady;
+  }
+
   // Render page content
   return (
     <div>
@@ -76,16 +91,10 @@ export default function OrderHistoryPage() {
                 // Set to the "_id" field of each order to uniquely identify each row
                 <tr key={order._id}>
                   <td>{order._id}</td>
-                  <td>{order.createdAt.substring(0, 10)}</td>
+                  <td>{formatDate(order.createdAt)}</td>
                   <td>{order.totalPrice.toFixed(2)}</td>
-                  <td>
-                    {order.paidAt
-                      ? order.paidAt.substring(0, 10)
-                      : order.isPaid
-                      ? 'Yes'
-                      : 'No'}
-                  </td>
-                  <td>{order.isPickupReady ? 'Yes' : 'No'}</td>
+                  <td>{isOrderPaid(order) ? 'Yes' : 'No'}</td>
+                  <td>{isOrderReadyForPickup(order) ? 'Yes' : 'No'}</td>
                   <td>
                     {/* Navigates to the OrderPage.js when the button is clicked */}
                     <Button
