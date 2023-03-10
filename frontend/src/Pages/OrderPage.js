@@ -80,7 +80,9 @@ export default function OrderScreen() {
           }
         );
         dispatch({ type: 'PAY_SUCCESS', payload: data });
-        toast.success('Payment successful! Your order has been placed.');
+        toast.success(
+          'Your payment has been successfully processed, and your order has been placed.'
+        );
       } catch (err) {
         dispatch({ type: 'PAY_FAIL', payload: getErrorMessage(err) });
         toast.error(getErrorMessage(err));
@@ -140,7 +142,7 @@ export default function OrderScreen() {
       </Helmet>
       <h1 className="my-3">Order {orderId}</h1>
       <Row>
-        <Col md={8}>
+        <Col md={9}>
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Your Information</Card.Title>
@@ -154,13 +156,13 @@ export default function OrderScreen() {
                 {order.shippingInfo.zip} {/*{order.shippingInfo.country}*/}
               </Card.Text>
               {order.isPickupReady ? (
-                <Message variant="success">
+                <Message variant="success" className="mb-3">
                   Your order is now <strong>AVAILABLE FOR STORE PICKUP</strong>{' '}
                   Kindly come to the store and present a valid photo ID to
                   collect your items. Thank you.
                 </Message>
               ) : (
-                <Message variant="danger">
+                <Message variant="danger" className="mb-3">
                   Your item is{' '}
                   <strong>NOT CURRENTLY AVAILABLE FOR STORE PICKUP</strong>. A
                   representative from the store will contact you at the phone
@@ -168,16 +170,13 @@ export default function OrderScreen() {
                   collection.
                 </Message>
               )}
-            </Card.Body>
-          </Card>
-          <Card className="mb-3">
-            <Card.Body>
-              <Card.Title>Payment</Card.Title>
+              <hr></hr>
+              <Card.Title className="mt-3">Payment</Card.Title>
               <Card.Text>
                 <strong>Method:</strong> {order.paymentMethod}
               </Card.Text>
               {order.isPaid ? (
-                <Message variant="success">
+                <Message variant="success" className="mb-3">
                   Thank you for your payment. Please note that your order will
                   be ready for pickup at the store. A representative from the
                   store will contact you at the phone number you provided to
@@ -185,7 +184,7 @@ export default function OrderScreen() {
                   appreciate your business and thank you for shopping with us.
                 </Message>
               ) : (
-                <Message variant="danger">
+                <Message variant="danger" className="mb-3">
                   Your order has not been paid for. Please proceed to make
                   payment for your item(s). Once payment has been received, a
                   representative from the store will contact you at the phone
@@ -193,17 +192,13 @@ export default function OrderScreen() {
                   process.
                 </Message>
               )}
-            </Card.Body>
-          </Card>
-
-          <Card className="mb-3">
-            <Card.Body>
-              <Card.Title>Items</Card.Title>
+              <hr></hr>
+              <Card.Title className="mt-3">Items</Card.Title>
               <ListGroup variant="flush">
                 {order.orderItems.map((item) => (
                   <ListGroup.Item key={item._id}>
                     <Row className="align-items-center">
-                      <Col md={9}>
+                      <Col md={12} className="my-3">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -216,10 +211,12 @@ export default function OrderScreen() {
                           {item.name}
                         </Link>
                       </Col>
-                      <Col md={1}>
-                        <span>{item.quantity}</span>
+                      <Col md={6} className="my-3">
+                        <strong>Qty: {item.quantity}</strong>
                       </Col>
-                      <Col md={2}>${item.price}</Col>
+                      <Col md={6} className="my-3">
+                        <strong>Price: {item.price}</strong>
+                      </Col>
                     </Row>
                   </ListGroup.Item>
                 ))}
@@ -227,14 +224,14 @@ export default function OrderScreen() {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={4}>
+        <Col md={3}>
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Order Summary</Card.Title>
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <Row>
-                    <Col>Items</Col>
+                    <Col>Item(s)</Col>
                     <Col>${order.itemsPrice.toFixed(2)}</Col>
                   </Row>
                 </ListGroup.Item>

@@ -13,6 +13,14 @@ export default function ShoppingCartPage() {
     cart: { cartItems },
   } = state;
 
+  function calculateSubtotal(items) {
+    const subtotal = items.reduce((total, item) => {
+      return total + item.price * item.quantity;
+    }, 0);
+
+    return `$${subtotal.toFixed(2)}`;
+  }
+
   const updateCart = async (item, quantity) => {
     const { data } = await axios.get(`api/products/${item._id}`);
     if (data.countInStock < quantity) {
@@ -39,10 +47,10 @@ export default function ShoppingCartPage() {
       {/* Displaying the page header */}
       <h1>Shopping Cart</h1>
       <Row>
-        <Col md={8}>
+        <Col md={9}>
           {cartItems.length === 0 ? (
             <Message variant="warning">
-              Your cart is empty. Want to{' '}
+              Oops, there are no items in your bag. Want to{' '}
               <Button variant="warning" onClick={() => navigate('/')}>
                 GO SHOPPING ?
               </Button>{' '}
@@ -52,7 +60,7 @@ export default function ShoppingCartPage() {
               {cartItems.map((item) => (
                 <ListGroup.Item key={item._id}>
                   <Row className="align-items-center">
-                    <Col md={12} className="mb-3">
+                    <Col md={12} className="my-3">
                       <img
                         src={item.image}
                         alt={item.name}
@@ -65,29 +73,29 @@ export default function ShoppingCartPage() {
                         {item.name}
                       </Link>
                     </Col>
-                    <Col md={4} className="mb-3">
+                    <Col md={4} className="my-3">
                       <Button
-                        variant="primary"
+                        variant="light"
                         disabled={item.quantity === 1}
                         onClick={() => updateCart(item, item.quantity - 1)}
                       >
                         <i className="fas fa-minus-circle"></i>
                       </Button>{' '}
                       <span style={{ margin: '0 10px' }}>
-                        <strong>{item.quantity}</strong>
+                        <strong>Qty: {item.quantity}</strong>
                       </span>{' '}
                       <Button
-                        variant="primary"
+                        variant="light"
                         disabled={item.quantity === item.countInStock}
                         onClick={() => updateCart(item, item.quantity + 1)}
                       >
                         <i className="fas fa-plus-circle"></i>
                       </Button>{' '}
                     </Col>
-                    <Col md={4} className="mb-3">
-                      <strong>{item.price}</strong>
+                    <Col md={4} className="my-3">
+                      <strong>Price: {item.price}</strong>
                     </Col>
-                    <Col md={4} className="mb-3">
+                    <Col md={4} className="my-3">
                       <Button
                         onClick={() => removeItem(item)}
                         variant="primary"
@@ -112,18 +120,14 @@ export default function ShoppingCartPage() {
             </ListGroup>
           )}
         </Col>
-        <Col md={4}>
+        <Col md={3}>
           <Card>
             <Card.Body>
               <Card.Title>Order Summary</Card.Title>
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <h4>
-                    Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}{' '}
-                    items) : <br />$
-                    {cartItems
-                      .reduce((a, c) => a + c.price * c.quantity, 0)
-                      .toFixed(2)}
+                    Subtotal: <strong>{calculateSubtotal(cartItems)}</strong>
                   </h4>
                 </ListGroup.Item>
                 <ListGroup.Item>

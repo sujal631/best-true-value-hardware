@@ -83,7 +83,7 @@ export default function PreviewOrderPage() {
       {/* Displaying the page header */}
       <h1 className="my-3">Preview Order</h1>
       <Row>
-        <Col md={8}>
+        <Col md={9}>
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Your Information</Card.Title>
@@ -100,36 +100,32 @@ export default function PreviewOrderPage() {
                 {/*{cart.shippingInfo.country}*/}
               </Card.Text>
               <Button
+                className="mb-3"
                 variant="secondary"
                 onClick={() => navigate('/shippingInfo')}
               >
                 Edit
               </Button>{' '}
-            </Card.Body>
-          </Card>
-          <Card className="mb-3">
-            <Card.Body>
-              <Card.Title>Payment</Card.Title>
+              <hr></hr>
+              <Card.Title className="mt-3">Payment</Card.Title>
               <Card.Text>
                 <strong>Method: </strong>
                 {cart.paymentMethod}
               </Card.Text>
               <Button
+                className="mb-3"
                 variant="secondary"
                 onClick={() => navigate('/paymentMethod')}
               >
                 Edit
               </Button>{' '}
-            </Card.Body>
-          </Card>
-          <Card className="mb-3">
-            <Card.Body>
-              <Card.Title>Items</Card.Title>
+              <hr></hr>
+              <Card.Title className="mt-3">Items</Card.Title>
               <ListGroup variant="flush">
                 {cart.cartItems.map((item) => (
                   <ListGroup.Item key={item._id}>
                     <Row className="align-items-center ">
-                      <Col md={9}>
+                      <Col md={12} className="my-3">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -142,10 +138,14 @@ export default function PreviewOrderPage() {
                           {item.name}
                         </Link>
                       </Col>
-                      <Col md={1}>
-                        <span>{item.quantity}</span>
+                      <Col md={6} className="my-3">
+                        <span>
+                          <strong>Qty: {item.quantity}</strong>
+                        </span>
                       </Col>
-                      <Col md={2}>${item.price}</Col>
+                      <Col md={6} className="my-3">
+                        <strong>Price: {item.price}</strong>
+                      </Col>
                     </Row>
                   </ListGroup.Item>
                 ))}
@@ -160,14 +160,14 @@ export default function PreviewOrderPage() {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={4}>
+        <Col md={3}>
           <Card>
             <Card.Body>
               <Card.Title>Order Summary</Card.Title>
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <Row>
-                    <Col>Items</Col>
+                    <Col>Item(s)</Col>
                     <Col>${cart.itemsPrice.toFixed(2)}</Col>
                   </Row>
                 </ListGroup.Item>
