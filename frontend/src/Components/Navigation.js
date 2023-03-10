@@ -111,7 +111,7 @@ export default function Navigation() {
 
                   {/* Cart Link */}
                   <Link to="/cart" className="nav-link">
-                    <i className="fa fa-shopping-cart"></i>
+                    <i className="fa fa-shopping-bag"></i>
                     {cart.cartItems.length > 0 && (
                       <Badge pill bg="danger">
                         {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}

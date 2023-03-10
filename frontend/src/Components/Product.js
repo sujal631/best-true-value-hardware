@@ -12,7 +12,7 @@ const Product = ({ product }) => {
     cart: { cartItems },
   } = state;
 
-  const addToCart = async (item) => {
+  const addToBag = async (item) => {
     const existItem = cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`api/products/${item._id}`);
@@ -53,8 +53,8 @@ const Product = ({ product }) => {
             OUT OF STOCK
           </Button>
         ) : (
-          <Button variant="primary" onClick={() => addToCart(product)}>
-            ADD TO CART
+          <Button variant="primary" onClick={() => addToBag(product)}>
+            ADD TO BAG
           </Button>
         )}
       </Card.Body>

@@ -67,15 +67,17 @@ export default function ShoppingCartPage() {
                     </Col>
                     <Col md={4} className="mb-3">
                       <Button
-                        variant="light"
+                        variant="primary"
                         disabled={item.quantity === 1}
                         onClick={() => updateCart(item, item.quantity - 1)}
                       >
                         <i className="fas fa-minus-circle"></i>
                       </Button>{' '}
-                      <span>{item.quantity}</span>{' '}
+                      <span style={{ margin: '0 10px' }}>
+                        <strong>{item.quantity}</strong>
+                      </span>{' '}
                       <Button
-                        variant="light"
+                        variant="primary"
                         disabled={item.quantity === item.countInStock}
                         onClick={() => updateCart(item, item.quantity + 1)}
                       >
@@ -83,11 +85,25 @@ export default function ShoppingCartPage() {
                       </Button>{' '}
                     </Col>
                     <Col md={4} className="mb-3">
-                      {item.price}
+                      <strong>{item.price}</strong>
                     </Col>
                     <Col md={4} className="mb-3">
-                      <Button onClick={() => removeItem(item)} variant="light">
-                        <i className="fas fa-trash"></i>
+                      <Button
+                        onClick={() => removeItem(item)}
+                        variant="primary"
+                      >
+                        <i className="fa fa-trash">
+                          {' '}
+                          <span
+                            style={{
+                              padding: '0 10px',
+                              fontWeight: '300',
+                              fontSize: '13px',
+                            }}
+                          >
+                            Delete
+                          </span>
+                        </i>
                       </Button>
                     </Col>
                   </Row>
@@ -99,6 +115,7 @@ export default function ShoppingCartPage() {
         <Col md={4}>
           <Card>
             <Card.Body>
+              <Card.Title>Order Summary</Card.Title>
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <h4>
@@ -117,7 +134,7 @@ export default function ShoppingCartPage() {
                       type="button"
                       disabled={cartItems.length === 0}
                     >
-                      Proceed to Checkout
+                      Checkout
                     </Button>
                   </div>
                 </ListGroup.Item>

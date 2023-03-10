@@ -35,7 +35,7 @@ const ProductDetailsPage = () => {
 
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart } = state;
-  const addToCart = async () => {
+  const addToBag = async () => {
     const existItem = cart.cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`/api/products/${product._id}`);
@@ -99,8 +99,8 @@ const ProductDetailsPage = () => {
                   <ListGroup.Item>
                     <div className="d-flex justify-content-center">
                       {/* Add to Cart button */}
-                      <Button onClick={addToCart} variant="primary">
-                        Add to Cart
+                      <Button onClick={addToBag} variant="primary">
+                        ADD TO BAG
                       </Button>
                     </div>
                   </ListGroup.Item>
