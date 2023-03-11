@@ -22,6 +22,14 @@ export default function LogInPage() {
     dispatch,
   } = useContext(Store);
 
+  // Function to handle changes to form inputs
+  const handleChange = (e) => {
+    if (e.target.id === 'email') {
+      setEmail(e.target.value);
+    } else if (e.target.id === 'password') {
+      setPassword(e.target.value);
+    }
+  };
   // Handling the form submission event
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -68,7 +76,7 @@ export default function LogInPage() {
               className="form-control"
               id="email"
               required
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleChange}
             />
           </div>
           {/* Password input */}
@@ -81,7 +89,7 @@ export default function LogInPage() {
               className="form-control"
               id="password"
               required
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handleChange}
             />
           </div>
           {/* Log in button */}

@@ -89,7 +89,7 @@ export default function Registration() {
 
     // Check if password fields match
     if (password !== confirmPassword) {
-      toast.error('Password field and confirm password field do not match.');
+      toast.error('Password and Confirm Password do not match.');
       return;
     }
 

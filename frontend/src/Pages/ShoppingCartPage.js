@@ -50,9 +50,9 @@ export default function ShoppingCartPage() {
         <Col md={9}>
           {cartItems.length === 0 ? (
             <Message variant="warning">
-              Oops, there are no items in your bag. Want to{' '}
+              Oops, there are no items in your bag.{' '}
               <Button variant="warning" onClick={() => navigate('/')}>
-                GO SHOPPING ?
+                KEEP SHOPPING ?
               </Button>{' '}
             </Message>
           ) : (
