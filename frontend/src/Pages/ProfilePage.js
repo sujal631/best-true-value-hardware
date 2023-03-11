@@ -76,11 +76,11 @@ export default function ProfilePage() {
     <Container className="container small-container">
       {/* Set the title of the page to "User Profile" */}
       <Helmet>
-        <title>User Profile</title>
+        <title>Your Profile</title>
       </Helmet>
 
       {/* Display the page header */}
-      <h1 className="my-3">User Profile</h1>
+      <h1 className="my-3">Your Profile</h1>
 
       {/* Form with the function handleSubmit being called on submit */}
       <Form onSubmit={handleSubmit}>

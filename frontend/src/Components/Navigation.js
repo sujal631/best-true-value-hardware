@@ -30,6 +30,24 @@ export default function Navigation() {
     // Redirecting to the login page
     window.location.href = 'login';
   };
+  const navLinks = userInfo ? (
+    <NavDropdown title={userInfo.firstName} id="basic-nav-dropdown">
+      <LinkContainer to="/profile">
+        <NavDropdown.Item>Profile</NavDropdown.Item>
+      </LinkContainer>
+      <LinkContainer to="/orderHistory">
+        <NavDropdown.Item>Orders</NavDropdown.Item>
+      </LinkContainer>
+      <NavDropdown.Divider />
+      <Link className="dropdown-item" to="/" onClick={logout}>
+        Log Out
+      </Link>
+    </NavDropdown>
+  ) : (
+    <LinkContainer to="/login">
+      <Nav.Link>Log In</Nav.Link>
+    </LinkContainer>
+  );
 
   // Rendering the navigation bar
   return (
@@ -88,27 +106,7 @@ export default function Navigation() {
 
                   {/* Rendering user related dropdown menu if the user is logged in, else rendering the login link */}
 
-                  {userInfo ? (
-                    <NavDropdown
-                      title={userInfo.firstName}
-                      id="basic-nav-dropdown"
-                    >
-                      <LinkContainer to="/profile">
-                        <NavDropdown.Item>User Profile</NavDropdown.Item>
-                      </LinkContainer>
-                      <LinkContainer to="/orderHistory">
-                        <NavDropdown.Item>Order History</NavDropdown.Item>
-                      </LinkContainer>
-                      <NavDropdown.Divider />
-                      <Link className="dropdown-item" to="/" onClick={logout}>
-                        Log Out
-                      </Link>
-                    </NavDropdown>
-                  ) : (
-                    <LinkContainer to="/login">
-                      <Nav.Link>Log In</Nav.Link>
-                    </LinkContainer>
-                  )}
+                  <Nav className="ml-auto">{navLinks}</Nav>
 
                   {/* Cart Link */}
                   <Link to="/cart" className="nav-link">

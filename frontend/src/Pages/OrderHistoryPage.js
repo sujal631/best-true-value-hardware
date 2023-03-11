@@ -61,9 +61,9 @@ export default function OrderHistoryPage() {
   return (
     <div>
       <Helmet>
-        <title>Order History</title>
+        <title>Orders</title>
       </Helmet>
-      <h1 className="my-3">Order History</h1>
+      <h1 className="my-3">Orders</h1>
       {/* Show loading spinner if data is being fetched or Show error message if data fetch fails */}
       {loading ? (
         <LoadingSpinner />
