@@ -67,7 +67,7 @@ export default function ProfilePage() {
 
     // Check if password fields match
     if (password !== confirmPassword) {
-      return toast.error('New Password and Confirm New Password do not match.');
+      return toast.error('Password and Confirm Password do not match.');
     }
     // Call async function to update user profile
     updateUserProfile();
@@ -143,7 +143,7 @@ export default function ProfilePage() {
         {/* A form input for the user's password */}
         <div className="mb-3">
           <label htmlFor="password" className="form-label">
-            New Password
+            Password
           </label>
           <input
             type="password"
@@ -191,7 +191,7 @@ export default function ProfilePage() {
         {/* A form input for the user's confirm password */}
         <div className="mb-3">
           <label htmlFor="confirmPassword" className="form-label">
-            Confirm New Password
+            Confirm Password
           </label>
           <input
             type="password"

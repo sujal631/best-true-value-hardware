@@ -226,6 +226,21 @@ body {
   font-size: 0.8rem;
   margin-left: 0.2rem;
 }
+.form-check-input[type='radio']:checked {
+  background-color: #bb0000;
+  border-color: #bb0000;
+}
+
+.form-check-input[type='radio']:not(:disabled):active {
+  background-color: #bb0000;
+  border-color: #bb0000;
+  box-shadow: none;
+}
+
+.form-check-input[type='radio']:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
 
 .search-form {
   width: 290px;

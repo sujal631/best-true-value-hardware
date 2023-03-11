@@ -1,34 +1,44 @@
 // Importing necessary dependencies and components
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import CheckoutSteps from '../Components/CheckoutSteps';
 import { Store } from '../Store';
+import { faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import { faPaypal } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // Defining the PaymentPage component
 export default function PaymentPage() {
   // Creating a navigate constant using useNavigate from react-router-dom
   const navigate = useNavigate();
   // Destructuring the state and dispatch from the Store context
-  const { state, dispatch: ctxDispatch } = useContext(Store);
-  // Initializing the paymentMethodName state with the current payment method or 'PayPal'
+  const { state, dispatch } = useContext(Store);
+
+  // Initializing the paymentMethodName state with the current payment method or 'Debit/Credit Card'
   const [paymentMethodName, setPaymentMethod] = useState(
-    state.cart.paymentMethod || 'PayPal'
+    state.cart.paymentMethod || 'Debit/Credit Card'
   );
 
-  // Setting up an effect to navigate to the shippingInfo page if no shipping info address is available
-  useEffect(() => {
-    if (!state.cart.shippingInfo.address) {
-      navigate('/shippingInfo');
-    }
-  }, [state.cart.shippingInfo.address, navigate]);
+  // Function to handle the radio button change
+  const handleRadioChange = (e) => {
+    setPaymentMethod(e.target.value);
+  };
 
-  // Setting up a submitHandler function to dispatch the selected payment method to the Store and local storage, then navigate to the previewOrder page
-  const submitHandler = (e) => {
+  //Function to update the payment method in the global state
+  const dispatchPaymentMethod = (dispatch, paymentMethodName) => {
+    dispatch({ type: 'PAYMENT_METHOD', payload: paymentMethodName });
+  };
+
+  // Setting up a handleSubmit function
+  const handleSubmit = (e) => {
     e.preventDefault();
-    ctxDispatch({ type: 'PAYMENT_METHOD', payload: paymentMethodName });
+    // Dispatch an action to update the payment method in the global state
+    dispatchPaymentMethod(dispatch, paymentMethodName);
+    // Store the payment method in local storage
     localStorage.setItem('paymentMethod', paymentMethodName);
+    // Navigate to the previewOrder page
     navigate('/previewOrder');
   };
 
@@ -37,36 +47,45 @@ export default function PaymentPage() {
     <div>
       {/* Setting the page title using react-helmet-async */}
       <Helmet>
-        <title>Payment Methods</title>
+        <title>Payment Method</title>
       </Helmet>
       {/* Rendering the CheckoutSteps component */}
       <CheckoutSteps step1 step2 step3></CheckoutSteps>
       <div className="container small-container">
         {/* Displaying the page header */}
-        <h1 className="my-3">Payment Methods</h1>
+        <h1 className="my-3">Your Payment</h1>
         {/* Rendering a Form component to select a payment method */}
-        <Form onSubmit={submitHandler}>
+        <Form onSubmit={handleSubmit}>
           {/* Rendering radio buttons to select the payment method */}
-          <div className="mb-3">
-            <Form.Check
-              type="radio"
-              id="PayPal"
-              label="PayPal"
-              value="PayPal"
-              checked={paymentMethodName === 'PayPal'}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            ></Form.Check>
-          </div>
-          <div className="mb-3">
-            <Form.Check
-              type="radio"
-              id="Stripe"
-              label="Stripe"
-              value="Stripe"
-              checked={paymentMethodName === 'Stripe'}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            ></Form.Check>
-          </div>
+          {['Debit/Credit Card', 'PayPal'].map((method) => (
+            <div className="mb-3" key={method}>
+              <Form.Check
+                type="radio"
+                id={method}
+                label={
+                  <div>
+                    {method === 'Debit/Credit Card' && (
+                      <FontAwesomeIcon
+                        icon={faCreditCard}
+                        style={{ marginRight: '10px', fontSize: '22px' }}
+                      />
+                    )}
+                    {method === 'PayPal' && (
+                      <FontAwesomeIcon
+                        icon={faPaypal}
+                        style={{ marginRight: '18px', fontSize: '22px' }}
+                      />
+                    )}
+                    {method}
+                  </div>
+                }
+                value={method}
+                checked={paymentMethodName === method}
+                onChange={handleRadioChange}
+                className="radio-button"
+              ></Form.Check>
+            </div>
+          ))}
           {/* Rendering a button to continue to the previewOrder page */}
           <div className="d-grid gap-2 mb-3">
             <Button type="submit">CONTINUE</Button>
