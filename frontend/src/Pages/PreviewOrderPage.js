@@ -10,16 +10,13 @@ import { Store } from '../Store';
 import { getErrorMessage } from '../utils';
 
 const reducer = (state, action) => {
-  switch (action.type) {
-    case 'REQUEST':
-      return { ...state, loading: true };
-    case ' SUCCESS':
-      return { ...state, loading: false };
-    case 'FAILURE':
-      return { ...state, loading: false };
-    default:
-      return state;
-  }
+  const actionHandlers = {
+    REQUEST: { ...state, loading: true },
+    SUCCESS: { ...state, loading: false },
+    FAILURE: { ...state, loading: false },
+  };
+
+  return actionHandlers[action.type] || state;
 };
 
 export default function PreviewOrderPage() {
@@ -30,13 +27,13 @@ export default function PreviewOrderPage() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
 
-  const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100;
-  cart.itemsPrice = round2(
+  const roundToTwoDecimalPlaces = (num) =>
+    Math.round(num * 100 + Number.EPSILON) / 100;
+  cart.itemsPrice = roundToTwoDecimalPlaces(
     cart.cartItems.reduce((a, c) => a + c.quantity * c.price, 0)
   );
-  cart.shippingPrice = cart.itemsPrice > 50 ? round2(0) : round2(15);
-  cart.taxPrice = round2(0.105 * cart.itemsPrice);
-  cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
+  cart.taxPrice = roundToTwoDecimalPlaces(0.105 * cart.itemsPrice);
+  cart.totalPrice = cart.itemsPrice + cart.taxPrice;
 
   const placeOrder = async () => {
     try {
@@ -48,7 +45,6 @@ export default function PreviewOrderPage() {
           shippingInfo: cart.shippingInfo,
           paymentMethod: cart.paymentMethod,
           itemsPrice: cart.itemsPrice,
-          shippingPrice: cart.shippingPrice,
           taxPrice: cart.taxPrice,
           totalPrice: cart.totalPrice,
         },
@@ -75,18 +71,18 @@ export default function PreviewOrderPage() {
   }, [cart, navigate]);
   return (
     <div>
-      {/* Setting the page title using react-helmet-async */}
       <Helmet>
         <title>Preview Order</title>
       </Helmet>
-      <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
-      {/* Displaying the page header */}
+      <CheckoutSteps step1 step2 step3 step4 />
       <h1 className="my-3">Preview Order</h1>
       <Row>
-        <Col md={9}>
+        <Col xs={12} lg={8}>
           <Card className="mb-3">
             <Card.Body>
-              <Card.Title>Your Information</Card.Title>
+              <Card.Title style={{ color: '#dd2222' }}>
+                Your Information
+              </Card.Title>
               <Card.Text>
                 <strong>Name: </strong>
                 {cart.shippingInfo.firstName} {cart.shippingInfo.lastName}
@@ -96,55 +92,57 @@ export default function PreviewOrderPage() {
                 <br />
                 <strong>Address: </strong>
                 {cart.shippingInfo.address}, {cart.shippingInfo.city},{' '}
-                {cart.shippingInfo.region}, {cart.shippingInfo.zip}{' '}
-                {/*{cart.shippingInfo.country}*/}
+                {cart.shippingInfo.region}, {cart.shippingInfo.zip}
               </Card.Text>
               <Button
-                className="mb-3"
+                className="mb-1"
                 variant="secondary"
                 onClick={() => navigate('/shippingInfo')}
               >
                 Edit
-              </Button>{' '}
-              <hr></hr>
-              <Card.Title className="mt-3">Payment</Card.Title>
+              </Button>
+              <hr />
+              <Card.Title className="my-1" style={{ color: '#dd2222' }}>
+                Your Payment
+              </Card.Title>
               <Card.Text>
-                <strong>Method: </strong>
+                <strong>Selected Method: </strong>
                 {cart.paymentMethod}
               </Card.Text>
               <Button
-                className="mb-3"
+                className="mb-1"
                 variant="secondary"
                 onClick={() => navigate('/paymentMethod')}
               >
                 Edit
-              </Button>{' '}
-              <hr></hr>
-              <Card.Title className="mt-3">Items</Card.Title>
-              <ListGroup variant="flush">
+              </Button>
+              <hr />
+              <Card.Title className="my-1" style={{ color: '#dd2222' }}>
+                Your Items
+              </Card.Title>
+              <ListGroup>
                 {cart.cartItems.map((item) => (
                   <ListGroup.Item key={item._id}>
                     <Row className="align-items-center ">
-                      <Col md={12} className="my-3">
+                      <Col xs={12} lg={12} className="my-2">
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="img-fluid rounded img-thumbnail mx-1"
-                        ></img>
+                          className="img-fluid rounded img-thumbnail d-block mb-1"
+                          style={{ maxWidth: '80px', maxHeight: '80px' }}
+                        />
                         <Link
                           className="remove-link-style"
                           to={`/product/${item.slug}`}
                         >
-                          {item.name}
+                          <strong>{item.name}</strong>
                         </Link>
                       </Col>
-                      <Col md={6} className="my-3">
-                        <span>
-                          <strong>Qty: {item.quantity}</strong>
-                        </span>
+                      <Col xs={12} lg={6} className="mb-1  btn-text">
+                        <span>Qty: {item.quantity}</span>
                       </Col>
-                      <Col md={6} className="my-3">
-                        <strong>Price: {item.price}</strong>
+                      <Col xs={12} lg={6} className="mb-1 mx-auto btn-text">
+                        Price: {item.price}
                       </Col>
                     </Row>
                   </ListGroup.Item>
@@ -152,15 +150,15 @@ export default function PreviewOrderPage() {
               </ListGroup>
               <Button
                 variant="secondary"
-                className="mt-4"
+                className="mt-3"
                 onClick={() => navigate('/cart')}
               >
                 Edit
-              </Button>{' '}
+              </Button>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
+        <Col xs={12} lg={4}>
           <Card>
             <Card.Body>
               <Card.Title>Order Summary</Card.Title>
@@ -168,19 +166,13 @@ export default function PreviewOrderPage() {
                 <ListGroup.Item>
                   <Row>
                     <Col>Item(s)</Col>
-                    <Col>${cart.itemsPrice.toFixed(2)}</Col>
-                  </Row>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Row>
-                    <Col>Shipping</Col>
-                    <Col>${cart.shippingPrice.toFixed(2)}</Col>
+                    <Col>${cart.itemsPrice}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Tax</Col>
-                    <Col>${cart.taxPrice.toFixed(2)}</Col>
+                    <Col>${cart.taxPrice}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
@@ -203,7 +195,7 @@ export default function PreviewOrderPage() {
                       Place Order
                     </Button>
                   </div>
-                  {loading && <LoadingSpinner></LoadingSpinner>}
+                  {loading && <LoadingSpinner />}
                 </ListGroup.Item>
               </ListGroup>
             </Card.Body>
