@@ -1,3 +1,4 @@
+//Import necessary modules
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
