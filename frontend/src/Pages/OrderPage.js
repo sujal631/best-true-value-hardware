@@ -1,3 +1,4 @@
+// Import necessary modules and dependencies
 import axios from 'axios';
 import React, { useContext, useEffect, useReducer } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -14,35 +15,31 @@ import { getErrorMessage } from '../utils';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { toast } from 'react-toastify';
 
-function reducer(state, action) {
-  switch (action.type) {
-    case 'REQUEST':
-      return { ...state, loading: true, error: '' };
-    case 'SUCCESS':
-      return { ...state, loading: false, order: action.payload, error: '' };
-    case 'FAILURE':
-      return { ...state, loading: false, error: action.payload };
-    case 'PAY_REQUEST':
-      return { ...state, loadingPay: true };
-    case 'PAY_SUCCESS':
-      return { ...state, loadingPay: false, successPay: true };
-    case 'PAY_FAIL':
-      return { ...state, loadingPay: false };
-    case 'PAY_RESET':
-      return { ...state, loadingPay: false, successPay: false };
+// Reducer function for handling state changes
+const reducer = (state, action) => {
+  const cases = {
+    REQUEST: { ...state, loading: true, error: '' },
+    SUCCESS: { ...state, loading: false, order: action.payload, error: '' },
+    FAILURE: { ...state, loading: false, error: action.payload },
+    PAY_REQUEST: { ...state, loadingPay: true },
+    PAY_SUCCESS: { ...state, loadingPay: false, successPay: true },
+    PAY_FAIL: { ...state, loadingPay: false },
+    PAY_RESET: { ...state, loadingPay: false, successPay: false },
+    default: state,
+  };
+  return cases[action.type] || cases.default;
+};
 
-    default:
-      return state;
-  }
-}
 export default function OrderScreen() {
+  // Getting user information from context
   const { state } = useContext(Store);
   const { userInfo } = state;
 
-  const params = useParams();
-  const { id: orderId } = params;
+  // Getting the order ID from URL parameters and navigation function from react-router-dom
+  const { id: orderId } = useParams();
   const navigate = useNavigate();
 
+  // Defining state variables and reducer for handling state changes
   const [{ loading, error, order, successPay, loadingPay }, dispatch] =
     useReducer(reducer, {
       loading: true,
@@ -52,85 +49,131 @@ export default function OrderScreen() {
       loadingPay: false,
     });
 
-  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+  // Extracting the 'isPending' state variable and 'paypalDispatch' function from the usePayPalScriptReducer hook
+  const paypalScriptReducer = usePayPalScriptReducer();
+  const isPending = paypalScriptReducer[0].isPending;
+  const paypalDispatch = paypalScriptReducer[1];
 
-  function createOrder(data, actions) {
-    return actions.order
-      .create({
-        purchase_units: [
-          {
-            amount: { value: order.totalPrice.toFixed(2) },
-          },
-        ],
-      })
-      .then((orderID) => {
-        return orderID;
-      });
-  }
+  // Function for handling PayPal order creation
+  const createPayPalOrder = (data, actions) => {
+    const { totalPrice } = order;
+    const formattedPrice = totalPrice.toFixed(2);
+    const purchaseUnits = [{ amount: { value: formattedPrice } }];
+    const orderData = { purchase_units: purchaseUnits };
+    return actions.order.create(orderData).then((orderId) => orderId);
+  };
 
-  function onApprove(data, actions) {
-    return actions.order.capture().then(async function (details) {
-      try {
-        dispatch({ type: 'PAY_REQUEST' });
-        const { data } = await axios.put(
-          `/api/orders/${order._id}/pay`,
-          details,
-          {
-            headers: { authorization: `Bearer ${userInfo.token}` },
-          }
-        );
-        dispatch({ type: 'PAY_SUCCESS', payload: data });
-        toast.success(
-          'Your payment has been successfully processed, and your order has been placed.'
-        );
-      } catch (err) {
-        dispatch({ type: 'PAY_FAIL', payload: getErrorMessage(err) });
-        toast.error(getErrorMessage(err));
-      }
-    });
-  }
-  function onError(err) {
-    toast.error(getErrorMessage(err));
-  }
-
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        dispatch({ type: 'REQUEST' });
-        const { data } = await axios.get(`/api/orders/${orderId}`, {
+  // Function for handling the approval of the PayPal payment
+  const handleApprove = async (data, actions) => {
+    try {
+      // Dispatch a payment request action to update the payment status
+      dispatch({ type: 'PAY_REQUEST' });
+      // Capture the payment details from the PayPal API
+      const captureDetails = await actions.order.capture();
+      // Send a PUT request to the server to update the order's payment status
+      const { data: payData } = await axios.put(
+        `/api/orders/${order._id}/pay`,
+        captureDetails,
+        {
           headers: { authorization: `Bearer ${userInfo.token}` },
-        });
-        dispatch({ type: 'SUCCESS', payload: data });
-      } catch (err) {
-        dispatch({ type: 'FAILURE', payload: getErrorMessage(err) });
-      }
+        }
+      );
+      // Dispatch a payment success action and display a success message
+      dispatch({ type: 'PAY_SUCCESS', payload: payData });
+      toast.success('Payment Successful!');
+      // Dispatch a payment failure action and display an error message
+    } catch (getErrorMessage) {
+      const errorMessage = getErrorMessage(error);
+      dispatch({ type: 'PAY_FAIL', payload: errorMessage });
+      toast.error(errorMessage);
+    }
+  };
+
+  // Function for handling errors during the PayPal payment process
+  const handleError = (err) => {
+    const errorMessage = getErrorMessage(err);
+    toast.error(errorMessage);
+  };
+
+  // Define a useEffect hook to fetch the order data and configure the PayPal SDK
+  useEffect(() => {
+    // Check if the order ID is valid and needs to be fetched
+    const isOrderValid = order._id && order._id === orderId;
+    const shouldFetchOrder = !isOrderValid || successPay;
+
+    // Define a helper function to fetch the PayPal client ID from the server
+    const fetchPaypalClientId = async (token) => {
+      const response = await axios.get('/api/keys/paypal', {
+        headers: { authorization: `Bearer ${token}` },
+      });
+      return response.data.clientId;
     };
 
+    // Define a helper function to configure the PayPal SDK with the client ID
+    const configurePaypal = async (dispatch, token, paypalDispatch) => {
+      const clientId = await fetchPaypalClientId(token);
+      dispatch({
+        type: 'resetOptions',
+        value: {
+          'client-id': clientId,
+          currency: 'USD',
+        },
+      });
+      paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+    };
+
+    // Define a helper function to load the PayPal SDK script
+    const loadPaypalScript = async () => {
+      await configurePaypal(dispatch, userInfo.token, paypalDispatch);
+    };
+
+    // If userInfo is not defined, navigate to the login page and return
     if (!userInfo) {
-      return navigate('/login');
+      navigate('/login');
+      return;
     }
-    if (!order._id || successPay || (order._id && order._id !== orderId)) {
+
+    // If the order should be fetched, fetch the order from the server
+    if (shouldFetchOrder) {
+      async function fetchOrder() {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        };
+
+        try {
+          // Make a GET request to the server to fetch the order details
+          const response = await axios.get(`/api/orders/${orderId}`, config);
+
+          // Dispatch the SUCCESS action with the order details as the payload
+          dispatch({ type: 'SUCCESS', payload: response.data });
+
+          // Dispatch the FAILURE action with the error message as the payload
+        } catch (error) {
+          dispatch({ type: 'FAILURE', payload: getErrorMessage(error) });
+        }
+      }
+
       fetchOrder();
+      // If a payment has just been made, reset the payment state
       if (successPay) {
         dispatch({ type: 'PAY_RESET' });
       }
+      // Otherwise, load the PayPal script
     } else {
-      const loadPaypalScript = async () => {
-        const { data: clientId } = await axios.get('/api/keys/paypal', {
-          headers: { authorization: `Bearer ${userInfo.token}` },
-        });
-        paypalDispatch({
-          type: 'resetOptions',
-          value: {
-            'client-id': clientId,
-            currency: 'USD',
-          },
-        });
-        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
-      };
       loadPaypalScript();
     }
-  }, [order, userInfo, orderId, navigate, paypalDispatch, successPay]);
+  }, [
+    dispatch,
+    navigate,
+    orderId,
+    order,
+    paypalDispatch,
+    successPay,
+    userInfo,
+  ]);
+
   return loading ? (
     <LoadingSpinner></LoadingSpinner>
   ) : error ? (
@@ -142,19 +185,35 @@ export default function OrderScreen() {
       </Helmet>
       <h1 className="my-3">Order {orderId}</h1>
       <Row>
-        <Col md={8}>
+        <Col xs={12} lg={8}>
           <Card className="mb-3">
+            {/*Display the customer information */}
             <Card.Body>
-              <Card.Title>Your Information</Card.Title>
+              <Card.Title style={{ color: '#dd2222' }}>
+                Your Information
+              </Card.Title>
               <Card.Text>
-                <strong>Name:</strong> {order.shippingInfo.firstName}{' '}
-                {order.shippingInfo.lastName} <br />
-                <strong>Phone Number:</strong> {order.shippingInfo.phoneNumber}{' '}
-                <br />
-                <strong>Address: </strong> {order.shippingInfo.address},{' '}
-                {order.shippingInfo.city}, {order.shippingInfo.region},{' '}
-                {order.shippingInfo.zip} {/*{order.shippingInfo.country}*/}
+                <div>
+                  <span>
+                    <strong>Name: </strong>
+                    {`${order.shippingInfo.firstName} ${order.shippingInfo.lastName}`}
+                  </span>
+                </div>
+                <div>
+                  <span>
+                    <strong>Phone Number: </strong>
+                    {order.shippingInfo.phoneNumber}
+                  </span>
+                </div>
+                <div>
+                  <span>
+                    <strong>Address: </strong>
+                    {`${order.shippingInfo.address}, ${order.shippingInfo.city}, ${order.shippingInfo.region}, ${order.shippingInfo.zip}`}
+                  </span>
+                </div>
               </Card.Text>
+
+              {/* Message component displays a message based on whether the order is available for pickup or not */}
               {order.isPickupReady ? (
                 <Message variant="success" className="mb-3">
                   Your order is now <strong>AVAILABLE FOR STORE PICKUP</strong>{' '}
@@ -171,10 +230,16 @@ export default function OrderScreen() {
                 </Message>
               )}
               <hr></hr>
-              <Card.Title className="mt-3">Payment</Card.Title>
+
+              <Card.Title className="my-1" style={{ color: '#dd2222' }}>
+                {/*Display the payment details */}
+                Your Payment
+              </Card.Title>
               <Card.Text>
-                <strong>Method:</strong> {order.paymentMethod}
+                <strong>Selected Method: </strong>
+                {order.paymentMethod}
               </Card.Text>
+              {/* Message component displays a message based on whether the order has been paid for or not */}
               {order.isPaid ? (
                 <Message variant="success" className="mb-3">
                   Thank you for your payment. Please note that your order will
@@ -193,41 +258,49 @@ export default function OrderScreen() {
                 </Message>
               )}
               <hr></hr>
-              <Card.Title className="mt-3">Items</Card.Title>
-              <ListGroup variant="flush">
-                {order.orderItems.map((item) => (
-                  <ListGroup.Item key={item._id}>
-                    <Row className="align-items-center">
-                      <Col md={12} className="mb-3">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="img-fluid rounded img-thumbnail d-block mb-1"
-                          style={{ maxWidth: '80px', maxHeight: '80px' }}
-                        ></img>{' '}
-                        <Link
-                          className="remove-link-style"
-                          to={`/product/${item.slug}`}
-                        >
-                          <strong>{item.name}</strong>
-                        </Link>
-                      </Col>
-                      <Col md={6} className="mb-1 btn-text">
-                        Qty: {item.quantity}
-                      </Col>
-                      <Col md={6} className="mb-1 text-end btn-text">
-                        Price: ${item.price}
-                      </Col>
-                    </Row>
-                  </ListGroup.Item>
-                ))}
+              <Card.Title className="my-1" style={{ color: '#dd2222' }}>
+                {/* Displays the items in the order including the item's image, name, quantity, and price */}
+                Your Items
+              </Card.Title>
+              <ListGroup>
+                {order.orderItems.map((item) => {
+                  //  Destructuring the item object to extract its properties
+                  const { _id, image, name, slug, quantity, price } = item;
+                  return (
+                    <ListGroup.Item key={_id}>
+                      <Row className="align-items-center">
+                        <Col xs={12} lg={12} className="my-2">
+                          <img
+                            src={image}
+                            alt={name}
+                            className="img-fluid rounded img-thumbnail d-block mb-1"
+                            style={{ maxWidth: '80px', maxHeight: '80px' }}
+                          />
+                          <Link
+                            className="remove-link-style"
+                            to={`/product/${slug}`}
+                          >
+                            <strong>{name}</strong>
+                          </Link>
+                        </Col>
+                        <Col xs={12} lg={6} className="mb-1  btn-text">
+                          <span>Qty: {quantity}</span>
+                        </Col>
+                        <Col xs={12} lg={6} className="mb-1 mx-auto btn-text">
+                          Price: ${price}
+                        </Col>
+                      </Row>
+                    </ListGroup.Item>
+                  );
+                })}
               </ListGroup>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={4}>
-          <Card className="mb-3">
+        <Col xs={12} lg={4}>
+          <Card>
             <Card.Body>
+              {/* Order summary component displaying subtotal, tax, and total prices for the order*/}
               <Card.Title>Order Summary</Card.Title>
               <ListGroup variant="flush">
                 <ListGroup.Item>
@@ -245,7 +318,7 @@ export default function OrderScreen() {
                 <ListGroup.Item>
                   <Row>
                     <Col>
-                      <strong> Order Total</strong>
+                      <strong>Order Total</strong>
                     </Col>
                     <Col>
                       <strong>${order.totalPrice.toFixed(2)}</strong>
@@ -254,14 +327,15 @@ export default function OrderScreen() {
                 </ListGroup.Item>
                 {!order.isPaid && (
                   <ListGroup.Item>
+                    {/* If the order has not been paid for, the PayPal buttons are displayed and the 'createOrder', 'onApprove', and 'onError' methods are called when appropriate */}
                     {isPending ? (
                       <LoadingSpinner />
                     ) : (
                       <div>
                         <PayPalButtons
-                          createOrder={createOrder}
-                          onApprove={onApprove}
-                          onError={onError}
+                          createOrder={createPayPalOrder}
+                          onApprove={handleApprove}
+                          onError={handleError}
                         ></PayPalButtons>
                       </div>
                     )}

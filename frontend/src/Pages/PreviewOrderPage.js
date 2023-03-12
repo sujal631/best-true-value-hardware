@@ -1,5 +1,4 @@
-// Import necessary modules
-import axios from 'axios';
+import Axios from 'axios';
 import React, { useContext, useEffect, useReducer } from 'react';
 import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
@@ -19,14 +18,12 @@ const reducer = (state, action) => {
     SUCCESS: { ...state, loading: false },
     FAILURE: { ...state, loading: false },
   };
-
   return actionHandlers[action.type] || state;
 };
 
 // Define a helper function to round a number to two decimal places
 const roundToTwoDecimalPlaces = (num) =>
   Math.round(num * 100 + Number.EPSILON) / 100;
-
 export default function PreviewOrderPage() {
   const navigate = useNavigate();
   // Get the global state and dispatch function from the Store context
@@ -49,7 +46,7 @@ export default function PreviewOrderPage() {
       // Set the loading state to true
       dispatch({ type: 'REQUEST' });
       // Make a request to the backend to place the order
-      const { data } = await axios.post(
+      const { data } = await Axios.post(
         '/api/orders',
         {
           orderItems: cart.cartItems,
@@ -65,7 +62,6 @@ export default function PreviewOrderPage() {
           },
         }
       );
-
       // Clear the cart, set the loading state to false, remove cart items from local storage, and navigate to the order confirmation page
       ctxDispatch({ type: 'CLEAR' });
       dispatch({ type: 'SUCCESS' });
@@ -78,22 +74,18 @@ export default function PreviewOrderPage() {
       toast.error(getErrorMessage(error));
     }
   };
-
   // Calculate the item price, tax price, and total price
   const itemsPrice = roundToTwoDecimalPlaces(
     cart.cartItems.reduce((a, c) => a + c.quantity * c.price, 0)
   );
   const taxPrice = roundToTwoDecimalPlaces(0.105 * itemsPrice);
   const totalPrice = itemsPrice + taxPrice;
-
   return (
     <div>
       <CheckoutSteps step1 step2 step3 step4 />
-
       <Helmet>
         <title>Preview Order</title>
       </Helmet>
-
       {/* Header of the page*/}
       <h1 className="my-3">Preview Order</h1>
       <Row>
@@ -123,7 +115,6 @@ export default function PreviewOrderPage() {
                   </span>
                 </div>
               </Card.Text>
-
               <Button
                 className="mb-1"
                 variant="secondary"
@@ -152,7 +143,6 @@ export default function PreviewOrderPage() {
               <Card.Title className="my-1" style={{ color: '#dd2222' }}>
                 Your Items
               </Card.Title>
-
               <ListGroup>
                 {/*  Mapping over an array of items in the cart to render a ListGroup.Item component for each item */}
                 {cart.cartItems.map((item) => {
@@ -221,20 +211,14 @@ export default function PreviewOrderPage() {
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <div className="d-grid gap-2 mb-3">
-                    {/* If the length of cartItems is 0, the button is disabled */}
-                    {cart.cartItems.length === 0 ? (
-                      <Button type="button" disabled>
-                        Place Order
-                      </Button>
-                    ) : (
-                      {
-                        /* If cartItems has a length greater than 0, the button is enabled and onClick calls the handlePlaceOrder function */
-                      }(
-                        <Button type="button" onClick={handlePlaceOrder}>
-                          Place Order
-                        </Button>
-                      )
-                    )}
+                    {/* If cartItems has a length greater than 0, the button is enabled and onClick calls the handlePlaceOrder function */}
+                    <Button
+                      type="button"
+                      onClick={handlePlaceOrder}
+                      disabled={cart.cartItems.length === 0}
+                    >
+                      Place Order
+                    </Button>
                   </div>
                   {loading && <LoadingSpinner />}
                 </ListGroup.Item>
