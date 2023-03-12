@@ -142,7 +142,7 @@ export default function OrderScreen() {
       </Helmet>
       <h1 className="my-3">Order {orderId}</h1>
       <Row>
-        <Col md={9}>
+        <Col md={8}>
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Your Information</Card.Title>
@@ -198,24 +198,25 @@ export default function OrderScreen() {
                 {order.orderItems.map((item) => (
                   <ListGroup.Item key={item._id}>
                     <Row className="align-items-center">
-                      <Col md={12} className="my-3">
+                      <Col md={12} className="mb-3">
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="img-fluid rounded img-thumbnail mx-1"
+                          className="img-fluid rounded img-thumbnail d-block mb-1"
+                          style={{ maxWidth: '80px', maxHeight: '80px' }}
                         ></img>{' '}
                         <Link
                           className="remove-link-style"
                           to={`/product/${item.slug}`}
                         >
-                          {item.name}
+                          <strong>{item.name}</strong>
                         </Link>
                       </Col>
-                      <Col md={6} className="my-3">
-                        <strong>Qty: {item.quantity}</strong>
+                      <Col md={6} className="mb-1 btn-text">
+                        Qty: {item.quantity}
                       </Col>
-                      <Col md={6} className="my-3">
-                        <strong>Price: {item.price}</strong>
+                      <Col md={6} className="mb-1 text-end btn-text">
+                        Price: ${item.price}
                       </Col>
                     </Row>
                   </ListGroup.Item>
@@ -224,7 +225,7 @@ export default function OrderScreen() {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
+        <Col md={4}>
           <Card className="mb-3">
             <Card.Body>
               <Card.Title>Order Summary</Card.Title>

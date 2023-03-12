@@ -106,7 +106,7 @@ export default function ShippingInfoPage() {
 
     // Dispatch an action to update the shipping info in the global state
     ctxDispatch({
-      type: 'SHIPPING_INFO',
+      type: 'SET_SHIPPING_INFO',
       payload: {
         firstName,
         lastName,

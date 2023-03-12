@@ -28,7 +28,7 @@ export default function PaymentPage() {
 
   //Function to update the payment method in the global state
   const dispatchPaymentMethod = (dispatch, paymentMethodName) => {
-    dispatch({ type: 'PAYMENT_METHOD', payload: paymentMethodName });
+    dispatch({ type: 'SET_PAYMENT_METHOD', payload: paymentMethodName });
   };
 
   // Setting up a handleSubmit function

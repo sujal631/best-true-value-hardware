@@ -287,3 +287,21 @@ body {
   background-size: 8px 10px;
   padding-right: 2.5rem;
 }
+
+@media (max-width: 767px) {
+  .btn-text {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .btn-text {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 992px) {
+  .btn-text {
+    font-size: 16px;
+  }
+}
