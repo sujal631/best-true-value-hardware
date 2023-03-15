@@ -30,6 +30,8 @@ import Navigation from './Components/Navigation';
 import Footer from './Components/Footer';
 import ProductsPage from './Pages/ProductsPage';
 import ScrollToTop from './Components/ScrollToTop';
+import UserAuthorizedAccess from './Components/UserAuthorizedAccess';
+import AdminAuthorizedAccess from './Components/AdminAuthorizedAccess';
 
 // Main App component that contains all the routes
 const App = () => {
@@ -40,11 +42,11 @@ const App = () => {
         {/* Header with Navbar as Navigation */}
         <header>
           <Navigation />
+          <ScrollToTop />
         </header>
         {/* Main content section */}
         <main className="main-section">
           <Container>
-            <ScrollToTop />
             {/* All the routes are defined here */}
             <Routes>
               <Route path="/" element={<HomePage />} />
@@ -57,14 +59,63 @@ const App = () => {
               <Route path="/shippingInfo" element={<ShippingInfoPage />} />
               <Route path="/paymentMethod" element={<PaymentPage />} />
               <Route path="/previewOrder" element={<PreviewOrderPage />} />
-              <Route path="/order/:id" element={<OrderPage />} />
-              <Route path="/orderHistory" element={<OrderHistoryPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route
+                path="/order/:id"
+                element={
+                  <UserAuthorizedAccess>
+                    <OrderPage />
+                  </UserAuthorizedAccess>
+                }
+              />
+              <Route
+                path="/orderHistory"
+                element={
+                  <UserAuthorizedAccess>
+                    <OrderHistoryPage />
+                  </UserAuthorizedAccess>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <UserAuthorizedAccess>
+                    <ProfilePage />
+                  </UserAuthorizedAccess>
+                }
+              />
               <Route path="/search" element={<SearchPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/listProducts" element={<ListProductsPage />} />
-              <Route path="/listOrders" element={<ListOrdersPage />} />
-              <Route path="/listUsers" element={<ListUsersPage />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <AdminAuthorizedAccess>
+                    <DashboardPage />
+                  </AdminAuthorizedAccess>
+                }
+              />
+              <Route
+                path="/listProducts"
+                element={
+                  <AdminAuthorizedAccess>
+                    <ListProductsPage />
+                  </AdminAuthorizedAccess>
+                }
+              />
+              <Route
+                path="/listOrders"
+                element={
+                  <AdminAuthorizedAccess>
+                    <ListOrdersPage />
+                  </AdminAuthorizedAccess>
+                }
+              />
+              <Route
+                path="/listUsers"
+                element={
+                  <AdminAuthorizedAccess>
+                    <ListUsersPage />
+                  </AdminAuthorizedAccess>
+                }
+              />
               <Route path="/editProduct" element={<EditProductPage />} />
             </Routes>
           </Container>
