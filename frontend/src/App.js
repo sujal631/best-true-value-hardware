@@ -29,6 +29,7 @@ import AboutPage from './Pages/AboutPage';
 import Navigation from './Components/Navigation';
 import Footer from './Components/Footer';
 import ProductsPage from './Pages/ProductsPage';
+import ScrollToTop from './Components/ScrollToTop';
 
 // Main App component that contains all the routes
 const App = () => {
@@ -43,6 +44,7 @@ const App = () => {
         {/* Main content section */}
         <main className="main-section">
           <Container>
+            <ScrollToTop />
             {/* All the routes are defined here */}
             <Routes>
               <Route path="/" element={<HomePage />} />

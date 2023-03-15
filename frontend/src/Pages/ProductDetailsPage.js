@@ -34,17 +34,39 @@ const ProductDetailsPage = () => {
       });
   }, [slug]);
 
+  // Access the state and dispatch from the Store context
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart } = state;
+
+  // Function to check the stock availability of a product
+  const checkStockAvailability = async (productId, quantity) => {
+    // Fetch the product details using its ID
+    const { data } = await axios.get(`/api/products/${productId}`);
+    // Return true if the available stock is greater than or equal to the requested quantity
+    return data.countInStock >= quantity;
+  };
+
   const addToBag = async () => {
-    const existItem = cart.cartItems.find((x) => x._id === product._id);
-    const quantity = existItem ? existItem.quantity + 1 : 1;
-    const { data } = await axios.get(`/api/products/${product._id}`);
-    if (data.countInStock < quantity) {
+    // Find if the product already exists in the cart
+    const existingItem = cart.cartItems.find((x) => x._id === product._id);
+    // Calculate the updated quantity of the product
+    const quantity = existingItem ? existingItem.quantity + 1 : 1;
+
+    // Check if the stock is available for the updated quantity
+    const isStockAvailable = await checkStockAvailability(
+      product._id,
+      quantity
+    );
+
+    // If the stock is not available, show an alert and return
+    if (!isStockAvailable) {
       window.alert('Sorry, this product is out of stock');
       return;
     }
+
+    // If the stock is available, dispatch the 'ADD_ITEM' action with the updated product details
     ctxDispatch({ type: 'ADD_ITEM', payload: { ...product, quantity } });
+    // Navigate to the cart page
     navigate('/cart');
   };
 

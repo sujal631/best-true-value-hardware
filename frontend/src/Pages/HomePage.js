@@ -40,6 +40,11 @@ const HomePage = () => {
     fetchProducts();
   }, []);
 
+  // Scroll to the top of the page when currentPage changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage]);
+
   // Calculate the index of the first and last product to be displayed
   const lastPostIndex = currentPage * postsPerPage;
   const firstPostIndex = lastPostIndex - postsPerPage;
