@@ -59,7 +59,10 @@ export default function Navigation() {
           id="responsive-nav-dropdown "
         >
           {/*Admin Dashboard link */}
-          <LinkContainer to="/dashboard" onClick={() => setExpanded(false)}>
+          <LinkContainer
+            to="/admin/dashboard"
+            onClick={() => setExpanded(false)}
+          >
             <NavDropdown.Item>Dashboard</NavDropdown.Item>
           </LinkContainer>
           {/*Admin Profile link */}
@@ -67,15 +70,24 @@ export default function Navigation() {
             <NavDropdown.Item>Profile</NavDropdown.Item>
           </LinkContainer>
           {/*Admin Products Management link */}
-          <LinkContainer to="/listProducts" onClick={() => setExpanded(false)}>
+          <LinkContainer
+            to="/admin/listProducts"
+            onClick={() => setExpanded(false)}
+          >
             <NavDropdown.Item>Products</NavDropdown.Item>
           </LinkContainer>
           {/*Admin Orders Management link */}
-          <LinkContainer to="/listOrders" onClick={() => setExpanded(false)}>
+          <LinkContainer
+            to="/admin/listOrders"
+            onClick={() => setExpanded(false)}
+          >
             <NavDropdown.Item>Orders</NavDropdown.Item>
           </LinkContainer>
           {/*Admin Users Management link */}
-          <LinkContainer to="/listUsers" onClick={() => setExpanded(false)}>
+          <LinkContainer
+            to="/admin/listUsers"
+            onClick={() => setExpanded(false)}
+          >
             <NavDropdown.Item>Users</NavDropdown.Item>
           </LinkContainer>
           <NavDropdown.Divider />

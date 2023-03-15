@@ -18,7 +18,7 @@ export const isAuth = (req, res, next) => {
   }
 
   // Extract the token from the authorization header
-  const token = authorization.slice(7);
+  const token = authorization.slice(7, authorization.length);
   // Verify the token using the secret key
   jwt.verify(token, secretKey, (error, decode) => {
     if (error) {
@@ -29,4 +29,11 @@ export const isAuth = (req, res, next) => {
     req.user = decode;
     next();
   });
+};
+export const isAdmin = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    res.status(401).send({ message: 'Invalid Admin Token' });
+  }
 };

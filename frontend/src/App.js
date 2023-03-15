@@ -85,7 +85,7 @@ const App = () => {
               />
               <Route path="/search" element={<SearchPage />} />
               <Route
-                path="/dashboard"
+                path="/admin/dashboard"
                 element={
                   <AdminAuthorizedAccess>
                     <DashboardPage />
@@ -93,7 +93,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/listProducts"
+                path="/admin/listProducts"
                 element={
                   <AdminAuthorizedAccess>
                     <ListProductsPage />
@@ -101,7 +101,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/listOrders"
+                path="/admin/listOrders"
                 element={
                   <AdminAuthorizedAccess>
                     <ListOrdersPage />
@@ -109,7 +109,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/listUsers"
+                path="/admin/listUsers"
                 element={
                   <AdminAuthorizedAccess>
                     <ListUsersPage />
