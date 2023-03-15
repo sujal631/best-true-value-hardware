@@ -81,6 +81,13 @@ export default function PreviewOrderPage() {
   );
   const taxPrice = roundToTwoDecimalPlaces(0.105 * itemsPrice);
   const totalPrice = itemsPrice + taxPrice;
+
+  const orderDetails = [
+    { label: 'Item(s)', value: itemsPrice },
+    { label: 'Tax', value: taxPrice },
+    { label: 'Order Total', value: totalPrice.toFixed(2), isTotal: true },
+  ];
+
   return (
     <div>
       <CheckoutSteps step1 step2 step3 step4 />
@@ -188,28 +195,20 @@ export default function PreviewOrderPage() {
             <Card.Body>
               <Card.Title>Order Summary</Card.Title>
               <ListGroup variant="flush">
-                <ListGroup.Item>
-                  <Row>
-                    <Col>Item(s)</Col>
-                    <Col>${itemsPrice}</Col>
-                  </Row>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Row>
-                    <Col>Tax</Col>
-                    <Col>${taxPrice}</Col>
-                  </Row>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Row>
-                    <Col>
-                      <strong>Order Total</strong>
-                    </Col>
-                    <Col>
-                      <strong>${totalPrice.toFixed(2)}</strong>
-                    </Col>
-                  </Row>
-                </ListGroup.Item>
+                {orderDetails.map((detail, index) => (
+                  <ListGroup.Item key={index}>
+                    <Row>
+                      <Col>{detail.label}</Col>
+                      <Col>
+                        {detail.isTotal ? (
+                          <strong>${detail.value}</strong>
+                        ) : (
+                          `$${detail.value}`
+                        )}
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
+                ))}
                 <ListGroup.Item>
                   <div className="d-grid gap-2 mb-3">
                     {/* If cartItems has a length greater than 0, the button is enabled and onClick calls the handlePlaceOrder function */}
