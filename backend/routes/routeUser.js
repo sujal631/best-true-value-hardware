@@ -69,29 +69,23 @@ routeUser.post(
   })
 );
 
-// Handle updating user profile
+// Handle updating user info
 routeUser.put(
-  '/profile',
+  '/profile/info',
   isAuth,
   expressAsyncHandler(async (req, res) => {
-    // Find the user to be updated
     const user = await User.findById(req.user._id);
     if (user) {
-      // Get updated user data from request body
       const {
         firstName = user.firstName,
         lastName = user.lastName,
         email = user.email,
-        password,
       } = req.body;
-      // Update user data
       user.firstName = firstName;
       user.lastName = lastName;
       user.email = email;
-      if (password) user.password = bcrypt.hashSync(password, 8);
-      // Save updated user data
+
       const updatedUser = await user.save();
-      // Extract relevant user data
       const {
         _id,
         firstName: userFirstName,
@@ -99,7 +93,6 @@ routeUser.put(
         email: userEmail,
         isAdmin,
       } = updatedUser;
-      // Send a response with updated user data and a generated token
       res.send({
         _id,
         firstName: userFirstName,
@@ -109,7 +102,38 @@ routeUser.put(
         token: generateToken(updatedUser),
       });
     } else {
-      // Send an error response
+      res.status(404).send({ message: 'User not found' });
+    }
+  })
+);
+
+// Handle updating user password
+routeUser.put(
+  '/profile/password',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      const { password } = req.body;
+      if (password) user.password = bcrypt.hashSync(password, 8);
+
+      const updatedUser = await user.save();
+      const {
+        _id,
+        firstName: userFirstName,
+        lastName: userLastName,
+        email: userEmail,
+        isAdmin,
+      } = updatedUser;
+      res.send({
+        _id,
+        firstName: userFirstName,
+        lastName: userLastName,
+        email: userEmail,
+        isAdmin,
+        token: generateToken(updatedUser),
+      });
+    } else {
       res.status(404).send({ message: 'User not found' });
     }
   })
