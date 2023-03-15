@@ -12,8 +12,9 @@ import LoadingSpinner from '../Components/LoadingComponent.js';
 import Message from '../Components/MessageComponent.js';
 import { Store } from '../Store';
 import { getErrorMessage } from '../utils';
-import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import { usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { toast } from 'react-toastify';
+import OrderSummaryCard from '../Components/OrderSummaryCard';
 
 // Reducer function for handling state changes
 const reducer = (state, action) => {
@@ -298,53 +299,14 @@ export default function OrderScreen() {
           </Card>
         </Col>
         <Col xs={12} lg={4}>
-          <Card>
-            <Card.Body>
-              {/* Order summary component displaying subtotal, tax, and total prices for the order*/}
-              <Card.Title>Order Summary</Card.Title>
-              <ListGroup variant="flush">
-                <ListGroup.Item>
-                  <Row>
-                    <Col>Item(s)</Col>
-                    <Col>${order.itemsPrice.toFixed(2)}</Col>
-                  </Row>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Row>
-                    <Col>Tax</Col>
-                    <Col>${order.taxPrice.toFixed(2)}</Col>
-                  </Row>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <Row>
-                    <Col>
-                      <strong>Order Total</strong>
-                    </Col>
-                    <Col>
-                      <strong>${order.totalPrice.toFixed(2)}</strong>
-                    </Col>
-                  </Row>
-                </ListGroup.Item>
-                {!order.isPaid && (
-                  <ListGroup.Item>
-                    {/* If the order has not been paid for, the PayPal buttons are displayed and the 'createOrder', 'onApprove', and 'onError' methods are called when appropriate */}
-                    {isPending ? (
-                      <LoadingSpinner />
-                    ) : (
-                      <div>
-                        <PayPalButtons
-                          createOrder={createPayPalOrder}
-                          onApprove={handleApprove}
-                          onError={handleError}
-                        ></PayPalButtons>
-                      </div>
-                    )}
-                    {loadingPay && <LoadingSpinner></LoadingSpinner>}
-                  </ListGroup.Item>
-                )}
-              </ListGroup>
-            </Card.Body>
-          </Card>
+          <OrderSummaryCard
+            order={order}
+            createPayPalOrder={createPayPalOrder}
+            handleApprove={handleApprove}
+            handleError={handleError}
+            isPending={isPending}
+            loadingPay={loadingPay}
+          />
         </Col>
       </Row>
     </div>
