@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import Message from '../Components/MessageComponent';
 import { Store } from '../Store';
 import { getErrorMessage } from '../utils';
+import { useRef } from 'react';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -32,6 +33,7 @@ export default function ProfilePage() {
   const [oldPassword, setOldPassword] = useState('');
   const [toastMessage, setToastMessage] = useState({ type: '', message: '' });
   const [toastId, setToastId] = useState(null);
+  const oldPasswordRef = useRef(null);
 
   const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
     loadingUpdate: false,
@@ -116,10 +118,17 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     if (editMode) {
-      updateUserInfo();
-      setEditMode(false);
+      const oldPasswordValid = await verifyOldPassword();
+      if (oldPasswordValid) {
+        updateUserInfo();
+        setEditMode(false);
+        setOldPassword('');
+      } else {
+        showToast('error', 'Incorrect Password.');
+        oldPasswordRef.current.focus();
+      }
     }
   };
 
@@ -158,36 +167,38 @@ export default function ProfilePage() {
       <h1 className="my-3">Your Profile</h1>
 
       <Form>
-        <div className="mb-3">
-          <label htmlFor="firstName" className="form-label">
-            First Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="firstName"
-            required
-            disabled={!editMode}
-            readOnly={!editMode}
-            onChange={(e) => setFirstName(e.target.value)}
-            value={firstName}
-          />
-        </div>
+        <div className="row">
+          <div className=" col-md-6 mb-3">
+            <label htmlFor="firstName" className="form-label">
+              First Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="firstName"
+              required
+              disabled={!editMode}
+              readOnly={!editMode}
+              onChange={(e) => setFirstName(e.target.value)}
+              value={firstName}
+            />
+          </div>
 
-        <div className="mb-3">
-          <label htmlFor="lastName" className="form-label">
-            Last Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="lastName"
-            required
-            disabled={!editMode}
-            readOnly={!editMode}
-            onChange={(e) => setLastName(e.target.value)}
-            value={lastName}
-          />
+          <div className=" col-md-6 mb-3">
+            <label htmlFor="lastName" className="form-label">
+              Last Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="lastName"
+              required
+              disabled={!editMode}
+              readOnly={!editMode}
+              onChange={(e) => setLastName(e.target.value)}
+              value={lastName}
+            />
+          </div>
         </div>
 
         <div className="mb-3">
@@ -215,6 +226,22 @@ export default function ProfilePage() {
             value={email}
           />
         </div>
+
+        {editMode && (
+          <div className="mb-3">
+            <label htmlFor="oldPassword" className="form-label">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              id="oldPassword"
+              ref={oldPasswordRef}
+              onChange={(e) => setOldPassword(e.target.value)}
+              value={oldPassword}
+            />
+          </div>
+        )}
 
         {/* Conditionally render the password fields if passwordChangeMode is true */}
         {passwordChangeMode && (

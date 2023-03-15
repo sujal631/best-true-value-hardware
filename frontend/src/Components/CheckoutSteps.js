@@ -7,7 +7,7 @@ export default function CheckoutSteps(props) {
   // Array of objects called 'steps' that contains name of each steps
   const steps = [
     { name: 'Log In', active: props.step1 },
-    { name: 'Shipping Info', active: props.step2 },
+    { name: 'Your Information', active: props.step2 },
     { name: 'Payment Method', active: props.step3 },
     { name: 'Preview Order', active: props.step4 },
   ];

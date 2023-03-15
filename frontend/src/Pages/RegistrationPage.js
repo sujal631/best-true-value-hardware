@@ -136,34 +136,36 @@ export default function Registration() {
 
       {/* Form with the function handleSubmit being called on submit */}
       <Form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          {/* A form input for the user's first name */}
-          <label htmlFor="firstName" className="form-label">
-            First Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="firstName"
-            required
-            onChange={handleChange}
-            value={firstName}
-          />
-        </div>
+        <div className="row">
+          <div className=" col-md-6 mb-3">
+            {/* A form input for the user's first name */}
+            <label htmlFor="firstName" className="form-label">
+              First Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="firstName"
+              required
+              onChange={handleChange}
+              value={firstName}
+            />
+          </div>
 
-        {/* A form input for the user's last name */}
-        <div className="mb-3">
-          <label htmlFor="lastName" className="form-label">
-            Last Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="lastName"
-            required
-            onChange={handleChange}
-            value={lastName}
-          />
+          {/* A form input for the user's last name */}
+          <div className=" col-md-6 mb-3">
+            <label htmlFor="lastName" className="form-label">
+              Last Name
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="lastName"
+              required
+              onChange={handleChange}
+              value={lastName}
+            />
+          </div>
         </div>
 
         {/* A form input for the user's email address */}

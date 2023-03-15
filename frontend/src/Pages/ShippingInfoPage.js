@@ -150,33 +150,35 @@ export default function ShippingInfoPage() {
         {/* Render the Shipping Info form */}
         <Form onSubmit={handleSubmit}>
           {/* A form input for the user's first name */}
-          <div className="mb-3">
-            <label htmlFor="firstName" className="form-label">
-              First Name
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="firstName"
-              required
-              onChange={(e) => setFirstName(e.target.value)}
-              value={firstName}
-            />
-          </div>
+          <div className="row">
+            <div className=" col-md-6 mb-3">
+              <label htmlFor="firstName" className="form-label">
+                First Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="firstName"
+                required
+                onChange={(e) => setFirstName(e.target.value)}
+                value={firstName}
+              />
+            </div>
 
-          {/* A form input for the user's last name */}
-          <div className="mb-3">
-            <label htmlFor="lastName" className="form-label">
-              Last Name
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="lastName"
-              required
-              onChange={(e) => setLastName(e.target.value)}
-              value={lastName}
-            />
+            {/* A form input for the user's last name */}
+            <div className=" col-md-6 mb-3">
+              <label htmlFor="lastName" className="form-label">
+                Last Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="lastName"
+                required
+                onChange={(e) => setLastName(e.target.value)}
+                value={lastName}
+              />
+            </div>
           </div>
 
           {/* A form input for the user's phone number */}
@@ -234,38 +236,40 @@ export default function ShippingInfoPage() {
           </div>
 
           {/* A form input for the user's city */}
-          <div className="mb-3">
-            <label htmlFor="city" className="form-label">
-              City
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="city"
-              required
-              onChange={(e) => setCity(e.target.value)}
-              value={city}
-            />
-          </div>
+          <div className="row">
+            <div className=" col-md-6 mb-3">
+              <label htmlFor="city" className="form-label">
+                City
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="city"
+                required
+                onChange={(e) => setCity(e.target.value)}
+                value={city}
+              />
+            </div>
 
-          {/* A form input for the user's state */}
-          <div className="mb-3">
-            <label htmlFor="region" className="form-label">
-              State
-            </label>
-            <select
-              className="form-control custom-select"
-              id="region"
-              required
-              onChange={(e) => setRegion(e.target.value)}
-              value={region}
-            >
-              {stateOptions.map((state) => (
-                <option key={state} value={state}>
-                  {state}
-                </option>
-              ))}
-            </select>
+            {/* A form input for the user's state */}
+            <div className=" col-md-6 mb-3">
+              <label htmlFor="region" className="form-label">
+                State
+              </label>
+              <select
+                className="form-control custom-select"
+                id="region"
+                required
+                onChange={(e) => setRegion(e.target.value)}
+                value={region}
+              >
+                {stateOptions.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* A form input for the user's zip code */}
