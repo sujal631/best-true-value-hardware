@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { useContext } from 'react';
 import { Button, Container, Form } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
@@ -29,6 +29,9 @@ export default function ProfilePage() {
   const [email, setEmail] = useState(userInfo.email);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
+  const [toastMessage, setToastMessage] = useState({ type: '', message: '' });
+  const [toastId, setToastId] = useState(null);
 
   const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
     loadingUpdate: false,
@@ -37,6 +40,36 @@ export default function ProfilePage() {
   // Add state variables to control edit mode and password change mode
   const [editMode, setEditMode] = useState(false);
   const [passwordChangeMode, setPasswordChangeMode] = useState(false);
+
+  useEffect(() => {
+    if (toastMessage.type !== '') {
+      let newToastId;
+      if (toastMessage.type === 'success') {
+        newToastId = toast.success(toastMessage.message);
+      } else if (toastMessage.type === 'error') {
+        newToastId = toast.error(toastMessage.message);
+      }
+      setToastId(newToastId);
+      setToastMessage({ type: '', message: '' });
+    }
+  }, [toastMessage.type, toastMessage.message]);
+
+  const showToast = (type, message) => {
+    setToastMessage({ type, message });
+  };
+
+  // verifyOldPassword function
+  const verifyOldPassword = async () => {
+    const userData = { password: oldPassword };
+    const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+
+    try {
+      await axios.post('/api/users/profile/verify-password', userData, config);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
 
   const updateUserInfo = async () => {
     const userData = { firstName, lastName, email };
@@ -71,10 +104,15 @@ export default function ProfilePage() {
       dispatch({ type: 'SUCCESS' });
       ctxDispatch({ type: 'LOGIN', payload: data });
       localStorage.setItem('userInfo', JSON.stringify(data));
-      toast.success('Password Update Successful');
+      setToastMessage({
+        type: 'success',
+        message: 'Password Update Successful',
+      });
+      setToastId(null);
     } catch (error) {
-      dispatch({ type: 'FAILURE' });
-      toast.error(getErrorMessage(error));
+      // ...
+      setToastMessage({ type: 'error', message: getErrorMessage(error) });
+      setToastId(null);
     }
   };
 
@@ -85,19 +123,30 @@ export default function ProfilePage() {
     }
   };
 
-  const handleUpdatePasswordClick = (e) => {
+  const handleUpdatePasswordClick = async (e) => {
     e.preventDefault();
 
-    if (password === '' || confirmPassword === '') {
-      return toast.error('Please enter a password and confirm it.');
+    if (password === '' || confirmPassword === '' || oldPassword === '') {
+      showToast('error', 'Please fill out all password fields.');
+      return;
     }
 
     if (password !== confirmPassword) {
-      return toast.error('Password and Confirm Password do not match.');
+      showToast('error', 'New Password and Confirm New Password do not match.');
+      return;
     }
 
-    updatePassword();
-    setPasswordChangeMode(false);
+    const oldPasswordValid = await verifyOldPassword();
+    if (oldPasswordValid) {
+      updatePassword();
+      setPasswordChangeMode(false);
+      // Clear password fields after a successful update
+      setOldPassword('');
+      setPassword('');
+      setConfirmPassword('');
+    } else {
+      showToast('error', 'Incorrect Old Password.');
+    }
   };
 
   return (
@@ -171,8 +220,25 @@ export default function ProfilePage() {
         {passwordChangeMode && (
           <>
             <div className="mb-3">
+              <label htmlFor="oldPassword" className="form-label">
+                Old Password
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                id="oldPassword"
+                onChange={(e) => setOldPassword(e.target.value)}
+                value={oldPassword}
+              />
+            </div>
+          </>
+        )}
+
+        {passwordChangeMode && (
+          <>
+            <div className="mb-3">
               <label htmlFor="password" className="form-label">
-                Password
+                New Password
               </label>
               <input
                 type="password"
@@ -219,7 +285,7 @@ export default function ProfilePage() {
 
             <div className="mb-3">
               <label htmlFor="confirmPassword" className="form-label">
-                Confirm Password
+                Confirm New Password
               </label>
               <input
                 type="password"
@@ -236,7 +302,7 @@ export default function ProfilePage() {
         {!editMode && !passwordChangeMode && (
           <>
             <div className="d-grid gap-2 mb-3">
-              <Button onClick={() => setEditMode(true)}>Edit</Button>
+              <Button onClick={() => setEditMode(true)}>Edit Your Info</Button>
             </div>
             <div className="d-grid gap-2 mb-3">
               <Button onClick={() => setPasswordChangeMode(true)}>
@@ -248,18 +314,28 @@ export default function ProfilePage() {
 
         {editMode && (
           <div className="d-grid gap-2 mb-3">
-            <Button onClick={() => setEditMode(false)}>Cancel</Button>
             <Button type="button" onClick={handleSaveClick}>
-              Update Your Profile
+              Update Your Info
             </Button>
+            <Button onClick={() => setEditMode(false)}>Cancel</Button>
           </div>
         )}
 
         {passwordChangeMode && (
           <div className="d-grid gap-2 mb-3">
-            <Button onClick={() => setPasswordChangeMode(false)}>Cancel</Button>
             <Button type="button" onClick={handleUpdatePasswordClick}>
               Update Password
+            </Button>
+            <Button
+              onClick={() => {
+                setPasswordChangeMode(false);
+                // Clear password fields when user cancels password update
+                setOldPassword('');
+                setPassword('');
+                setConfirmPassword('');
+              }}
+            >
+              Cancel
             </Button>
           </div>
         )}

@@ -139,5 +139,24 @@ routeUser.put(
   })
 );
 
+// Handle verifying old password
+routeUser.post(
+  '/profile/verify-password',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      const { password } = req.body;
+      if (bcrypt.compareSync(password, user.password)) {
+        res.send({ message: 'Old password verified successfully' });
+      } else {
+        res.status(401).send({ message: 'Old password is incorrect' });
+      }
+    } else {
+      res.status(404).send({ message: 'User not found' });
+    }
+  })
+);
+
 // Export the express router
 export default routeUser;
