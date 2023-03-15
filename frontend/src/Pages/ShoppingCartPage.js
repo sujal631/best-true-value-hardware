@@ -42,6 +42,55 @@ export default function ShoppingCartPage() {
   const handleCheckout = () => {
     navigate('/login?redirect=/shippingInfo');
   };
+
+  // Define a function that displays the calculated subtotal for the cart items
+  const Subtotal = ({ cartItems, calculateCartSubtotal }) => (
+    <h4>Subtotal: {calculateCartSubtotal(cartItems)}</h4>
+  );
+
+  // Define a function called CheckoutButton that displays the checkout button and handles its click event
+  const CheckoutButton = ({ cartItems, handleCheckout }) => (
+    <div className="d-grid">
+      <Button
+        variant="primary"
+        onClick={handleCheckout}
+        type="button"
+        disabled={cartItems.length === 0}
+      >
+        Checkout
+      </Button>
+    </div>
+  );
+
+  // Define a OrderSummary function that displays the order summary with the subtotal and checkout button
+  const OrderSummary = ({
+    cartItems,
+    calculateCartSubtotal,
+    handleCheckout,
+  }) => (
+    <Card>
+      <Card.Body>
+        <Card.Title>Order Summary</Card.Title>
+        <ListGroup variant="flush">
+          <ListGroup.Item>
+            {/* Displays the subtotal of the cart using the calculateCartSubtotal function */}
+            <Subtotal
+              cartItems={cartItems}
+              calculateCartSubtotal={calculateCartSubtotal}
+            />
+          </ListGroup.Item>
+          <ListGroup.Item>
+            {/* Button that calls the handleCheckout function on click */}
+            <CheckoutButton
+              cartItems={cartItems}
+              handleCheckout={handleCheckout}
+            />
+          </ListGroup.Item>
+        </ListGroup>
+      </Card.Body>
+    </Card>
+  );
+
   return (
     <div>
       {/* Setting the page title using react-helmet-async */}
@@ -138,30 +187,12 @@ export default function ShoppingCartPage() {
           )}
         </Col>
         <Col xs={12} lg={4}>
-          <Card>
-            <Card.Body>
-              <Card.Title>Order Summary</Card.Title>
-              <ListGroup variant="flush">
-                <ListGroup.Item>
-                  {/* Displays the subtotal of the cart using the calculateCartSubtotal function */}
-                  <h4>Subtotal: {calculateCartSubtotal(cartItems)}</h4>
-                </ListGroup.Item>
-                <ListGroup.Item>
-                  <div className="d-grid">
-                    {/* Button that calls the handleCheckout function on click */}
-                    <Button
-                      variant="primary"
-                      onClick={handleCheckout}
-                      type="button"
-                      disabled={cartItems.length === 0}
-                    >
-                      Checkout
-                    </Button>
-                  </div>
-                </ListGroup.Item>
-              </ListGroup>
-            </Card.Body>
-          </Card>
+          {/* Renders the OrderSummary component and passes the required props */}
+          <OrderSummary
+            cartItems={cartItems}
+            calculateCartSubtotal={calculateCartSubtotal}
+            handleCheckout={handleCheckout}
+          />
         </Col>
       </Row>
     </div>
