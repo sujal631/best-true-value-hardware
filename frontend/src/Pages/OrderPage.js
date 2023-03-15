@@ -299,6 +299,13 @@ export default function OrderScreen() {
           </Card>
         </Col>
         <Col xs={12} lg={4}>
+          {/* Render the OrderSummaryCard component with the necessary props:
+              - order: contains order details (items, tax, total price, etc.)
+              - createPayPalOrder: a function to create a PayPal order
+              - handleApprove: a function to handle approval of the PayPal order
+              - handleError: a function to handle errors during the PayPal process
+              - isPending: a boolean indicating if the PayPal order creation is pending
+              - loadingPay: a boolean indicating if the payment process is loading */}
           <OrderSummaryCard
             order={order}
             createPayPalOrder={createPayPalOrder}
