@@ -21,7 +21,7 @@ const HomePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Number of products per page
-  const [postsPerPage] = useState(8);
+  const [postsPerPage] = useState(12);
 
   // Effect hook to retrieve products from the API and update the productList state
   useEffect(() => {

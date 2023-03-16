@@ -1,5 +1,7 @@
 import express from 'express';
 import Product from '../models/productModel.js';
+import expressAsyncHandler from 'express-async-handler';
+import { isAuth, isAdmin } from '../utils.js';
 
 const routeProduct = express.Router();
 
@@ -18,6 +20,28 @@ routeProduct.get('/', async (req, res) => {
     });
   }
 });
+
+const PAGE_SIZE = 10;
+routeProduct.get(
+  '/admin',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const { query } = req;
+    const page = query.page || 1;
+    const pageSize = query.limit || PAGE_SIZE;
+    const products = await Product.find()
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+    const countProducts = await Product.countDocuments();
+    res.send({
+      products,
+      countProducts,
+      page,
+      pages: Math.ceil(countProducts / pageSize),
+    });
+  })
+);
 
 // Route handler to fetch a specific product by its slug
 routeProduct.get('/slug/:slug', async (req, res) => {
