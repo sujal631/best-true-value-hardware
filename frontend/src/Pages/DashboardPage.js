@@ -17,7 +17,7 @@ const reducer = (state, action) => {
     case 'SUCCESS':
       return {
         ...state,
-        summary: action.payload,
+        dashboard: action.payload,
         loading: false,
       };
     case 'FAILURE':
@@ -27,7 +27,7 @@ const reducer = (state, action) => {
   }
 };
 export default function DashboardPage() {
-  const [{ loading, summary, error }, dispatch] = useReducer(reducer, {
+  const [{ loading, dashboard, error }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
   });
@@ -41,7 +41,7 @@ export default function DashboardPage() {
     const fetchData = async () => {
       try {
         const { data } = await axios.get(
-          `/api/orders/summary?timeRange=${timeRange}`,
+          `/api/orders/dashboard?timeRange=${timeRange}`,
           {
             headers: { Authorization: `Bearer ${userInfo.token}` },
           }
@@ -100,8 +100,8 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Total Users"
                 value={
-                  summary.users && summary.users[0]
-                    ? summary.users[0].numUsers
+                  dashboard.users && dashboard.users[0]
+                    ? dashboard.users[0].numUsers
                     : 0
                 }
                 textColor="#bb0000"
@@ -112,8 +112,8 @@ export default function DashboardPage() {
               <SummaryCard
                 title="New Customers"
                 value={
-                  summary.newReturningCustomers
-                    ? summary.newReturningCustomers
+                  dashboard.newReturningCustomers
+                    ? dashboard.newReturningCustomers
                         .filter((customer) => customer._id === 'New Customer')
                         .map((customer) => customer.count)
                         .reduce((acc, val) => acc + val, 0)
@@ -128,8 +128,8 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Returning Customers"
                 value={
-                  summary.newReturningCustomers
-                    ? summary.newReturningCustomers
+                  dashboard.newReturningCustomers
+                    ? dashboard.newReturningCustomers
                         .filter(
                           (customer) => customer._id === 'Returning Customer'
                         )
@@ -148,8 +148,8 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Total Orders"
                 value={
-                  summary.orders && summary.users[0]
-                    ? summary.orders[0].numOrders
+                  dashboard.orders && dashboard.users[0]
+                    ? dashboard.orders[0].numOrders
                     : 0
                 }
                 textColor="#bb0000"
@@ -160,8 +160,8 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Orders in the Last 24 Hours"
                 value={
-                  summary.dailyOrders
-                    ? summary.dailyOrders
+                  dashboard.dailyOrders
+                    ? dashboard.dailyOrders
                         .filter((dailyOrder) => {
                           const today = new Date();
                           const yesterday = new Date(today);
@@ -181,8 +181,8 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Total Earnings"
                 value={`${
-                  summary.orders && summary.users[0]
-                    ? summary.orders[0].totalSales.toFixed(2)
+                  dashboard.orders && dashboard.users[0]
+                    ? dashboard.orders[0].totalSales.toFixed(2)
                     : 0
                 }`}
                 textColor="#bb0000"
@@ -194,12 +194,12 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Average Order Value"
                 value={`${
-                  summary.orders &&
-                  summary.users[0] &&
-                  summary.orders[0].numOrders > 0
+                  dashboard.orders &&
+                  dashboard.users[0] &&
+                  dashboard.orders[0].numOrders > 0
                     ? (
-                        summary.orders[0].totalSales /
-                        summary.orders[0].numOrders
+                        dashboard.orders[0].totalSales /
+                        dashboard.orders[0].numOrders
                       ).toFixed(2)
                     : 0
                 }`}
@@ -214,8 +214,8 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Total Products"
                 value={
-                  summary.productDepartments
-                    ? summary.productDepartments
+                  dashboard.productDepartments
+                    ? dashboard.productDepartments
                         .map((department) => department.count)
                         .reduce((acc, val) => acc + val, 0)
                     : 0
@@ -228,8 +228,9 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Top Selling Department"
                 value={
-                  summary.revenueByDepartment && summary.revenueByDepartment[0]
-                    ? summary.revenueByDepartment[0]._id
+                  dashboard.revenueByDepartment &&
+                  dashboard.revenueByDepartment[0]
+                    ? dashboard.revenueByDepartment[0]._id
                     : 'N/A'
                 }
                 textColor="#bb0000"
@@ -242,24 +243,28 @@ export default function DashboardPage() {
               <SummaryCard
                 title="Highest Revenue Customer"
                 value={
-                  summary.highestRevenueCustomer &&
-                  summary.highestRevenueCustomer[0] &&
-                  summary.highestRevenueCustomer[0].user
-                    ? `$${summary.highestRevenueCustomer[0].revenue.toFixed(2)}`
+                  dashboard.highestRevenueCustomer &&
+                  dashboard.highestRevenueCustomer[0] &&
+                  dashboard.highestRevenueCustomer[0].user
+                    ? `$${dashboard.highestRevenueCustomer[0].revenue.toFixed(
+                        2
+                      )}`
                     : 0
                 }
                 textColor="#bb0000"
                 backgroundColor="#F0F0F0"
               >
-                {summary.highestRevenueCustomer &&
-                summary.highestRevenueCustomer[0] &&
-                summary.highestRevenueCustomer[0].user ? (
+                {dashboard.highestRevenueCustomer &&
+                dashboard.highestRevenueCustomer[0] &&
+                dashboard.highestRevenueCustomer[0].user ? (
                   <div>
                     <p>
-                      Name: {summary.highestRevenueCustomer[0].user.firstName}{' '}
-                      {summary.highestRevenueCustomer[0].user.lastName}
+                      Name: {dashboard.highestRevenueCustomer[0].user.firstName}{' '}
+                      {dashboard.highestRevenueCustomer[0].user.lastName}
                     </p>
-                    <p>Email: {summary.highestRevenueCustomer[0].user.email}</p>
+                    <p>
+                      Email: {dashboard.highestRevenueCustomer[0].user.email}
+                    </p>
                   </div>
                 ) : (
                   <p>No customer data available</p>
@@ -286,7 +291,7 @@ export default function DashboardPage() {
                     <option value="all">All</option>
                   </select>
                 </div>
-                {summary.dailyOrders.length === 0 ? (
+                {dashboard.dailyOrders.length === 0 ? (
                   <Message variant="danger">No Data</Message>
                 ) : (
                   <Chart
@@ -296,7 +301,7 @@ export default function DashboardPage() {
                     loader={<div>Loading...</div>}
                     data={[
                       ['Date', 'Sales'],
-                      ...summary.dailyOrders.map((x) => [x._id, x.sales]),
+                      ...dashboard.dailyOrders.map((x) => [x._id, x.sales]),
                     ]}
                     options={{
                       title: 'Sales Performance',
@@ -349,7 +354,7 @@ export default function DashboardPage() {
             <Col md={6}>
               <div className="my-3">
                 <h2>Departments</h2>
-                {summary.productDepartments.length === 0 ? (
+                {dashboard.productDepartments.length === 0 ? (
                   <Message variant="danger">No Data</Message>
                 ) : (
                   <Chart
@@ -359,7 +364,7 @@ export default function DashboardPage() {
                     loader={<div>Loading...</div>}
                     data={[
                       ['Department', 'Products'],
-                      ...summary.productDepartments
+                      ...dashboard.productDepartments
                         .map((x) => [x._id || 'Unknown', x.count])
                         .sort((a, b) =>
                           a[0].toLowerCase() > b[0].toLowerCase() ? 1 : -1
@@ -381,7 +386,7 @@ export default function DashboardPage() {
             <Col md={6}>
               <div className="my-3">
                 <h2>Revenue by Department</h2>
-                {summary.revenueByDepartment.length === 0 ? (
+                {dashboard.revenueByDepartment.length === 0 ? (
                   <Message variant="danger">No Data</Message>
                 ) : (
                   <Chart
@@ -391,7 +396,7 @@ export default function DashboardPage() {
                     loader={<div>Loading Chart...</div>}
                     data={[
                       ['Department', 'Revenue'],
-                      ...summary.revenueByDepartment
+                      ...dashboard.revenueByDepartment
                         .map((x) => [x._id, x.revenue])
                         .sort((a, b) =>
                           a[0].toLowerCase() > b[0].toLowerCase() ? 1 : -1

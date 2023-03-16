@@ -26,7 +26,7 @@ routeOrder.route('/').post(
   })
 );
 
-routeOrder.route('/summary').get(
+routeOrder.route('/dashboard').get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
