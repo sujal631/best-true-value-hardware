@@ -32,10 +32,21 @@ routeOrder.route('/summary').get(
   expressAsyncHandler(async (req, res) => {
     const orders = await Order.aggregate([
       {
+        $match: {
+          isPaid: true, // Add this line to filter paid orders only
+        },
+      },
+      {
         $group: {
           _id: null,
           numOrders: { $sum: 1 },
           totalSales: { $sum: '$totalPrice' },
+        },
+      },
+      {
+        $addFields: {
+          numOrders: { $ifNull: ['$numOrders', 0] },
+          totalSales: { $ifNull: ['$totalSales', 0] },
         },
       },
     ]);
@@ -44,6 +55,11 @@ routeOrder.route('/summary').get(
         $group: {
           _id: null,
           numUsers: { $sum: 1 },
+        },
+      },
+      {
+        $addFields: {
+          numUsers: { $ifNull: ['$numUsers', 0] },
         },
       },
     ]);
@@ -57,15 +73,74 @@ routeOrder.route('/summary').get(
       },
       { $sort: { _id: 1 } },
     ]);
-    const productCategories = await Product.aggregate([
+    const productDepartments = await Product.aggregate([
       {
         $group: {
-          _id: '$category',
+          _id: '$department',
           count: { $sum: 1 },
         },
       },
     ]);
-    res.send({ users, orders, dailyOrders, productCategories });
+
+    const newReturningCustomers = await Order.aggregate([
+      {
+        $group: {
+          _id: '$user',
+          count: { $sum: 1 },
+          createdAt: { $first: '$createdAt' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          userType: {
+            $cond: [
+              { $eq: ['$count', 1] },
+              'New Customer',
+              'Returning Customer',
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$userType',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    const revenueByDepartment = await Order.aggregate([
+      { $unwind: '$orderItems' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'orderItems.product',
+          foreignField: '_id',
+          as: 'productInfo',
+        },
+      },
+      {
+        $unwind: '$productInfo',
+      },
+      {
+        $group: {
+          _id: '$productInfo.department',
+          revenue: {
+            $sum: { $multiply: ['$orderItems.quantity', '$orderItems.price'] },
+          },
+        },
+      },
+      { $sort: { revenue: -1 } },
+    ]);
+
+    res.send({
+      users: users.length ? users : [{ numUsers: 0 }],
+      orders: orders.length ? orders : [{ numOrders: 0, totalSales: 0 }],
+      dailyOrders,
+      productDepartments,
+      newReturningCustomers,
+      revenueByDepartment,
+    });
   })
 );
 // Get orders of the authenticated user

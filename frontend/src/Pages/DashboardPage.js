@@ -8,6 +8,7 @@ import Message from '../Components/MessageComponent';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import { Helmet } from 'react-helmet-async';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -39,6 +40,7 @@ export default function DashboardPage() {
         const { data } = await axios.get('/api/orders/summary', {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
+
         dispatch({ type: 'SUCCESS', payload: data });
       } catch (err) {
         dispatch({
@@ -52,6 +54,9 @@ export default function DashboardPage() {
 
   return (
     <div>
+      <Helmet>
+        <title>Dashboard</title>
+      </Helmet>
       <h1>Dashboard</h1>
       {loading ? (
         <LoadingSpinner />
@@ -68,7 +73,9 @@ export default function DashboardPage() {
                       ? summary.users[0].numUsers
                       : 0}
                   </Card.Title>
-                  <Card.Text> Users</Card.Text>
+                  <Card.Text style={{ color: '#bb0000' }}>
+                    Total Users
+                  </Card.Text>
                 </Card.Body>
               </Card>
             </Col>
@@ -80,7 +87,9 @@ export default function DashboardPage() {
                       ? summary.orders[0].numOrders
                       : 0}
                   </Card.Title>
-                  <Card.Text> Orders</Card.Text>
+                  <Card.Text style={{ color: '#bb0000' }}>
+                    Total Orders
+                  </Card.Text>
                 </Card.Body>
               </Card>
             </Col>
@@ -93,7 +102,9 @@ export default function DashboardPage() {
                       ? summary.orders[0].totalSales.toFixed(2)
                       : 0}
                   </Card.Title>
-                  <Card.Text> Orders</Card.Text>
+                  <Card.Text style={{ color: '#bb0000' }}>
+                    Total Earnings
+                  </Card.Text>
                 </Card.Body>
               </Card>
             </Col>
@@ -101,24 +112,64 @@ export default function DashboardPage() {
           <div className="my-3">
             <h2>Sales</h2>
             {summary.dailyOrders.length === 0 ? (
-              <Message>No Sale</Message>
+              <Message variant="danger">No Data</Message>
             ) : (
               <Chart
                 width="100%"
                 height="400px"
                 chartType="AreaChart"
-                loader={<div>Loading Chart...</div>}
+                loader={<div>Loading...</div>}
                 data={[
                   ['Date', 'Sales'],
                   ...summary.dailyOrders.map((x) => [x._id, x.sales]),
                 ]}
+                options={{
+                  title: 'Sales Performance',
+                  colors: ['#bb0000'],
+                  backgroundColor: 'transparent',
+                  chartArea: {
+                    backgroundColor: 'transparent',
+                  },
+                  legend: { position: 'none' },
+                }}
               ></Chart>
             )}
           </div>
           <div className="my-3">
-            <h2>Categories</h2>
-            {summary.productCategories.length === 0 ? (
-              <Message>No Category</Message>
+            <h2>Departments</h2>
+            {summary.productDepartments.length === 0 ? (
+              <Message variant="danger">No Data</Message>
+            ) : (
+              <Chart
+                width="100%"
+                height="400px"
+                chartType="ColumnChart"
+                loader={<div>Loading...</div>}
+                data={[
+                  ['Department', 'Products'],
+                  ...summary.productDepartments
+                    .map((x) => [x._id || 'Unknown', x.count])
+                    .sort((a, b) =>
+                      a[0].toLowerCase() > b[0].toLowerCase() ? 1 : -1
+                    ),
+                ]}
+                options={{
+                  title: 'Inventory Breakdown by Department',
+                  colors: ['#bb0000'],
+                  backgroundColor: 'transparent',
+                  chartArea: {
+                    backgroundColor: 'transparent',
+                  },
+                  legend: { position: 'none' },
+                }}
+              ></Chart>
+            )}
+          </div>
+
+          <div className="my-3">
+            <h2>New/Returning Customers</h2>
+            {summary.newReturningCustomers.length === 0 ? (
+              <Message variant="danger">No Data</Message>
             ) : (
               <Chart
                 width="100%"
@@ -126,9 +177,35 @@ export default function DashboardPage() {
                 chartType="PieChart"
                 loader={<div>Loading Chart...</div>}
                 data={[
-                  ['Category', 'Products'],
-                  ...summary.productCategories.map((x) => [x._id, x.count]),
+                  ['Customer Type', 'Count'],
+                  ...summary.newReturningCustomers.map((x) => [x._id, x.count]),
                 ]}
+              ></Chart>
+            )}
+          </div>
+          <div className="my-3">
+            <h2>Revenue by Department</h2>
+            {summary.revenueByDepartment.length === 0 ? (
+              <Message variant="danger">No Data</Message>
+            ) : (
+              <Chart
+                width="100%"
+                height="400px"
+                chartType="ColumnChart"
+                loader={<div>Loading Chart...</div>}
+                data={[
+                  ['Department', 'Revenue'],
+                  ...summary.revenueByDepartment.map((x) => [x._id, x.revenue]),
+                ]}
+                options={{
+                  title: 'Revenue by Department',
+                  colors: ['#bb0000'],
+                  backgroundColor: 'transparent',
+                  chartArea: {
+                    backgroundColor: 'transparent',
+                  },
+                  legend: { position: 'none' },
+                }}
               ></Chart>
             )}
           </div>
