@@ -30,6 +30,58 @@ routeOrder.route('/summary').get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    const timeRange = req.query.timeRange || 'daily';
+
+    const getDateBoundary = (timeRange) => {
+      const now = new Date();
+      const boundary = new Date(now);
+
+      switch (timeRange) {
+        case 'weekly':
+          boundary.setDate(now.getDate() - 7);
+          break;
+        case 'monthly':
+          boundary.setMonth(now.getMonth() - 1);
+          break;
+        case 'yearly':
+          boundary.setFullYear(now.getFullYear() - 1);
+          break;
+        default:
+          boundary.setFullYear(1970); // Set to the Unix epoch to include all records
+      }
+
+      return boundary;
+    };
+
+    const dateBoundary = getDateBoundary(timeRange);
+
+    const dailyOrders = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: dateBoundary },
+        },
+      },
+      {
+        $addFields: {
+          convertedDate: {
+            $cond: [
+              { $eq: [timeRange, 'yearly'] },
+              { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+              { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$convertedDate',
+          orders: { $sum: 1 },
+          sales: { $sum: '$totalPrice' },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
     const orders = await Order.aggregate([
       {
         $match: {
@@ -63,16 +115,7 @@ routeOrder.route('/summary').get(
         },
       },
     ]);
-    const dailyOrders = await Order.aggregate([
-      {
-        $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-          orders: { $sum: 1 },
-          sales: { $sum: '$totalPrice' },
-        },
-      },
-      { $sort: { _id: 1 } },
-    ]);
+
     const productDepartments = await Product.aggregate([
       {
         $group: {
@@ -82,33 +125,6 @@ routeOrder.route('/summary').get(
       },
     ]);
 
-    const newReturningCustomers = await Order.aggregate([
-      {
-        $group: {
-          _id: '$user',
-          count: { $sum: 1 },
-          createdAt: { $first: '$createdAt' },
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          userType: {
-            $cond: [
-              { $eq: ['$count', 1] },
-              'New Customer',
-              'Returning Customer',
-            ],
-          },
-        },
-      },
-      {
-        $group: {
-          _id: '$userType',
-          count: { $sum: 1 },
-        },
-      },
-    ]);
     const revenueByDepartment = await Order.aggregate([
       { $unwind: '$orderItems' },
       {
@@ -133,14 +149,88 @@ routeOrder.route('/summary').get(
       { $sort: { revenue: -1 } },
     ]);
 
+    const highestRevenueCustomer = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: dateBoundary },
+        },
+      },
+      {
+        $group: {
+          _id: '$user',
+          revenue: { $sum: '$totalPrice' },
+        },
+      },
+      { $sort: { revenue: -1 } },
+      { $limit: 1 },
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          user: { $arrayElemAt: ['$user', 0] },
+          revenue: 1,
+        },
+      },
+    ]);
+
     res.send({
       users: users.length ? users : [{ numUsers: 0 }],
       orders: orders.length ? orders : [{ numOrders: 0, totalSales: 0 }],
       dailyOrders,
       productDepartments,
-      newReturningCustomers,
+
       revenueByDepartment,
+      highestRevenueCustomer: highestRevenueCustomer.length
+        ? highestRevenueCustomer
+        : [{ user: null, revenue: 0 }],
     });
+  })
+);
+
+routeOrder.route('/top-selling-products').get(
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const topSellingProducts = await Order.aggregate([
+      { $unwind: '$orderItems' },
+      {
+        $group: {
+          _id: '$orderItems.product',
+          totalQuantity: { $sum: '$orderItems.quantity' },
+          totalRevenue: {
+            $sum: { $multiply: ['$orderItems.price', '$orderItems.quantity'] },
+          },
+        },
+      },
+      { $sort: { totalRevenue: -1 } }, // Sort by descending revenue, change to totalQuantity to sort by quantity
+      { $limit: 10 }, // Limit the results to the top 10 products
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'product',
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          product: { $arrayElemAt: ['$product', 0] },
+          totalQuantity: 1,
+          totalRevenue: 1,
+        },
+      },
+    ]);
+
+    // Send the fetched top-selling products in the response object
+    res.send(topSellingProducts);
   })
 );
 // Get orders of the authenticated user
