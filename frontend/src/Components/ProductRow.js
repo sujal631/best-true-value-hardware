@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
-function ProductRow({ products, onEdit }) {
+function ProductRow({ products, onEdit, onDelete }) {
   return (
     <table className="table table-striped table-bordered table-hover">
       <thead>
@@ -29,6 +29,14 @@ function ProductRow({ products, onEdit }) {
                 onClick={() => onEdit(product._id)}
               >
                 Edit
+              </Button>
+              &emsp;
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => onDelete(product)}
+              >
+                <i className="fa fa-trash "></i>
               </Button>
             </td>
           </tr>

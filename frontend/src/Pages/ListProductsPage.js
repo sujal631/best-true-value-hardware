@@ -1,3 +1,4 @@
+// Importing packages and components
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
@@ -13,6 +14,7 @@ import ReactModal from 'react-modal';
 import ProductRow from '../Components/ProductRow';
 import queryString from 'query-string';
 
+// Reducer function declarations
 const actionsMap = {
   REQUEST: (state) => ({ ...state, loading: true }),
   SUCCESS: (state, action) => ({
@@ -30,6 +32,26 @@ const actionsMap = {
   CREATE_REQUEST: (state) => ({ ...state, loadingCreate: true }),
   CREATE_SUCCESS: (state) => ({ ...state, loadingCreate: false }),
   CREATE_FAILURE: (state) => ({ ...state, loadingCreate: false }),
+  DELETE_REQUEST: (state) => ({
+    ...state,
+    loadingDelete: true,
+    successDelete: false,
+  }),
+  DELETE_SUCCESS: (state) => ({
+    ...state,
+    loadingDelete: false,
+    successDelete: true,
+  }),
+  DELETE_FAILURE: (state) => ({
+    ...state,
+    loadingDelete: false,
+    successDelete: false,
+  }),
+  RESET: (state) => ({
+    ...state,
+    loadingDelete: false,
+    successDelete: false,
+  }),
 };
 
 const reducer = (state, action) => {
@@ -40,14 +62,24 @@ const reducer = (state, action) => {
 ReactModal.setAppElement('#root');
 
 export default function ListProductsPage() {
-  const [{ loading, error, products, pages, loadingCreate }, dispatch] =
-    useReducer(reducer, {
-      loading: true,
-      error: '',
-    });
+  const [
+    {
+      loading,
+      error,
+      products,
+      pages,
+      loadingCreate,
+      loadingDelete,
+      successDelete,
+    },
+    dispatch,
+  ] = useReducer(reducer, {
+    loading: true,
+    error: '',
+  });
+
   const navigate = useNavigate();
   const location = useLocation();
-
   const {
     state: { userInfo },
   } = useContext(Store);
@@ -56,6 +88,8 @@ export default function ListProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [countProducts, setCountProducts] = useState(0);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const fetchProducts = (page, limit, token) => {
     return axios.get(`/api/products/admin?page=${page}&limit=${limit}`, {
@@ -71,21 +105,6 @@ export default function ListProductsPage() {
   const handleFetchError = (error) => {
     dispatch({ type: 'FAILURE', payload: error.message });
   };
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    const parsed = queryString.parse(location.search);
-    const pageFromUrl = parsed.page ? parseInt(parsed.page, 10) : 1;
-    const pageFromState = location.state?.currentPage || pageFromUrl;
-
-    if (currentPage !== pageFromState) {
-      setCurrentPage(pageFromState);
-    } else {
-      fetchProducts(currentPage, pageSize, userInfo.token)
-        .then(({ data }) => handleFetchSuccess(data))
-        .catch(handleFetchError);
-    }
-  }, [currentPage, location, userInfo]);
 
   const setCurrentPageAndUpdateUrl = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -109,7 +128,6 @@ export default function ListProductsPage() {
       )
       .then(({ data }) => {
         dispatch({ type: 'CREATE_SUCCESS' });
-        toast.success('Product created successfully');
         navigate(`/admin/product/${data.product._id}`);
       })
       .catch((error) => {
@@ -130,6 +148,62 @@ export default function ListProductsPage() {
   const handleCancelCreateProduct = () => {
     setShowConfirmModal(false);
   };
+
+  const handleShowDeleteConfirmModal = (product) => {
+    setProductToDelete(product);
+    setShowDeleteConfirmModal(true);
+  };
+
+  const handleCloseDeleteConfirmModal = () => {
+    setShowDeleteConfirmModal(false);
+  };
+
+  const handleProductDelete = async () => {
+    try {
+      await axios.delete(`/api/products/${productToDelete._id}`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      });
+      toast.success('Delete Successful');
+      dispatch({ type: 'DELETE_SUCCESS' });
+      setShowDeleteConfirmModal(false);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      dispatch({
+        type: 'DELETE_FAILURE',
+      });
+    }
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const parsed = queryString.parse(location.search);
+    const pageFromUrl = parsed.page ? parseInt(parsed.page, 10) : 1;
+    const pageFromState = location.state?.currentPage || pageFromUrl;
+
+    const fetchData = async () => {
+      try {
+        const { data } = await fetchProducts(
+          currentPage,
+          pageSize,
+          userInfo.token
+        );
+        handleFetchSuccess(data);
+      } catch (error) {
+        handleFetchError(error);
+      }
+    };
+
+    if (currentPage !== pageFromState) {
+      setCurrentPage(pageFromState);
+    } else {
+      fetchData();
+    }
+
+    if (successDelete) {
+      dispatch({ type: 'RESET' });
+      fetchData();
+    }
+  }, [currentPage, location, userInfo, successDelete]);
 
   const customStyles = {
     overlay: {
@@ -194,12 +268,37 @@ export default function ListProductsPage() {
                 </Button>
               </div>
             </ReactModal>
+
+            <ReactModal
+              isOpen={showDeleteConfirmModal}
+              onRequestClose={handleCloseDeleteConfirmModal}
+              style={customStyles}
+            >
+              <strong>
+                <p>Confirm Delete Product</p>
+              </strong>
+              <p>Are you sure you want to delete this product?</p>
+              <div className="d-flex justify-content-around mt-3">
+                <Button variant="warning" onClick={handleProductDelete}>
+                  CONFIRM
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleCloseDeleteConfirmModal}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </ReactModal>
           </div>
         </Col>
       </Row>
 
       {(() => {
         if (loadingCreate) {
+          return <LoadingSpinner />;
+        }
+        if (loadingDelete) {
           return <LoadingSpinner />;
         }
         if (loading) {
@@ -210,7 +309,11 @@ export default function ListProductsPage() {
         }
         return (
           <>
-            <ProductRow products={products} onEdit={onEdit} />
+            <ProductRow
+              products={products}
+              onEdit={onEdit}
+              onDelete={handleShowDeleteConfirmModal}
+            />
             <div>
               <AdminPagination
                 totalPages={pages}

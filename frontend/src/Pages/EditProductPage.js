@@ -93,22 +93,34 @@ const EditProductPage = () => {
   }, [productId]);
 
   const handleUploadImages = async (e) => {
-    const image_file = e.target.files[0];
-    const bodyFormData = new FormData();
-    bodyFormData.append('image_file', image_file);
+    const imageFile = e.target.files[0];
+
+    const uploadImage = async (file) => {
+      const formData = new FormData();
+      formData.append('image_file', file);
+
+      try {
+        const { data } = await axios.post('/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+
+        return data.secure_url;
+      } catch (error) {
+        throw new Error(getErrorMessage(error));
+      }
+    };
+
     try {
       dispatch({ type: 'UPLOAD_REQUEST' });
-      const { data } = await axios.post('/api/upload', bodyFormData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          authorization: `Bearer ${userInfo.token}`,
-        },
-      });
+      const uploadedImageUrl = await uploadImage(imageFile);
       dispatch({ type: 'UPLOAD_SUCCESS' });
-      setProductData({ ...productData, image: data.secure_url });
+      setProductData({ ...productData, image: uploadedImageUrl });
     } catch (error) {
-      toast.error(getErrorMessage(error));
-      dispatch({ type: 'UPLOAD_FAILURE', payload: getErrorMessage(error) });
+      toast.error(error.message);
+      dispatch({ type: 'UPLOAD_FAILURE', payload: error.message });
     }
   };
 

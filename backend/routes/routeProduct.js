@@ -60,7 +60,22 @@ routeProduct.put(
       product.price = req.body.price;
       product.countInStock = req.body.countInStock;
       await product.save();
-      res.send({ message: 'Update Successful' });
+      res.send();
+    } else {
+      res.status(404).send({ message: 'Product not found' });
+    }
+  })
+);
+
+routeProduct.delete(
+  '/:id',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    if (product) {
+      await product.remove();
+      res.send();
     } else {
       res.status(404).send({ message: 'Product not found' });
     }

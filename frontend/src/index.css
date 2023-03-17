@@ -109,6 +109,15 @@ body {
   border: none;
 }
 
+.btn-trash {
+  background-color: #bb0000;
+  color: #ffffff;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+  border: none;
+  font-size: 0.9rem;
+}
 .btn-primary:disabled {
   background-color: #bb0000;
 }
