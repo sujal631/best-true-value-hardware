@@ -8,6 +8,7 @@ import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import { toast } from 'react-toastify';
 import { Container, Form } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
 
 const actionsMap = {
   REQUEST: (state) => ({ ...state, loading: true }),
@@ -20,6 +21,21 @@ const actionsMap = {
   UPDATE_REQUEST: (state) => ({ ...state, loadingUpdate: true }),
   UPDATE_SUCCESS: (state) => ({ ...state, loadingUpdate: false }),
   UPDATE_FAILURE: (state) => ({ ...state, loadingUpdate: false }),
+  UPLOAD_REQUEST: (state) => ({
+    ...state,
+    loadingUpload: true,
+    errorUpload: '',
+  }),
+  UPLOAD_SUCCESS: (state) => ({
+    ...state,
+    loadingUpload: false,
+    errorUpload: '',
+  }),
+  UPLOAD_FAILURE: (state, action) => ({
+    ...state,
+    loadingUpload: false,
+    errorUpload: action.payload,
+  }),
 };
 
 const reducer = (state, action) => {
@@ -34,13 +50,15 @@ const EditProductPage = () => {
   } = useContext(Store);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPage = location.state?.currentPage || 1;
 
   const [state, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
   });
 
-  const { loading, error, loadingUpdate } = state;
+  const { loading, error, loadingUpdate, loadingUpload } = state;
 
   const [productData, setProductData] = useState({
     name: '',
@@ -74,6 +92,26 @@ const EditProductPage = () => {
     fetchData();
   }, [productId]);
 
+  const handleUploadImages = async (e) => {
+    const image_file = e.target.files[0];
+    const bodyFormData = new FormData();
+    bodyFormData.append('image_file', image_file);
+    try {
+      dispatch({ type: 'UPLOAD_REQUEST' });
+      const { data } = await axios.post('/api/upload', bodyFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          authorization: `Bearer ${userInfo.token}`,
+        },
+      });
+      dispatch({ type: 'UPLOAD_SUCCESS' });
+      setProductData({ ...productData, image: data.secure_url });
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      dispatch({ type: 'UPLOAD_FAILURE', payload: getErrorMessage(error) });
+    }
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setProductData({ ...productData, [name]: value });
@@ -102,7 +140,7 @@ const EditProductPage = () => {
 
     const onUpdateSuccess = () => {
       toast.success('Update Successful');
-      navigate('/admin/listProducts');
+      navigate('/admin/listProducts', { state: { currentPage: currentPage } });
     };
 
     const onUpdateFailure = () => {
@@ -185,6 +223,20 @@ const EditProductPage = () => {
                 onChange={handleChange}
                 required
               />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="imageFile" className="form-label">
+                Upload Image
+              </label>
+              <input
+                type="file"
+                className="form-control"
+                id="imageFile"
+                name="imageFile"
+                onChange={handleUploadImages}
+                required
+              />
+              {loadingUpload && <LoadingSpinner />}
             </div>
             <div className="mb-3">
               <label htmlFor="brand" className="form-label">

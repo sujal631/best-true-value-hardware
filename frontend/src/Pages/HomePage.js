@@ -18,7 +18,11 @@ const HomePage = () => {
   const [productList, setProductList] = useState([]);
 
   // State to keep track of the current page number
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const query = new URLSearchParams(window.location.search);
+    const page = query.get('page');
+    return page ? parseInt(page, 10) : 1;
+  });
 
   // Number of products per page
   const [postsPerPage] = useState(12);
@@ -49,6 +53,13 @@ const HomePage = () => {
   const lastPostIndex = currentPage * postsPerPage;
   const firstPostIndex = lastPostIndex - postsPerPage;
   const currentPosts = productList.slice(firstPostIndex, lastPostIndex);
+
+  // Update the URL query parameter when currentPage changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', currentPage);
+    window.history.pushState({}, '', '?' + params.toString());
+  }, [currentPage]);
 
   return (
     <div>

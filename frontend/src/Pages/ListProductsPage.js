@@ -8,9 +8,10 @@ import AdminPagination from '../Components/AdminPagination.js';
 import { Col, Row, Button } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { getErrorMessage } from '../utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ReactModal from 'react-modal';
 import ProductRow from '../Components/ProductRow';
+import queryString from 'query-string';
 
 const actionsMap = {
   REQUEST: (state) => ({ ...state, loading: true }),
@@ -45,6 +46,7 @@ export default function ListProductsPage() {
       error: '',
     });
   const navigate = useNavigate();
+  const location = useLocation();
 
   const {
     state: { userInfo },
@@ -72,10 +74,27 @@ export default function ListProductsPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchProducts(currentPage, pageSize, userInfo.token)
-      .then(({ data }) => handleFetchSuccess(data))
-      .catch(handleFetchError);
-  }, [currentPage, userInfo]);
+    const parsed = queryString.parse(location.search);
+    const pageFromUrl = parsed.page ? parseInt(parsed.page, 10) : 1;
+    const pageFromState = location.state?.currentPage || pageFromUrl;
+
+    if (currentPage !== pageFromState) {
+      setCurrentPage(pageFromState);
+    } else {
+      fetchProducts(currentPage, pageSize, userInfo.token)
+        .then(({ data }) => handleFetchSuccess(data))
+        .catch(handleFetchError);
+    }
+  }, [currentPage, location, userInfo]);
+
+  const setCurrentPageAndUpdateUrl = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    navigate(`${location.pathname}?page=${pageNumber}`, { replace: true });
+  };
+
+  const onEdit = (productId) => {
+    navigate(`/admin/product/${productId}`, { state: { currentPage } });
+  };
 
   const createProduct = () => {
     dispatch({ type: 'CREATE_REQUEST' });
@@ -191,14 +210,11 @@ export default function ListProductsPage() {
         }
         return (
           <>
-            <ProductRow
-              products={products}
-              onEdit={(productId) => navigate(`/admin/product/${productId}`)}
-            />
+            <ProductRow products={products} onEdit={onEdit} />
             <div>
               <AdminPagination
                 totalPages={pages}
-                setCurrentPage={setCurrentPage}
+                setCurrentPage={setCurrentPageAndUpdateUrl}
                 currentPage={currentPage}
               />
             </div>

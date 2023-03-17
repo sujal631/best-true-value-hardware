@@ -8,7 +8,7 @@ export default function AdminPagination({
   currentPage,
 }) {
   const handleClick = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    setCurrentPage(pageNumber, currentPage);
   };
 
   const renderPageNumbers = () => {

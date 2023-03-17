@@ -7,6 +7,7 @@ import routeProduct from './routes/routeProduct.js';
 import routeSliderImage from './routes/routeSliderImage.js';
 import routeUser from './routes/routeUser.js';
 import routeOrder from './routes/routeOrder.js';
+import routeCloudinary from './routes/routeCloudinary.js';
 
 // Load environment variables from .env file
 config();
@@ -33,6 +34,7 @@ app.get('/api/keys/paypal', (req, res) =>
 
 // Use routes for seed, products, slider images, users, and orders
 app.use('/api/seed', routeSeed);
+app.use('/api/upload', routeCloudinary);
 app.use('/api/products', routeProduct);
 app.use('/api/sliderImages', routeSliderImage);
 app.use('/api/users', routeUser);
