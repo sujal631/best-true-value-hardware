@@ -5,57 +5,147 @@ import { Store } from '../Store.js';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import AdminPagination from '../Components/AdminPagination.js';
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'REQUEST':
-      return { ...state, loading: true };
-    case 'SUCCESS':
-      return {
-        ...state,
-        products: action.payload.products,
-        page: action.payload.page,
-        pages: action.payload.pages,
-        loading: false,
-      };
-    case 'FAILURE':
-      return { ...state, loading: false, error: action.payload };
-    default:
-      return state;
-  }
-};
-export default function ListProductsPage() {
-  const [{ loading, error, products, pages }, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-  });
+import { Col, Row, Button } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+import { getErrorMessage } from '../utils';
+import { useNavigate } from 'react-router-dom';
+import ReactModal from 'react-modal';
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [countProducts, setCountProducts] = useState(0);
+const actionsMap = {
+  REQUEST: (state) => ({ ...state, loading: true }),
+  SUCCESS: (state, action) => ({
+    ...state,
+    products: action.payload.products,
+    page: action.payload.page,
+    pages: action.payload.pages,
+    loading: false,
+  }),
+  FAILURE: (state, action) => ({
+    ...state,
+    loading: false,
+    error: action.payload,
+  }),
+  CREATE_REQUEST: (state) => ({ ...state, loadingCreate: true }),
+  CREATE_SUCCESS: (state) => ({ ...state, loadingCreate: false }),
+  CREATE_FAILURE: (state) => ({ ...state, loadingCreate: false }),
+};
+
+const reducer = (state, action) => {
+  const handler = actionsMap[action.type];
+  return handler ? handler(state, action) : state;
+};
+
+ReactModal.setAppElement('#root');
+
+export default function ListProductsPage() {
+  const [{ loading, error, products, pages, loadingCreate }, dispatch] =
+    useReducer(reducer, {
+      loading: true,
+      error: '',
+    });
+  const navigate = useNavigate();
+
+  const {
+    state: { userInfo },
+  } = useContext(Store);
 
   const pageSize = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [countProducts, setCountProducts] = useState(0);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const { state } = useContext(Store);
-  const { userInfo } = state;
+  const fetchProducts = (page, limit, token) => {
+    return axios.get(`/api/products/admin?page=${page}&limit=${limit}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  };
+
+  const handleFetchSuccess = (data) => {
+    dispatch({ type: 'SUCCESS', payload: data });
+    setCountProducts(data.count);
+  };
+
+  const handleFetchError = (error) => {
+    dispatch({ type: 'FAILURE', payload: error.message });
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data } = await axios.get(
-          `/api/products/admin?page=${currentPage}&limit=${pageSize}`,
-          {
-            headers: { Authorization: `Bearer ${userInfo.token}` },
-          }
-        );
-
-        dispatch({ type: 'SUCCESS', payload: data });
-        setCountProducts(data.count);
-      } catch (error) {
-        dispatch({ type: 'FAILURE', payload: error.message });
-      }
-    };
-
-    fetchData();
+    fetchProducts(currentPage, pageSize, userInfo.token)
+      .then(({ data }) => handleFetchSuccess(data))
+      .catch(handleFetchError);
   }, [currentPage, userInfo]);
+
+  const createProduct = () => {
+    dispatch({ type: 'CREATE_REQUEST' });
+
+    axios
+      .post(
+        '/api/products',
+        {},
+        {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        }
+      )
+      .then(({ data }) => {
+        dispatch({ type: 'CREATE_SUCCESS' });
+        toast.success('Product created successfully');
+        navigate(`/admin/product/${data.product._id}`);
+      })
+      .catch((error) => {
+        dispatch({ type: 'CREATE_FAILURE' });
+        toast.error(getErrorMessage(error));
+      });
+  };
+
+  const handleCreateProduct = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmCreateProduct = () => {
+    createProduct();
+    setShowConfirmModal(false);
+  };
+
+  const handleCancelCreateProduct = () => {
+    setShowConfirmModal(false);
+  };
+
+  const customStyles = {
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    content: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      minWidth: '300px',
+      maxWidth: '400px',
+      height: '200px',
+      padding: '20px',
+      textAlign: 'center',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '8px',
+      border: '1px solid #ccc',
+    },
+  };
+
+  function ProductRow({ product, onEdit }) {
+    return (
+      <tr key={product._id}>
+        <td>{product._id}</td>
+        <td>{product.name}</td>
+        <td>{product.price.toFixed(2)}</td>
+        <td>{product.department}</td>
+        <td>{product.brand}</td>
+        <td>
+          <Button type="button" variant="secondary" onClick={onEdit}>
+            Edit
+          </Button>
+        </td>
+      </tr>
+    );
+  }
 
   return (
     <div>
@@ -65,44 +155,88 @@ export default function ListProductsPage() {
       </Helmet>
 
       {/* Displaying the page header */}
-      <h1>Products</h1>
-      {loading ? (
-        <LoadingSpinner></LoadingSpinner>
-      ) : error ? (
-        <Message variant="danger">{error}</Message>
-      ) : (
-        <>
-          <table className="table table-striped table-bordered table-hover">
-            <thead>
-              <tr>
-                <th>PRODUCT ID</th>
-                <th>PRODUCT NAME</th>
-                <th>AMOUNT</th>
-                <th>DEPARTMENT</th>
-                <th>BRAND</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product._id}>
-                  <td>{product._id}</td>
-                  <td>{product.name}</td>
-                  <td>{product.price}</td>
-                  <td>{product.department}</td>
-                  <td>{product.brand}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <Row>
+        <Col>
+          <h1>Products</h1>
+        </Col>
+      </Row>
+      <Row className="mb-3">
+        <Col className="text-end">
           <div>
-            <AdminPagination
-              totalPages={pages}
-              setCurrentPage={setCurrentPage}
-              currentPage={currentPage}
-            />
+            <Button
+              className="mb-3"
+              variant="primary"
+              type="button"
+              onClick={handleCreateProduct}
+            >
+              CREATE A NEW PRODUCT
+            </Button>
+
+            <ReactModal
+              isOpen={showConfirmModal}
+              onRequestClose={handleCancelCreateProduct}
+              style={customStyles}
+            >
+              <strong>
+                <p>Confirm Create New Product</p>
+              </strong>
+              <p>Are you sure you would like to create a new product?</p>
+              <div className="d-flex justify-content-around mt-3">
+                <Button variant="warning" onClick={handleConfirmCreateProduct}>
+                  CONFIRM
+                </Button>
+                <Button variant="primary" onClick={handleCancelCreateProduct}>
+                  Cancel
+                </Button>
+              </div>
+            </ReactModal>
           </div>
-        </>
-      )}
+        </Col>
+      </Row>
+
+      {(() => {
+        if (loadingCreate) {
+          return <LoadingSpinner />;
+        }
+        if (loading) {
+          return <LoadingSpinner />;
+        }
+        if (error) {
+          return <Message variant="danger">{error}</Message>;
+        }
+        return (
+          <>
+            <table className="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>PRODUCT ID</th>
+                  <th>PRODUCT NAME</th>
+                  <th>AMOUNT</th>
+                  <th>DEPARTMENT</th>
+                  <th>BRAND</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <ProductRow
+                    key={product._id}
+                    product={product}
+                    onEdit={() => navigate(`/admin/product/${product._id}`)}
+                  />
+                ))}
+              </tbody>
+            </table>
+            <div>
+              <AdminPagination
+                totalPages={pages}
+                setCurrentPage={setCurrentPage}
+                currentPage={currentPage}
+              />
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 }

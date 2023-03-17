@@ -1,11 +1,12 @@
 // Import necessary dependencies
 import axios from 'axios';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import Message from '../Components/MessageComponent';
 import { Store } from '../Store';
+import ReactModal from 'react-modal';
 
 // Define ShoppingCartPage component
 export default function ShoppingCartPage() {
@@ -14,6 +15,28 @@ export default function ShoppingCartPage() {
   // Use the useContext hook to get the cartItems and dispatchCartAction from the Store context
   const { cartItems } = useContext(Store).state.cart;
   const dispatchCartAction = useContext(Store).dispatch;
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const customStyles = {
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    content: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      minWidth: '300px',
+      maxWidth: '400px',
+      height: '200px',
+      padding: '20px',
+      textAlign: 'center',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '8px',
+      border: '1px solid #ccc',
+    },
+  };
 
   // Define a function to calculate the subtotal of the cart items
   const calculateCartSubtotal = (items) =>
@@ -27,7 +50,8 @@ export default function ShoppingCartPage() {
     const { data } = await axios.get(`api/products/${item._id}`);
     // If the item is out of stock, show an alert to the user
     if (data.countInStock < quantity) {
-      return window.alert('Sorry, this product is out of stock');
+      setModalIsOpen(true);
+      return;
     }
     // Dispatch the ADD_ITEM action to add the item to the cart with the updated quantity
     dispatchCartAction({ type: 'ADD_ITEM', payload: { ...item, quantity } });
@@ -100,6 +124,19 @@ export default function ShoppingCartPage() {
 
       {/* Displaying the page header */}
       <h1>Shopping Cart</h1>
+
+      <ReactModal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        style={customStyles}
+      >
+        <h4>Out of Stock</h4>
+        <p>Sorry, this product is out of stock.</p>
+        <Button variant="primary" onClick={() => setModalIsOpen(false)}>
+          Close
+        </Button>
+      </ReactModal>
+
       <Row>
         <Col xs={12} lg={8}>
           {/* If the cart is empty, show a message and a button to keep shopping */}

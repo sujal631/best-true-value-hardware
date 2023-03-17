@@ -21,6 +21,52 @@ routeProduct.get('/', async (req, res) => {
   }
 });
 
+routeProduct.post(
+  '/',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const newProduct = new Product({
+      name: 'Product' + Date.now(),
+      slug: 'slug-' + Date.now(),
+      image: '/images/p1.png',
+      brand: 'Brand' + Date.now(),
+      department: 'Department' + Date.now(),
+      description: 'Description' + Date.now(),
+      price: 0,
+      countInStock: 0,
+      rating: 0,
+      numReviews: 0,
+    });
+    const product = await newProduct.save();
+    res.send({ message: 'New Product Created', product });
+  })
+);
+
+routeProduct.put(
+  '/:id',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    if (product) {
+      product.name = req.body.name;
+      product.slug = req.body.slug;
+      product.image = req.body.image;
+      product.brand = req.body.brand;
+      product.department = req.body.department;
+      product.description = req.body.description;
+      product.price = req.body.price;
+      product.countInStock = req.body.countInStock;
+      await product.save();
+      res.send({ message: 'Update Successful' });
+    } else {
+      res.status(404).send({ message: 'Product not found' });
+    }
+  })
+);
+
 const PAGE_SIZE = 10;
 routeProduct.get(
   '/admin',

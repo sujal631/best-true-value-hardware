@@ -9,6 +9,7 @@ import { getErrorMessage } from '../utils';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import { Store } from '../Store';
+import ReactModal from 'react-modal';
 
 const ProductDetailsPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,27 @@ const ProductDetailsPage = () => {
   const [product, setProduct] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const customStyles = {
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    content: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      minWidth: '300px',
+      maxWidth: '400px',
+      height: '200px',
+      padding: '20px',
+      textAlign: 'center',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '4px',
+      border: '1px solid #ccc',
+    },
+  };
 
   // useEffect hook to fetch the product data based on the slug
   useEffect(() => {
@@ -60,7 +82,7 @@ const ProductDetailsPage = () => {
 
     // If the stock is not available, show an alert and return
     if (!isStockAvailable) {
-      window.alert('Sorry, this product is out of stock');
+      setModalIsOpen(true);
       return;
     }
 
@@ -80,6 +102,19 @@ const ProductDetailsPage = () => {
       <Helmet>
         <title>{product.name}</title>
       </Helmet>
+      <ReactModal
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        style={customStyles}
+      >
+        <strong>
+          <p>Out of Stock</p>
+        </strong>
+        <p>Sorry, this product is out of stock.</p>
+        <Button variant="primary" onClick={() => setModalIsOpen(false)}>
+          Close
+        </Button>
+      </ReactModal>
       <Row>
         <Col md={5}>
           {/* Display the product image */}
@@ -118,16 +153,14 @@ const ProductDetailsPage = () => {
                   )}
                 </ListGroup.Item>
                 {/* Only show the add to cart button if there is stock */}
-                {product.countInStock > 0 && (
-                  <ListGroup.Item>
-                    <div className="d-flex justify-content-center">
-                      {/* Add to Cart button */}
-                      <Button onClick={addToBag} variant="primary">
-                        ADD TO BAG
-                      </Button>
-                    </div>
-                  </ListGroup.Item>
-                )}
+                <ListGroup.Item>
+                  <div className="d-flex justify-content-center">
+                    {/* Add to Cart button */}
+                    <Button onClick={addToBag} variant="primary">
+                      ADD TO BAG
+                    </Button>
+                  </div>
+                </ListGroup.Item>
               </ListGroup>
             </Card.Body>
           </Card>

@@ -116,7 +116,14 @@ const App = () => {
                   </AdminAuthorizedAccess>
                 }
               />
-              <Route path="/editProduct" element={<EditProductPage />} />
+              <Route
+                path="/admin/product/:id"
+                element={
+                  <AdminAuthorizedAccess>
+                    <EditProductPage />
+                  </AdminAuthorizedAccess>
+                }
+              />
             </Routes>
           </Container>
         </main>

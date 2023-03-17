@@ -1,16 +1,270 @@
-import React from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Store } from '../Store';
+import { getErrorMessage } from '../utils';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+import LoadingSpinner from '../Components/LoadingComponent';
+import Message from '../Components/MessageComponent';
+import { toast } from 'react-toastify';
+import { Container, Form } from 'react-bootstrap';
 
-// A functional component to render the Edit Product page
+const actionsMap = {
+  REQUEST: (state) => ({ ...state, loading: true }),
+  SUCCESS: (state) => ({ ...state, loading: false }),
+  FAILURE: (state, action) => ({
+    ...state,
+    loading: false,
+    error: action.payload,
+  }),
+  UPDATE_REQUEST: (state) => ({ ...state, loadingUpdate: true }),
+  UPDATE_SUCCESS: (state) => ({ ...state, loadingUpdate: false }),
+  UPDATE_FAILURE: (state) => ({ ...state, loadingUpdate: false }),
+};
+
+const reducer = (state, action) => {
+  const updateState = actionsMap[action.type];
+  return updateState ? updateState(state, action) : state;
+};
+
 const EditProductPage = () => {
+  const { id: productId } = useParams();
+  const {
+    state: { userInfo },
+  } = useContext(Store);
+
+  const navigate = useNavigate();
+
+  const [state, dispatch] = useReducer(reducer, {
+    loading: true,
+    error: '',
+  });
+
+  const { loading, error, loadingUpdate } = state;
+
+  const [productData, setProductData] = useState({
+    name: '',
+    slug: '',
+    image: '',
+    brand: '',
+    department: '',
+    description: '',
+    price: '',
+    countInStock: '',
+  });
+
+  useEffect(() => {
+    const fetchData = () => {
+      dispatch({ type: 'REQUEST' });
+
+      axios
+        .get(`/api/products/${productId}`)
+        .then((response) => {
+          setProductData(response.data);
+          dispatch({ type: 'SUCCESS' });
+        })
+        .catch((error) => {
+          dispatch({
+            type: 'FAILURE',
+            payload: getErrorMessage(error),
+          });
+        });
+    };
+
+    fetchData();
+  }, [productId]);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setProductData({ ...productData, [name]: value });
+  };
+
+  const updateProduct = async (productId, productData, token) => {
+    const response = await axios.put(
+      `/api/products/${productId}`,
+      {
+        _id: productId,
+        ...productData,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response;
+  };
+
+  const handleUpdateProduct = (e) => {
+    e.preventDefault();
+
+    const onUpdateSuccess = () => {
+      toast.success('Update Successful');
+      navigate('/admin/listProducts');
+    };
+
+    const onUpdateFailure = () => {
+      dispatch({ type: 'UPDATE_FAILURE' });
+    };
+
+    dispatch({ type: 'UPDATE_REQUEST' });
+
+    updateProduct(productId, productData, userInfo.token)
+      .then(() => {
+        dispatch({ type: 'UPDATE_SUCCESS' });
+        onUpdateSuccess();
+      })
+      .catch(onUpdateFailure);
+  };
+
+  const {
+    name,
+    slug,
+    image,
+    brand,
+    department,
+    description,
+    price,
+    countInStock,
+  } = productData;
+
   return (
     <div>
-      {/* Set the title of the page */}
       <Helmet>
-        <title>Edit Product</title>
+        <title>Product {productId}</title>
       </Helmet>
-      {/* Render the header for the Edit Product page */}
-      <h1>Edit Product Page</h1>
+      <Container className="container small-container">
+        <h1>Product {productId}</h1>
+
+        {loading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <Message variant="danger">{error}</Message>
+        ) : (
+          <Form onSubmit={handleUpdateProduct}>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">
+                Name
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                name="name"
+                value={name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="slug" className="form-label">
+                Slug
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="slug"
+                name="slug"
+                value={slug}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="image" className="form-label">
+                Image
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="image"
+                name="image"
+                value={image}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="brand" className="form-label">
+                Brand
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="brand"
+                name="brand"
+                value={brand}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="department" className="form-label">
+                Department
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="department"
+                name="department"
+                value={department}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="price" className="form-label">
+                Price
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                id="price"
+                name="price"
+                value={price}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="countInStock" className="form-label">
+                Count In Stock
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                id="countInStock"
+                name="countInStock"
+                value={countInStock}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="description" className="form-label">
+                Description
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="description"
+                name="description"
+                value={description}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="d-grid gap-2 mb-2">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loadingUpdate}
+              >
+                UPDATE
+              </button>
+              {loadingUpdate && <LoadingSpinner />}
+            </div>
+          </Form>
+        )}
+      </Container>
     </div>
   );
 };
