@@ -93,6 +93,10 @@ const EditProductPage = () => {
     return response;
   };
 
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
   const handleUpdateProduct = (e) => {
     e.preventDefault();
 
@@ -259,6 +263,13 @@ const EditProductPage = () => {
                 disabled={loadingUpdate}
               >
                 UPDATE
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleCancel}
+              >
+                CANCEL
               </button>
               {loadingUpdate && <LoadingSpinner />}
             </div>

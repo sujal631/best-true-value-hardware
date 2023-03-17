@@ -233,6 +233,7 @@ routeOrder.route('/top-selling-products').get(
     res.send(topSellingProducts);
   })
 );
+
 // Get orders of the authenticated user
 routeOrder.route('/mine').get(
   isAuth, // Middleware for checking if user is authenticated

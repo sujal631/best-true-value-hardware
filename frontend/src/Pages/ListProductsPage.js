@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { getErrorMessage } from '../utils';
 import { useNavigate } from 'react-router-dom';
 import ReactModal from 'react-modal';
+import ProductRow from '../Components/ProductRow';
 
 const actionsMap = {
   REQUEST: (state) => ({ ...state, loading: true }),
@@ -70,6 +71,7 @@ export default function ListProductsPage() {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchProducts(currentPage, pageSize, userInfo.token)
       .then(({ data }) => handleFetchSuccess(data))
       .catch(handleFetchError);
@@ -130,23 +132,6 @@ export default function ListProductsPage() {
     },
   };
 
-  function ProductRow({ product, onEdit }) {
-    return (
-      <tr key={product._id}>
-        <td>{product._id}</td>
-        <td>{product.name}</td>
-        <td>{product.price.toFixed(2)}</td>
-        <td>{product.department}</td>
-        <td>{product.brand}</td>
-        <td>
-          <Button type="button" variant="secondary" onClick={onEdit}>
-            Edit
-          </Button>
-        </td>
-      </tr>
-    );
-  }
-
   return (
     <div>
       {/* Setting the page title using react-helmet-async */}
@@ -206,27 +191,10 @@ export default function ListProductsPage() {
         }
         return (
           <>
-            <table className="table table-striped table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th>PRODUCT ID</th>
-                  <th>PRODUCT NAME</th>
-                  <th>AMOUNT</th>
-                  <th>DEPARTMENT</th>
-                  <th>BRAND</th>
-                  <th>ACTIONS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product) => (
-                  <ProductRow
-                    key={product._id}
-                    product={product}
-                    onEdit={() => navigate(`/admin/product/${product._id}`)}
-                  />
-                ))}
-              </tbody>
-            </table>
+            <ProductRow
+              products={products}
+              onEdit={(productId) => navigate(`/admin/product/${productId}`)}
+            />
             <div>
               <AdminPagination
                 totalPages={pages}
