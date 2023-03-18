@@ -6,6 +6,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import Message from '../Components/MessageComponent';
+import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons';
 
 export default function Registration() {
   const navigate = useNavigate();
@@ -19,17 +20,23 @@ export default function Registration() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    phoneNumber: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
 
   // Extract values from form data
-  const { firstName, lastName, email, password, confirmPassword } = formData;
+  const { firstName, lastName, phoneNumber, email, password, confirmPassword } =
+    formData;
 
   // Get state and dispatch from the global store
   const { state, dispatch } = useContext(Store);
   const userInfo = state.userInfo; // extract user info from state
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] =
+    useState(false);
 
   // Function to handle changes to form inputs
   const handleChange = (e) => {
@@ -49,6 +56,8 @@ export default function Registration() {
 
     // Validate password if the input id is "password"
     if (id === 'password') {
+      setShowPasswordRequirements(value.length > 0);
+
       // Check if password meets requirements
       const hasUppercase = /[A-Z]/.test(value);
       const hasLowercase = /[a-z]/.test(value);
@@ -168,6 +177,23 @@ export default function Registration() {
           </div>
         </div>
 
+        {/* A form input for the user's phone number */}
+        <div className="mb-3">
+          <label htmlFor="phoneNumber" className="form-label">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            className="form-control"
+            id="phoneNumber"
+            required
+            onChange={handleChange}
+            value={phoneNumber}
+            pattern="^\d{10}$"
+            title="Phone number should be 10 digits"
+          />
+        </div>
+
         {/* A form input for the user's email address */}
         <div className="mb-3">
           <label htmlFor="email" className="form-label">
@@ -184,43 +210,80 @@ export default function Registration() {
         </div>
 
         {/* A form input for the user's password */}
-        <div className="mb-3">
+        <div className="mb-3 position-relative">
           <label htmlFor="password" className="form-label">
             Password
           </label>
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             className="form-control"
             id="password"
             required
             onChange={handleChange}
             value={formData.password}
+            style={{ paddingRight: '40px' }}
           />
+          {/* Eye icon */}
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: '10px',
+              transform: 'translateY(-5%)',
+              cursor: 'pointer',
+              fontSize: '1.25rem',
+              color: '#bb0000',
+              opacity: password.length > 0 ? 1 : 0,
+              transition: 'opacity 0.3s',
+            }}
+          >
+            {showPassword ? <EyeSlashFill /> : <EyeFill />}
+          </span>
         </div>
-        <div className="mb-3">
-          <Message variant="warning">
-            Please note that the password you create must meet the following
-            requirements: <br />
-            &emsp;At least 8 characters long <br />
-            &emsp;Includes at least one lowercase letter <br />
-            &emsp;Includes at least one uppercase letter <br />
-            &emsp;Includes at least one number or special character
-          </Message>
-        </div>
+        {showPasswordRequirements && (
+          <div className="mb-3 btn-text">
+            <Message variant="warning">
+              Please note that the password you create must meet the following
+              requirements: <br />
+              &emsp;At least 8 characters long <br />
+              &emsp;Includes at least one lowercase letter <br />
+              &emsp;Includes at least one uppercase letter <br />
+              &emsp;Includes at least one number or special character
+            </Message>
+          </div>
+        )}
 
         {/* A form input for the user's confirm password */}
-        <div className="mb-3">
+        <div className="mb-3 position-relative">
           <label htmlFor="confirmPassword" className="form-label">
             Confirm Password
           </label>
           <input
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             className="form-control"
             id="confirmPassword"
             required
             onChange={handleChange}
             value={confirmPassword}
+            style={{ paddingRight: '40px' }}
           />
+          <span
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: '10px',
+              transform: 'translateY(-5%)',
+              cursor: 'pointer',
+              fontSize: '1.25rem',
+              color: '#bb0000',
+              opacity: confirmPassword.length > 0 ? 1 : 0,
+              transition: 'opacity 0.3s',
+            }}
+          >
+            {showConfirmPassword ? <EyeSlashFill /> : <EyeFill />}
+          </span>
         </div>
 
         {/* Register button that triggers handleSubmit function */}
@@ -229,9 +292,9 @@ export default function Registration() {
         </div>
 
         {/* Redirect to login page if user already has an account  */}
-        <div className="mb-3">
-          Already have an account?{' '}
-          <Link to={`/login?redirect=${redirect}`}>Log In!</Link>
+        <div className="mb-3" style={{ fontSize: '0.9rem' }}>
+          Have an account?{' '}
+          <Link to={`/login?redirect=${redirect}`}>Log In now</Link>
         </div>
       </Form>
     </Container>

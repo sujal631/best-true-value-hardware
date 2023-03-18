@@ -8,29 +8,41 @@ import expressAsyncHandler from 'express-async-handler';
 // Create a new express router
 const routeUser = express.Router();
 
+// Helper function to extract user data
+const extractUserData = ({
+  _id,
+  firstName,
+  lastName,
+  email,
+  phoneNumber,
+  isAdmin,
+}) => ({
+  _id,
+  firstName,
+  lastName,
+  email,
+  phoneNumber,
+  isAdmin,
+  token: generateToken({
+    _id,
+    firstName,
+    lastName,
+    email,
+    phoneNumber,
+    isAdmin,
+  }),
+});
+
 // Handle user login
 routeUser.post(
   '/login',
   expressAsyncHandler(async (req, res) => {
-    // Get user input from request body
     const { email, password } = req.body;
-    // Find the user with matching email
     const user = await User.findOne({ email });
-    // If the user exists and the provided password matches the stored password
+
     if (user && bcrypt.compareSync(password, user.password)) {
-      // Extract relevant user data
-      const { _id, firstName, lastName, email: userEmail, isAdmin } = user;
-      // Send a response with user data and a generated token
-      res.send({
-        _id,
-        firstName,
-        lastName,
-        email: userEmail,
-        isAdmin,
-        token: generateToken(user),
-      });
+      res.send(extractUserData(user));
     } else {
-      // Send an error response
       res.status(401).send({ message: 'Invalid email or password' });
     }
   })
@@ -40,32 +52,16 @@ routeUser.post(
 routeUser.post(
   '/registration',
   expressAsyncHandler(async (req, res) => {
-    // Get user input from request body
-    const { firstName, lastName, email, password } = req.body;
-    // Create a new user with the provided data
+    const { firstName, lastName, email, password, phoneNumber } = req.body;
     const user = await User.create({
       firstName,
       lastName,
       email,
       password: bcrypt.hashSync(password),
+      phoneNumber,
     });
-    // Extract relevant user data
-    const {
-      _id,
-      firstName: userFirstName,
-      lastName: userLastName,
-      email: userEmail,
-      isAdmin,
-    } = user;
-    // Send a response with user data and a generated token
-    res.send({
-      _id,
-      firstName: userFirstName,
-      lastName: userLastName,
-      email: userEmail,
-      isAdmin,
-      token: generateToken(user),
-    });
+
+    res.send(extractUserData(user));
   })
 );
 
@@ -75,32 +71,18 @@ routeUser.put(
   isAuth,
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
+
     if (user) {
       const {
         firstName = user.firstName,
         lastName = user.lastName,
         email = user.email,
+        phoneNumber = user.phoneNumber,
       } = req.body;
-      user.firstName = firstName;
-      user.lastName = lastName;
-      user.email = email;
+      Object.assign(user, { firstName, lastName, email, phoneNumber });
 
       const updatedUser = await user.save();
-      const {
-        _id,
-        firstName: userFirstName,
-        lastName: userLastName,
-        email: userEmail,
-        isAdmin,
-      } = updatedUser;
-      res.send({
-        _id,
-        firstName: userFirstName,
-        lastName: userLastName,
-        email: userEmail,
-        isAdmin,
-        token: generateToken(updatedUser),
-      });
+      res.send(extractUserData(updatedUser));
     } else {
       res.status(404).send({ message: 'User not found' });
     }
@@ -113,26 +95,13 @@ routeUser.put(
   isAuth,
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
+
     if (user) {
       const { password } = req.body;
       if (password) user.password = bcrypt.hashSync(password, 8);
 
       const updatedUser = await user.save();
-      const {
-        _id,
-        firstName: userFirstName,
-        lastName: userLastName,
-        email: userEmail,
-        isAdmin,
-      } = updatedUser;
-      res.send({
-        _id,
-        firstName: userFirstName,
-        lastName: userLastName,
-        email: userEmail,
-        isAdmin,
-        token: generateToken(updatedUser),
-      });
+      res.send(extractUserData(updatedUser));
     } else {
       res.status(404).send({ message: 'User not found' });
     }
@@ -145,8 +114,10 @@ routeUser.post(
   isAuth,
   expressAsyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
+
     if (user) {
       const { password } = req.body;
+
       if (bcrypt.compareSync(password, user.password)) {
         res.send({ message: 'Old password verified successfully' });
       } else {

@@ -191,7 +191,7 @@ export default function ShippingInfoPage() {
               className="form-control"
               id="phoneNumber"
               required
-              pattern="[0-9]*"
+              pattern="^\d{10}$"
               onChange={(e) => {
                 // Remove non-digit characters from input
                 const cleaned = e.target.value.replace(/\D/g, '');

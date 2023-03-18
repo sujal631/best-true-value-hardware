@@ -8,6 +8,7 @@ import Message from '../Components/MessageComponent';
 import { Store } from '../Store';
 import { getErrorMessage } from '../utils';
 import { useRef } from 'react';
+import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -27,6 +28,7 @@ export default function ProfilePage() {
 
   const [firstName, setFirstName] = useState(userInfo.firstName);
   const [lastName, setLastName] = useState(userInfo.lastName);
+  const [phoneNumber, setPhoneNumber] = useState(userInfo.phoneNumber);
   const [email, setEmail] = useState(userInfo.email);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -42,6 +44,10 @@ export default function ProfilePage() {
   // Add state variables to control edit mode and password change mode
   const [editMode, setEditMode] = useState(false);
   const [passwordChangeMode, setPasswordChangeMode] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   useEffect(() => {
     if (toastMessage.type !== '') {
@@ -74,7 +80,7 @@ export default function ProfilePage() {
   };
 
   const updateUserInfo = async () => {
-    const userData = { firstName, lastName, email };
+    const userData = { firstName, lastName, email, phoneNumber };
     const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
 
     try {
@@ -202,6 +208,22 @@ export default function ProfilePage() {
         </div>
 
         <div className="mb-3">
+          <label htmlFor="phoneNumber" className="form-label">
+            Phone Number
+          </label>
+          <input
+            type="tel"
+            className="form-control"
+            id="phoneNumber"
+            required
+            disabled={!editMode}
+            readOnly={!editMode}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            value={phoneNumber}
+          />
+        </div>
+
+        <div className="mb-3">
           <label htmlFor="email" className="form-label">
             Email
           </label>
@@ -228,47 +250,83 @@ export default function ProfilePage() {
         </div>
 
         {editMode && (
-          <div className="mb-3">
+          <div className="mb-3 position-relative">
             <label htmlFor="oldPassword" className="form-label">
               Confirm Password
             </label>
             <input
-              type="password"
+              type={showConfirmPassword ? 'text' : 'password'}
               className="form-control"
               id="oldPassword"
               ref={oldPasswordRef}
               onChange={(e) => setOldPassword(e.target.value)}
               value={oldPassword}
+              style={{ paddingRight: '40px' }}
             />
+            {/* Eye icon */}
+            <span
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                right: '10px',
+                transform: 'translateY(-5%)',
+                cursor: 'pointer',
+                fontSize: '1.25rem',
+                color: '#bb0000',
+                opacity: oldPassword.length > 0 ? 1 : 0,
+                transition: 'opacity 0.4s',
+              }}
+            >
+              {showConfirmPassword ? <EyeSlashFill /> : <EyeFill />}
+            </span>
           </div>
         )}
 
         {/* Conditionally render the password fields if passwordChangeMode is true */}
         {passwordChangeMode && (
           <>
-            <div className="mb-3">
-              <label htmlFor="oldPassword" className="form-label">
+            <div className="mb-3 position-relative">
+              <label htmlFor="oldPasswordUpdate" className="form-label">
                 Old Password
               </label>
               <input
-                type="password"
+                type={showOldPassword ? 'text' : 'password'}
                 className="form-control"
-                id="oldPassword"
+                id="oldPasswordUpdate"
                 onChange={(e) => setOldPassword(e.target.value)}
                 value={oldPassword}
+                style={{ paddingRight: '40px' }}
               />
+              {/* Eye icon */}
+              <span
+                onClick={() => setShowOldPassword(!showOldPassword)}
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  right: '10px',
+                  transform: 'translateY(-5%)',
+                  cursor: 'pointer',
+                  fontSize: '1.25rem',
+                  color: '#bb0000',
+                  opacity: oldPassword.length > 0 ? 1 : 0,
+                  transition: 'opacity 0.4s',
+                }}
+              >
+                {showOldPassword ? <EyeSlashFill /> : <EyeFill />}
+              </span>
             </div>
           </>
         )}
 
         {passwordChangeMode && (
           <>
-            <div className="mb-3">
+            <div className="mb-3 position-relative">
               <label htmlFor="password" className="form-label">
                 New Password
               </label>
               <input
-                type="password"
+                type={showNewPassword ? 'text' : 'password'}
                 className="form-control"
                 id="password"
                 onChange={(e) => {
@@ -297,9 +355,27 @@ export default function ProfilePage() {
                   e.target.setCustomValidity(errorMessage);
                 }}
                 value={password}
+                style={{ paddingRight: '40px' }}
               />
+              {/* Eye icon */}
+              <span
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  right: '10px',
+                  transform: 'translateY(-5%)',
+                  cursor: 'pointer',
+                  fontSize: '1.25rem',
+                  color: '#bb0000',
+                  opacity: password.length > 0 ? 1 : 0,
+                  transition: 'opacity 0.4s',
+                }}
+              >
+                {showNewPassword ? <EyeSlashFill /> : <EyeFill />}
+              </span>
             </div>
-            <div className="mb-3">
+            <div className="mb-3 ">
               <Message variant="warning">
                 Please note that the password you create must meet the following
                 requirements: <br />
@@ -310,17 +386,36 @@ export default function ProfilePage() {
               </Message>
             </div>
 
-            <div className="mb-3">
+            <div className="mb-3 position-relative">
               <label htmlFor="confirmPassword" className="form-label">
                 Confirm New Password
               </label>
               <input
-                type="password"
+                type={showConfirmNewPassword ? 'text' : 'password'}
                 className="form-control"
                 id="confirmPassword"
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 value={confirmPassword}
               />
+              {/* Eye icon */}
+              <span
+                onClick={() =>
+                  setShowConfirmNewPassword(!showConfirmNewPassword)
+                }
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  right: '10px',
+                  transform: 'translateY(-5%)',
+                  cursor: 'pointer',
+                  fontSize: '1.25rem',
+                  color: '#bb0000',
+                  opacity: confirmPassword.length > 0 ? 1 : 0,
+                  transition: 'opacity 0.4s',
+                }}
+              >
+                {showConfirmNewPassword ? <EyeSlashFill /> : <EyeFill />}
+              </span>
             </div>
           </>
         )}
@@ -344,7 +439,14 @@ export default function ProfilePage() {
             <Button type="button" onClick={handleSaveClick}>
               Update Your Info
             </Button>
-            <Button onClick={() => setEditMode(false)}>Cancel</Button>
+            <Button
+              onClick={() => {
+                setEditMode(false);
+                setOldPassword(''); // Clear oldPassword state
+              }}
+            >
+              Cancel
+            </Button>
           </div>
         )}
 

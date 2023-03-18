@@ -7,6 +7,7 @@ import Axios from 'axios';
 import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getErrorMessage } from '../utils';
+import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons';
 
 // React component for login page
 export default function LogInPage() {
@@ -17,6 +18,8 @@ export default function LogInPage() {
   const redirect = new URLSearchParams(search).get('redirect') || '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     state: { userInfo }, // Getting user info from global context API
     dispatch,
@@ -30,6 +33,7 @@ export default function LogInPage() {
       setPassword(e.target.value);
     }
   };
+
   // Handling the form submission event
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -80,18 +84,37 @@ export default function LogInPage() {
             />
           </div>
           {/* Password input */}
-          <div className="mb-3">
+          <div className="mb-3 position-relative">
             <label htmlFor="password" className="form-label">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               className="form-control"
               id="password"
               required
               onChange={handleChange}
+              style={{ paddingRight: '40px' }}
             />
+            {/* Eye icon */}
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                right: '10px',
+                transform: 'translateY(-5%)',
+                cursor: 'pointer',
+                fontSize: '1.25rem',
+                color: '#bb0000',
+                opacity: password.length > 0 ? 1 : 0,
+                transition: 'opacity 0.4s',
+              }}
+            >
+              {showPassword ? <EyeSlashFill /> : <EyeFill />}
+            </span>
           </div>
+
           {/* Log in button */}
           <div className="d-grid gap-2 mb-3">
             <button type="submit" className="btn btn-primary">
@@ -99,11 +122,9 @@ export default function LogInPage() {
             </button>
           </div>
           {/* Link to registration page */}
-          <div className="mb-3">
-            New Customer?{' '}
-            <Link to={`/registration?redirect=${redirect}`}>
-              Register Here!
-            </Link>
+          <div className="mb-3" style={{ fontSize: '0.9rem' }}>
+            Don't have an Account?{' '}
+            <Link to={`/registration?redirect=${redirect}`}>Register now</Link>
           </div>
         </form>
       </Container>
