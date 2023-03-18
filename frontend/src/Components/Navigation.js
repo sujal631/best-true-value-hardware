@@ -29,7 +29,11 @@ export default function Navigation() {
       localStorage.removeItem(key)
     );
     // Redirecting to the login page
-    window.location.href = 'login';
+    if (userInfo.isAdmin) {
+      window.location.href = '/login';
+    } else {
+      window.location.href = '/login';
+    }
   };
 
   // Function to create a user dropdown menu based on the user's role (admin or regular user)
