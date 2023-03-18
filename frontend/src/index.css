@@ -59,14 +59,9 @@ body {
 .text-gray {
   color: rgb(220, 216, 216);
 }
-
-.product-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 0.5rem;
+.product-card {
+  width: 250px;
 }
-
 .card-body {
   background-color: #fff;
 }
@@ -315,6 +310,25 @@ body {
   background-size: 8px 10px;
   padding-right: 2.5rem;
 }
+.product-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.products-row-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 400px;
+  justify-content: center;
+}
+
+.pagination-container {
+  margin-top: auto;
+}
 
 @media (max-width: 767px) {
   .btn-text {
@@ -324,12 +338,12 @@ body {
 
 @media (min-width: 768px) {
   .btn-text {
-    font-size: 14px;
+    font-size: 12px;
   }
 }
 
 @media (min-width: 992px) {
   .btn-text {
-    font-size: 16px;
+    font-size: 14px;
   }
 }

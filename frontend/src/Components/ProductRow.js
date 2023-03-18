@@ -6,32 +6,34 @@ function ProductRow({ products, onEdit, onDelete }) {
     <table className="table table-striped table-bordered table-hover">
       <thead>
         <tr>
-          <th>PRODUCT ID</th>
-          <th>PRODUCT NAME</th>
-          <th>AMOUNT</th>
-          <th>DEPARTMENT</th>
-          <th>BRAND</th>
-          <th>ACTIONS</th>
+          <th className="btn-text">PRODUCT ID</th>
+          <th className="btn-text">PRODUCT NAME</th>
+          <th className="btn-text">AMOUNT</th>
+          <th className="btn-text">DEPARTMENT</th>
+          <th className="btn-text">BRAND</th>
+          <th className="btn-text">ACTIONS</th>
         </tr>
       </thead>
       <tbody>
         {products.map((product) => (
           <tr key={product._id}>
-            <td>{product._id}</td>
-            <td>{product.name}</td>
-            <td>{product.price.toFixed(2)}</td>
-            <td>{product.department}</td>
-            <td>{product.brand}</td>
+            <td className="btn-text">{product._id}</td>
+            <td className="btn-text">{product.name}</td>
+            <td className="btn-text">{product.price.toFixed(2)}</td>
+            <td className="btn-text">{product.department}</td>
+            <td className="btn-text">{product.brand}</td>
             <td>
               <Button
+                className="btn-text"
                 type="button"
                 variant="secondary"
                 onClick={() => onEdit(product._id)}
               >
                 Edit
               </Button>
-              &emsp;
+              <span style={{ margin: '5px' }}> </span>
               <Button
+                className="btn-text"
                 type="button"
                 variant="primary"
                 onClick={() => onDelete(product)}

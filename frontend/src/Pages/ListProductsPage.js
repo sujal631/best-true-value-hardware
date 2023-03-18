@@ -17,17 +17,17 @@ import queryString from 'query-string';
 // Reducer function declarations
 const actionsMap = {
   REQUEST: (state) => ({ ...state, loading: true }),
-  SUCCESS: (state, action) => ({
+  SUCCESS: (state, { payload: { products, page, pages } }) => ({
     ...state,
-    products: action.payload.products,
-    page: action.payload.page,
-    pages: action.payload.pages,
+    products,
+    page,
+    pages,
     loading: false,
   }),
-  FAILURE: (state, action) => ({
+  FAILURE: (state, { payload }) => ({
     ...state,
     loading: false,
-    error: action.payload,
+    error: payload,
   }),
   CREATE_REQUEST: (state) => ({ ...state, loadingCreate: true }),
   CREATE_SUCCESS: (state) => ({ ...state, loadingCreate: false }),
@@ -47,17 +47,11 @@ const actionsMap = {
     loadingDelete: false,
     successDelete: false,
   }),
-  RESET: (state) => ({
-    ...state,
-    loadingDelete: false,
-    successDelete: false,
-  }),
+  RESET: (state) => ({ ...state, loadingDelete: false, successDelete: false }),
 };
 
-const reducer = (state, action) => {
-  const handler = actionsMap[action.type];
-  return handler ? handler(state, action) : state;
-};
+const reducer = (state, action) =>
+  actionsMap[action.type] ? actionsMap[action.type](state, action) : state;
 
 ReactModal.setAppElement('#root');
 

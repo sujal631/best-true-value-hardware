@@ -9,6 +9,17 @@ import { isAuth, isAdmin } from '../utils.js';
 // Create a new router instance
 const routeOrder = express.Router();
 
+routeOrder.route('/').get(
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const orders = await Order.find({ isPaid: true })
+      .populate('user', 'firstName lastName')
+      .sort({ createdAt: -1 });
+    res.send(orders);
+  })
+);
+
 // Define routes for handling order-related requests
 // Create a new order
 routeOrder.route('/').post(
@@ -258,6 +269,20 @@ routeOrder.route('/:id').get(
       res.send(order);
     } else {
       // If order does not exist, send error response with status code 404 and error message
+      res.status(404).send({ message: 'Order Not Found' });
+    }
+  })
+);
+
+routeOrder.route('/:id/pickupReady').put(
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      order.isPickupReady = true;
+      await order.save();
+      res.send({ message: 'Ready for PICK UP' });
+    } else {
       res.status(404).send({ message: 'Order Not Found' });
     }
   })

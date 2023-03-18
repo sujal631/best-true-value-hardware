@@ -15,6 +15,7 @@ import { getErrorMessage } from '../utils';
 import { usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { toast } from 'react-toastify';
 import OrderSummaryCard from '../Components/OrderSummaryCard';
+import { Button } from 'react-bootstrap';
 
 // Reducer function for handling state changes
 const reducer = (state, action) => {
@@ -26,6 +27,22 @@ const reducer = (state, action) => {
     PAY_SUCCESS: { ...state, loadingPay: false, successPay: true },
     PAY_FAIL: { ...state, loadingPay: false },
     PAY_RESET: { ...state, loadingPay: false, successPay: false },
+    PICKUP_REQUEST: { ...state, loadingPickupReady: true },
+    PICKUP_SUCCESS: {
+      ...state,
+      loadingPickupReady: false,
+      successPickupReady: true,
+    },
+    PICKUP_FAILURE: {
+      ...state,
+      loadingPickupReady: false,
+      errorPickupReady: action.payload,
+    },
+    PICKUP_RESET: {
+      ...state,
+      loadingPickupReady: false,
+      successPickupReady: false,
+    },
     default: state,
   };
   return cases[action.type] || cases.default;
@@ -41,14 +58,24 @@ export default function OrderScreen() {
   const navigate = useNavigate();
 
   // Defining state variables and reducer for handling state changes
-  const [{ loading, error, order, successPay, loadingPay }, dispatch] =
-    useReducer(reducer, {
-      loading: true,
-      order: {},
-      error: '',
-      successPay: false,
-      loadingPay: false,
-    });
+  const [
+    {
+      loading,
+      error,
+      order,
+      successPay,
+      loadingPay,
+      loadingPickupReady,
+      successPickupReady,
+    },
+    dispatch,
+  ] = useReducer(reducer, {
+    loading: true,
+    order: {},
+    error: '',
+    successPay: false,
+    loadingPay: false,
+  });
 
   // Extracting the 'isPending' state variable and 'paypalDispatch' function from the usePayPalScriptReducer hook
   const paypalScriptReducer = usePayPalScriptReducer();
@@ -96,11 +123,29 @@ export default function OrderScreen() {
     toast.error(errorMessage);
   };
 
+  async function handlePickupReady() {
+    try {
+      dispatch({ type: 'PICKUP_REQUEST' });
+      const { data } = await axios.put(
+        `/api/orders/${order._id}/pickupReady`,
+        {},
+        {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+      dispatch({ type: 'PICKUP_SUCCESS', payload: data });
+      toast.success('Ready for PICK UP');
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      dispatch({ type: 'PICKUP_FAILURE' });
+    }
+  }
+
   // Define a useEffect hook to fetch the order data and configure the PayPal SDK
   useEffect(() => {
     // Check if the order ID is valid and needs to be fetched
     const isOrderValid = order._id && order._id === orderId;
-    const shouldFetchOrder = !isOrderValid || successPay;
+    const shouldFetchOrder = !isOrderValid || successPay || successPickupReady;
 
     // Define a helper function to fetch the PayPal client ID from the server
     const fetchPaypalClientId = async (token) => {
@@ -161,6 +206,9 @@ export default function OrderScreen() {
       if (successPay) {
         dispatch({ type: 'PAY_RESET' });
       }
+      if (successPickupReady) {
+        dispatch({ type: 'PICKUP_RESET' });
+      }
       // Otherwise, load the PayPal script
     } else {
       loadPaypalScript();
@@ -173,6 +221,7 @@ export default function OrderScreen() {
     paypalDispatch,
     successPay,
     userInfo,
+    successPickupReady,
   ]);
 
   return loading ? (
@@ -217,7 +266,7 @@ export default function OrderScreen() {
               {/* Message component displays a message based on whether the order is available for pickup or not */}
               {order.isPickupReady ? (
                 <Message variant="success" className="mb-3">
-                  Your order is now <strong>AVAILABLE FOR STORE PICKUP</strong>{' '}
+                  Your order is now <strong>READY FOR STORE PICKUP.</strong>{' '}
                   Kindly come to the store and present a valid photo ID to
                   collect your items. Thank you.
                 </Message>
@@ -314,6 +363,21 @@ export default function OrderScreen() {
             isPending={isPending}
             loadingPay={loadingPay}
           />
+          {userInfo.isAdmin && order.isPaid && !order.isPickupReady && (
+            <ListGroup.Item>
+              {loadingPickupReady && <LoadingSpinner />}
+              <div className="d-grid">
+                <Button
+                  className="my-3"
+                  type="button"
+                  variant="primary"
+                  onClick={handlePickupReady}
+                >
+                  PiCKUP IS READY
+                </Button>
+              </div>
+            </ListGroup.Item>
+          )}
         </Col>
       </Row>
     </div>

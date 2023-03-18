@@ -30,9 +30,9 @@ routeProduct.post(
       name: 'Product' + Date.now(),
       slug: 'slug-' + Date.now(),
       image: '/images/p1.png',
-      brand: 'Brand' + Date.now(),
-      department: 'Department' + Date.now(),
-      description: 'Description' + Date.now(),
+      brand: '-',
+      department: '-',
+      description: '...',
       price: 0,
       countInStock: 0,
       rating: 0,
@@ -89,9 +89,10 @@ routeProduct.get(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const { query } = req;
-    const page = query.page || 1;
-    const pageSize = query.limit || PAGE_SIZE;
+    const page = parseInt(query.page) || 1;
+    const pageSize = parseInt(query.limit) || PAGE_SIZE;
     const products = await Product.find()
+      .sort({ _id: -1 })
       .skip(pageSize * (page - 1))
       .limit(pageSize);
     const countProducts = await Product.countDocuments();

@@ -90,7 +90,7 @@ const Product = ({ product }) => {
           Close
         </Button>
       </ReactModal>
-      <Card>
+      <Card className="product-card">
         {/* Link to the product details page with the specific product's slug */}
         <Link to={`/product/${product.slug}`}>
           <Image

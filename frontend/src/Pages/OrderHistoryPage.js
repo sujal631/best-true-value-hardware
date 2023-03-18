@@ -74,12 +74,12 @@ export default function OrderHistoryPage() {
           <thead>
             <tr>
               {/* Table headers that describe the columns in the table that displays order history */}
-              <th>ORDER ID</th>
-              <th>DATE ORDERED</th>
-              <th>ORDER TOTAL</th>
-              <th>PAID ON</th>
-              <th>PICKUP READY</th>
-              <th>ACTIONS</th>
+              <th className="btn-text">ORDER ID</th>
+              <th className="btn-text">ORDER TOTAL</th>
+              <th className="btn-text">DATE ORDERED</th>
+              <th className="btn-text">PAID</th>
+              <th className="btn-text">PICKUP READY</th>
+              <th className="btn-text">ACTIONS</th>
             </tr>
           </thead>
           <tbody>
@@ -90,12 +90,16 @@ export default function OrderHistoryPage() {
               .map((order) => (
                 // Set to the "_id" field of each order to uniquely identify each row
                 <tr key={order._id}>
-                  <td>{order._id}</td>
-                  <td>{formatDate(order.createdAt)}</td>
-                  <td>{order.totalPrice.toFixed(2)}</td>
-                  <td>{isOrderPaid(order) ? 'Yes' : 'No'}</td>
-                  <td>{isOrderReadyForPickup(order) ? 'Yes' : 'No'}</td>
-                  <td>
+                  <td className="btn-text">{order._id}</td>
+                  <td className="btn-text">{order.totalPrice.toFixed(2)}</td>
+                  <td className="btn-text">{formatDate(order.createdAt)}</td>
+                  <td className="btn-text">
+                    {isOrderPaid(order) ? 'YES' : 'NO'}
+                  </td>
+                  <td className="btn-text">
+                    {isOrderReadyForPickup(order) ? 'YES' : 'NO'}
+                  </td>
+                  <td className="btn-text">
                     {/* Navigates to the OrderPage.js when the button is clicked */}
                     <Button
                       type="button"

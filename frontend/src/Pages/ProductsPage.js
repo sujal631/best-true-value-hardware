@@ -77,13 +77,15 @@ export default function ProductsPage() {
         ) : error ? (
           <Message variant="danger">{error}</Message>
         ) : (
-          <Row>
-            {filteredProducts.map((product) => (
-              <Col key={product.slug} sm={12} md={6} lg={3} className="mb-3">
-                <Product product={product} />
-              </Col>
-            ))}
-          </Row>
+          <div className="products-row-container">
+            <Row>
+              {filteredProducts.map((product) => (
+                <Col key={product.slug} sm={12} md={6} lg={3} className="mb-3">
+                  <Product product={product} />
+                </Col>
+              ))}
+            </Row>
+          </div>
         )}
       </div>
     </div>

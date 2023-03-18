@@ -78,21 +78,26 @@ const HomePage = () => {
         ) : errorMessage ? (
           <Message variant="danger">{errorMessage}</Message>
         ) : (
-          <Row>
-            {currentPosts.map((product) => (
-              <Col key={product.slug} sm={12} md={6} lg={3} className="mb-3">
-                <Product product={product} />
-              </Col>
-            ))}
-          </Row>
+          <div className="products-row-container">
+            <Row>
+              {currentPosts.map((product) => (
+                <Col key={product.slug} sm={12} md={6} lg={3} className="mb-3">
+                  <Product product={product} />
+                </Col>
+              ))}
+            </Row>
+          </div>
         )}
         {/* Render the pagination component */}
-        <Pagination
-          totalPosts={productList.length}
-          postsPerPage={postsPerPage}
-          setCurrentPage={setCurrentPage}
-          currentPage={currentPage}
-        />
+
+        <div className="pagination-container">
+          <Pagination
+            totalPosts={productList.length}
+            postsPerPage={postsPerPage}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+          />
+        </div>
       </div>
     </div>
   );
