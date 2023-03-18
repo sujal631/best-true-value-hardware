@@ -146,7 +146,7 @@ export default function Registration() {
       {/* Form with the function handleSubmit being called on submit */}
       <Form onSubmit={handleSubmit}>
         <div className="row">
-          <div className=" col-md-6 mb-3">
+          <div className=" col-md-6 mb-2">
             {/* A form input for the user's first name */}
             <label htmlFor="firstName" className="form-label">
               First Name
@@ -162,7 +162,7 @@ export default function Registration() {
           </div>
 
           {/* A form input for the user's last name */}
-          <div className=" col-md-6 mb-3">
+          <div className=" col-md-6 mb-2">
             <label htmlFor="lastName" className="form-label">
               Last Name
             </label>
@@ -178,7 +178,7 @@ export default function Registration() {
         </div>
 
         {/* A form input for the user's phone number */}
-        <div className="mb-3">
+        <div className="mb-2">
           <label htmlFor="phoneNumber" className="form-label">
             Phone Number
           </label>
@@ -195,7 +195,7 @@ export default function Registration() {
         </div>
 
         {/* A form input for the user's email address */}
-        <div className="mb-3">
+        <div className="mb-2">
           <label htmlFor="email" className="form-label">
             Email
           </label>
@@ -210,7 +210,7 @@ export default function Registration() {
         </div>
 
         {/* A form input for the user's password */}
-        <div className="mb-3 position-relative">
+        <div className="mb-2 position-relative">
           <label htmlFor="password" className="form-label">
             Password
           </label>

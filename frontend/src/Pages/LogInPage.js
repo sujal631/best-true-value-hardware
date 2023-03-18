@@ -71,7 +71,7 @@ export default function LogInPage() {
         {/* Form component that allows user to log in */}
         <form onSubmit={handleSubmit}>
           {/* Email input */}
-          <div className="mb-3">
+          <div className="mb-2">
             <label htmlFor="email" className="form-label">
               Email
             </label>

@@ -237,80 +237,89 @@ const EditProductPage = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="imageFile" className="form-label">
-                Upload Image
-              </label>
-              <input
-                type="file"
-                className="form-control"
-                id="imageFile"
-                name="imageFile"
-                onChange={handleUploadImages}
-                required
-              />
+              <div className="custom-file-container">
+                <label htmlFor="imageFile" className="custom-file-upload">
+                  Upload Image
+                </label>
+                <input
+                  type="file"
+                  className="form-control file-input"
+                  id="imageFile"
+                  name="imageFile"
+                  onChange={handleUploadImages}
+                  required
+                  style={{ display: 'none' }}
+                />
+                <span className="file-name" id="file-name"></span>
+              </div>
               {loadingUpload && <LoadingSpinner />}
             </div>
-            <div className="mb-3">
-              <label htmlFor="brand" className="form-label">
-                Brand
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="brand"
-                name="brand"
-                value={brand}
-                onChange={handleChange}
-                required
-              />
+
+            <div className="row">
+              <div className=" col-md-6 mb-3">
+                <label htmlFor="brand" className="form-label">
+                  Brand
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="brand"
+                  name="brand"
+                  value={brand}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className=" col-md-6 mb-3">
+                <label htmlFor="department" className="form-label">
+                  Department
+                </label>
+                <input
+                  type="text"
+                  className="form-control "
+                  id="department"
+                  name="department"
+                  value={department}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
-            <div className="mb-3">
-              <label htmlFor="department" className="form-label">
-                Department
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                id="department"
-                name="department"
-                value={department}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="price" className="form-label">
-                Price
-              </label>
-              <input
-                type="number"
-                className="form-control"
-                id="price"
-                name="price"
-                value={price}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="countInStock" className="form-label">
-                Count In Stock
-              </label>
-              <input
-                type="number"
-                className="form-control"
-                id="countInStock"
-                name="countInStock"
-                value={countInStock}
-                onChange={handleChange}
-                required
-              />
+            <div className="row">
+              <div className="col-md-6 mb-3">
+                <label htmlFor="price" className="form-label">
+                  Price
+                </label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="price"
+                  name="price"
+                  value={price}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label htmlFor="countInStock" className="form-label">
+                  Count In Stock
+                </label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="countInStock"
+                  name="countInStock"
+                  value={countInStock}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
             <div className="mb-3">
               <label htmlFor="description" className="form-label">
                 Description
               </label>
-              <input
+              <textarea
                 type="text"
                 className="form-control"
                 id="description"
@@ -318,6 +327,7 @@ const EditProductPage = () => {
                 value={description}
                 onChange={handleChange}
                 required
+                style={{ height: '150px', resize: 'vertical' }}
               />
             </div>
             <div className="d-grid gap-2 mb-2">

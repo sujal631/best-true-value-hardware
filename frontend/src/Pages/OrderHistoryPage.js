@@ -94,10 +94,26 @@ export default function OrderHistoryPage() {
                   <td className="btn-text">{order.totalPrice.toFixed(2)}</td>
                   <td className="btn-text">{formatDate(order.createdAt)}</td>
                   <td className="btn-text">
-                    {isOrderPaid(order) ? 'YES' : 'NO'}
+                    {isOrderPaid(order) ? (
+                      <span style={{ color: 'green', fontWeight: '600' }}>
+                        YES
+                      </span>
+                    ) : (
+                      <span style={{ color: 'red', fontWeight: '600' }}>
+                        NO
+                      </span>
+                    )}
                   </td>
                   <td className="btn-text">
-                    {isOrderReadyForPickup(order) ? 'YES' : 'NO'}
+                    {isOrderReadyForPickup(order) ? (
+                      <span style={{ color: 'green', fontWeight: '600' }}>
+                        YES
+                      </span>
+                    ) : (
+                      <span style={{ color: 'red', fontWeight: '600' }}>
+                        NO
+                      </span>
+                    )}
                   </td>
                   <td className="btn-text">
                     {/* Navigates to the OrderPage.js when the button is clicked */}

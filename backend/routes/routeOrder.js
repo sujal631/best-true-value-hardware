@@ -69,6 +69,11 @@ routeOrder.route('/dashboard').get(
     const dailyOrders = await Order.aggregate([
       {
         $match: {
+          isPaid: true, //filter paid orders only
+        },
+      },
+      {
+        $match: {
           createdAt: { $gte: dateBoundary },
         },
       },
@@ -96,7 +101,7 @@ routeOrder.route('/dashboard').get(
     const orders = await Order.aggregate([
       {
         $match: {
-          isPaid: true, // Add this line to filter paid orders only
+          isPaid: true, //filter paid orders only
         },
       },
       {
@@ -137,6 +142,11 @@ routeOrder.route('/dashboard').get(
     ]);
 
     const revenueByDepartment = await Order.aggregate([
+      {
+        $match: {
+          isPaid: true, //filter paid orders only
+        },
+      },
       { $unwind: '$orderItems' },
       {
         $lookup: {
@@ -210,6 +220,11 @@ routeOrder.route('/top-selling-products').get(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const topSellingProducts = await Order.aggregate([
+      {
+        $match: {
+          isPaid: true, //filter paid orders only
+        },
+      },
       { $unwind: '$orderItems' },
       {
         $group: {

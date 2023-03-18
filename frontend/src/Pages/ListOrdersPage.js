@@ -83,7 +83,13 @@ const ListOrdersPage = () => {
                 <td className="btn-text">{order.totalPrice.toFixed(2)}</td>
                 <td className="btn-text">{order.createdAt.substring(0, 10)}</td>
                 <td className="btn-text">
-                  {order.isPickupReady ? 'YES' : 'NO'}
+                  {order.isPickupReady ? (
+                    <span style={{ color: 'green', fontWeight: '600' }}>
+                      YES
+                    </span>
+                  ) : (
+                    <span style={{ color: 'red', fontWeight: '600' }}>NO</span>
+                  )}
                 </td>
                 <td className="btn-text">
                   <Button

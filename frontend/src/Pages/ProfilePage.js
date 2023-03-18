@@ -174,7 +174,7 @@ export default function ProfilePage() {
 
       <Form>
         <div className="row">
-          <div className=" col-md-6 mb-3">
+          <div className=" col-md-6 mb-2">
             <label htmlFor="firstName" className="form-label">
               First Name
             </label>
@@ -190,7 +190,7 @@ export default function ProfilePage() {
             />
           </div>
 
-          <div className=" col-md-6 mb-3">
+          <div className=" col-md-6 mb-2">
             <label htmlFor="lastName" className="form-label">
               Last Name
             </label>
@@ -207,7 +207,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="mb-3">
+        <div className="mb-2">
           <label htmlFor="phoneNumber" className="form-label">
             Phone Number
           </label>
@@ -286,7 +286,7 @@ export default function ProfilePage() {
         {/* Conditionally render the password fields if passwordChangeMode is true */}
         {passwordChangeMode && (
           <>
-            <div className="mb-3 position-relative">
+            <div className="mb-2 position-relative">
               <label htmlFor="oldPasswordUpdate" className="form-label">
                 Old Password
               </label>
@@ -321,7 +321,7 @@ export default function ProfilePage() {
 
         {passwordChangeMode && (
           <>
-            <div className="mb-3 position-relative">
+            <div className="mb-2 position-relative">
               <label htmlFor="password" className="form-label">
                 New Password
               </label>

@@ -82,6 +82,8 @@ export default function ShippingInfoPage() {
   const [city, setCity] = useState('');
   const [region, setRegion] = useState('');
   const [zip, setZip] = useState('');
+  const [showPhoneMessage, setShowPhoneMessage] = useState(false);
+  const [showZipMessage, setShowZipMessage] = useState(false);
 
   // Use the useEffect hook to set the form inputs to the shipping info stored in the global state
   useEffect(() => {
@@ -90,9 +92,9 @@ export default function ShippingInfoPage() {
       navigate('/login?redirect=/shippingInfo');
     } else {
       // Set the form input values to the shipping info stored in the global state
-      setFirstName(shippingInfo.firstName || '');
-      setLastName(shippingInfo.lastName || '');
-      setPhoneNumber(shippingInfo.phoneNumber || '');
+      setFirstName(userInfo.firstName || '');
+      setLastName(userInfo.lastName || '');
+      setPhoneNumber(userInfo.phoneNumber || '');
       setAddress(shippingInfo.address || '');
       setCity(shippingInfo.city || '');
       setRegion(shippingInfo.region || '');
@@ -133,6 +135,17 @@ export default function ShippingInfoPage() {
     );
     // Navigate to the payment method page
     navigate('/paymentMethod');
+  };
+
+  // Function to handle phone number input change
+  const handlePhoneChange = (e) => {
+    setPhoneNumber(e.target.value);
+    setShowPhoneMessage(e.target.value.length > 0);
+  };
+
+  const handleZipChange = (e) => {
+    setZip(e.target.value);
+    setShowZipMessage(e.target.value.length > 0);
   };
 
   return (
@@ -182,6 +195,7 @@ export default function ShippingInfoPage() {
           </div>
 
           {/* A form input for the user's phone number */}
+
           <div className="mb-3">
             <label htmlFor="phoneNumber" className="form-label">
               Phone Number
@@ -191,36 +205,24 @@ export default function ShippingInfoPage() {
               className="form-control"
               id="phoneNumber"
               required
+              onChange={handlePhoneChange}
+              value={phoneNumber}
               pattern="^\d{10}$"
-              onChange={(e) => {
-                // Remove non-digit characters from input
-                const cleaned = e.target.value.replace(/\D/g, '');
-                // Validate cleaned value
-                if (cleaned.length !== 10) {
-                  e.target.setCustomValidity(
-                    'Please enter a valid phone number'
-                  );
-                } else {
-                  e.target.setCustomValidity('');
-                  // Format cleaned value
-                  const formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(
-                    3,
-                    6
-                  )}-${cleaned.slice(6, 10)}`;
-                  setPhoneNumber(formatted);
-                }
-              }}
+              title="Phone number should be 10 digits"
             />
           </div>
 
+          {showPhoneMessage && (
+            <div className="mb-3">
+              <Message variant="warning">
+                Please provide a valid cell phone number so that a
+                representative from the store can call you to{' '}
+                <strong>PICKUP</strong> your item(s) when they are ready.
+              </Message>
+            </div>
+          )}
+
           {/* A form input for the user's physical address */}
-          <div className="mb-3">
-            <Message variant="warning">
-              Please provide a valid cell phone number so that a representative
-              from the store can call you to <strong>PICKUP</strong> your
-              item(s) when they are ready.
-            </Message>
-          </div>
           <div className="mb-3">
             <label htmlFor="address" className="form-label">
               Address
@@ -283,7 +285,7 @@ export default function ShippingInfoPage() {
               id="zip"
               required
               pattern="^\d{5}(?:[-\s]\d{4})?$"
-              onChange={(e) => setZip(e.target.value)}
+              onChange={handleZipChange}
               value={zip}
               onInvalid={(e) => {
                 e.target.setCustomValidity('Please enter a valid zip code');
@@ -292,12 +294,14 @@ export default function ShippingInfoPage() {
                 e.target.setCustomValidity('');
               }}
             />
-            <div className="my-3">
-              <Message variant="warning">
-                Please enter your 5-digit zip code (e.g., 12345) or your 9-digit
-                zip code (e.g., 12345-6789).
-              </Message>
-            </div>
+            {showZipMessage && (
+              <div className="my-3">
+                <Message variant="warning">
+                  Please enter your 5-digit zip code (e.g., 12345) or your
+                  9-digit zip code (e.g., 12345-6789).
+                </Message>
+              </div>
+            )}
           </div>
 
           {/* Submit button that triggers handleSubmit function */}
