@@ -20,6 +20,30 @@ routeOrder.route('/').get(
   })
 );
 
+const PAGE_SIZE = 10;
+routeOrder.get(
+  '/admin',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const { query } = req;
+    const page = parseInt(query.page) || 1;
+    const pageSize = parseInt(query.limit) || PAGE_SIZE;
+    const orders = await Order.find({ isPaid: true })
+      .populate('user', 'firstName lastName')
+      .sort({ _id: -1 })
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+    const countOrders = await Order.countDocuments();
+    res.send({
+      orders,
+      countOrders,
+      page,
+      pages: Math.ceil(countOrders / pageSize),
+    });
+  })
+);
+
 // Define routes for handling order-related requests
 // Create a new order
 routeOrder.route('/').post(

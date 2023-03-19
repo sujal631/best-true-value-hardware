@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Store } from '../Store';
 import axios from 'axios';
@@ -6,14 +6,23 @@ import { getErrorMessage } from '../utils';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import { Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import queryString from 'query-string';
+import AdminPagination from '../Components/AdminPagination.js';
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'REQUEST':
       return { ...state, loading: true };
     case 'SUCCESS':
-      return { ...state, orders: action.payload, loading: false };
+      return {
+        ...state,
+        orders: action.payload.orders.sort(
+          (a, b) => a.isPickupReady - b.isPickupReady
+        ),
+        pages: action.payload.pages,
+        loading: false,
+      };
     case 'FAILURE':
       return { ...state, loading: false, error: action.payload };
     default:
@@ -23,29 +32,58 @@ const reducer = (state, action) => {
 
 // A functional component that returns the page content for List Orders page
 const ListOrdersPage = () => {
-  const { state } = useContext(Store);
-  const { userInfo } = state;
-  const navigate = useNavigate();
-
-  const [{ loading, error, orders }, dispatch] = useReducer(reducer, {
+  const [{ loading, error, orders, pages }, dispatch] = useReducer(reducer, {
     loading: true,
     error: '',
   });
 
+  const { state } = useContext(Store);
+  const { userInfo } = state;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const pageSize = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const fetchOrders = (page, limit, token) => {
+    return axios.get(`/api/orders/admin?page=${page}&limit=${limit}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  };
+
+  const setCurrentPageAndUpdateUrl = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    navigate(`${location.pathname}?page=${pageNumber}`, { replace: true });
+  };
+
   useEffect(() => {
+    window.scrollTo(0, 0);
+    const parsed = queryString.parse(location.search);
+    const pageFromUrl = parsed.page ? parseInt(parsed.page, 10) : 1;
+    const pageFromState = location.state?.currentPage || pageFromUrl;
+
     const fetchData = async () => {
       try {
         dispatch({ type: 'REQUEST' });
-        const { data } = await axios.get(`/api/orders`, {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
+        const { data } = await fetchOrders(
+          currentPage,
+          pageSize,
+          userInfo.token
+        );
+        dispatch({
+          type: 'SUCCESS',
+          payload: { orders: data.orders, pages: data.pages },
         });
-        dispatch({ type: 'SUCCESS', payload: data });
       } catch (error) {
         dispatch({ type: 'FAILURE', payload: getErrorMessage(error) });
       }
     };
-    fetchData();
-  }, [userInfo]);
+    if (currentPage !== pageFromState) {
+      setCurrentPage(pageFromState);
+    } else {
+      fetchData();
+    }
+  }, [currentPage, location, userInfo]);
+
   return (
     <div>
       {/* Set the title of the page dynamically in the browser tab */}
@@ -81,7 +119,7 @@ const ListOrdersPage = () => {
                     : 'NOT AVAILABLE'}
                 </td>
                 <td className="btn-text">{order.totalPrice.toFixed(2)}</td>
-                <td className="btn-text">{order.createdAt.substring(0, 10)}</td>
+                <td className="btn-text">{order.paidAt.substring(0, 10)}</td>
                 <td className="btn-text">
                   {order.isPickupReady ? (
                     <span style={{ color: 'green', fontWeight: '600' }}>
@@ -91,8 +129,9 @@ const ListOrdersPage = () => {
                     <span style={{ color: 'red', fontWeight: '600' }}>NO</span>
                   )}
                 </td>
-                <td className="btn-text">
+                <td>
                   <Button
+                    className="btn-text"
                     type="button"
                     variant="secondary"
                     onClick={() => {
@@ -107,6 +146,13 @@ const ListOrdersPage = () => {
           </tbody>
         </table>
       )}
+      <div>
+        <AdminPagination
+          totalPages={pages}
+          setCurrentPage={setCurrentPageAndUpdateUrl}
+          currentPage={currentPage}
+        />
+      </div>
     </div>
   );
 };

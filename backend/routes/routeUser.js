@@ -38,10 +38,16 @@ routeUser.get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
-    const users = await User.find({});
-    res.send(users);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const users = await User.find({}).skip(skip).limit(limit);
+    const totalUsers = await User.countDocuments({});
+    res.send({ users, totalUsers });
   })
 );
+
 // Handle user login
 routeUser.post(
   '/login',

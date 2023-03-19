@@ -7,6 +7,7 @@ import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import ReactModal from 'react-modal';
 import { Button } from 'react-bootstrap';
+import AdminPagination from '../Components/AdminPagination';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -28,6 +29,9 @@ export default function ListUsersPage() {
 
   const { state } = useContext(Store);
   const { userInfo } = state;
+  const usersPerPage = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
@@ -82,10 +86,12 @@ export default function ListUsersPage() {
       try {
         const { data } = await axios.get(`/api/users`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
+          params: { page: currentPage, limit: usersPerPage },
         });
+        setTotalUsers(data.totalUsers);
 
         // Sort users according to the specified conditions
-        const sortedUsers = data.sort((a, b) => {
+        const sortedUsers = data.users.sort((a, b) => {
           if (a.isAdmin !== b.isAdmin) {
             return b.isAdmin - a.isAdmin;
           }
@@ -105,7 +111,7 @@ export default function ListUsersPage() {
       }
     };
     fetchData();
-  }, [userInfo]);
+  }, [currentPage, userInfo]);
 
   const customStyles = {
     overlay: {
@@ -251,6 +257,13 @@ export default function ListUsersPage() {
           </tbody>
         </table>
       )}
+      <div>
+        <AdminPagination
+          totalPages={Math.ceil(totalUsers / usersPerPage)}
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+        />
+      </div>
     </div>
   );
 }
