@@ -1,6 +1,6 @@
 // Import necessary modules and dependencies
 import axios from 'axios';
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
@@ -16,6 +16,7 @@ import { usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { toast } from 'react-toastify';
 import OrderSummaryCard from '../Components/OrderSummaryCard';
 import { Button } from 'react-bootstrap';
+import ReactModal from 'react-modal';
 
 // Reducer function for handling state changes
 const reducer = (state, action) => {
@@ -81,6 +82,7 @@ export default function OrderScreen() {
   const paypalScriptReducer = usePayPalScriptReducer();
   const isPending = paypalScriptReducer[0].isPending;
   const paypalDispatch = paypalScriptReducer[1];
+  const [showModal, setShowModal] = useState(false);
 
   // Function for handling PayPal order creation
   const createPayPalOrder = (data, actions) => {
@@ -139,6 +141,17 @@ export default function OrderScreen() {
       toast.error(getErrorMessage(error));
       dispatch({ type: 'PICKUP_FAILURE' });
     }
+  }
+
+  const onConfirm = (event) => {
+    event.preventDefault();
+    handlePickupReady();
+    setShowModal(false);
+    window.scrollTo(0, 0);
+  };
+
+  function handleClickPickupReady() {
+    setShowModal(true);
   }
 
   // Define a useEffect hook to fetch the order data and configure the PayPal SDK
@@ -223,6 +236,30 @@ export default function OrderScreen() {
     userInfo,
     successPickupReady,
   ]);
+
+  const customStyles = {
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    content: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      minWidth: '300px',
+      maxWidth: '400px',
+      height: '220px',
+      padding: '20px',
+      textAlign: 'center',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '8px',
+      border: '1px solid #ccc',
+    },
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return loading ? (
     <LoadingSpinner></LoadingSpinner>
@@ -363,6 +400,39 @@ export default function OrderScreen() {
             isPending={isPending}
             loadingPay={loadingPay}
           />
+          <ReactModal
+            isOpen={showModal}
+            onRequestClose={() => setShowModal(false)}
+            style={customStyles}
+            shouldFocusAfterRender={false}
+            shouldReturnFocusAfterClose={false}
+          >
+            <strong>
+              <p>Confirm "READY FOR PICKUP"</p>
+            </strong>
+            <p>
+              Are you sure you want to mark this order as "READY FOR PICKUP"?
+            </p>
+            <div className="d-flex justify-content-around mt-3">
+              <Button
+                className="my-2"
+                type="button"
+                variant="warning"
+                onClick={onConfirm}
+              >
+                CONFIRM
+              </Button>
+              <Button
+                className="my-2"
+                type="button"
+                variant="primary"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </ReactModal>
+
           {userInfo.isAdmin && order.isPaid && !order.isPickupReady && (
             <ListGroup.Item>
               {loadingPickupReady && <LoadingSpinner />}
@@ -371,7 +441,7 @@ export default function OrderScreen() {
                   className="my-3"
                   type="button"
                   variant="primary"
-                  onClick={handlePickupReady}
+                  onClick={handleClickPickupReady}
                 >
                   PiCKUP IS READY
                 </Button>

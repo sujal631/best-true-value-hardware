@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import Product from '../Components/Product';
+import Pagination from '../Components/Pagination';
 
 // AllDepartmentsPage component
 export default function ProductsPage() {
@@ -15,6 +16,17 @@ export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [allDepartments, setAllDepartments] = useState([]);
+
+  const [currentPage, setCurrentPage] = useState(() => {
+    const query = new URLSearchParams(window.location.search);
+    const page = query.get('page');
+    return page ? parseInt(page, 10) : 1;
+  });
+  const [postsPerPage] = useState(12);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage]);
 
   // useEffect hook to fetch products data from the API and set state variables
   useEffect(() => {
@@ -35,6 +47,12 @@ export default function ProductsPage() {
     fetchProduct();
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', currentPage);
+    window.history.pushState({}, '', '?' + params.toString());
+  }, [currentPage]);
+
   // Function to handle change in the selected department
   const handleDepartmentChange = (department) => {
     setSelectedDepartment(department);
@@ -45,6 +63,10 @@ export default function ProductsPage() {
     selectedDepartment === ''
       ? products
       : products.filter((product) => product.department === selectedDepartment);
+
+  const lastPostIndex = currentPage * postsPerPage;
+  const firstPostIndex = lastPostIndex - postsPerPage;
+  const currentPosts = filteredProducts.slice(firstPostIndex, lastPostIndex);
 
   return (
     <div>
@@ -79,7 +101,7 @@ export default function ProductsPage() {
         ) : (
           <div className="products-row-container">
             <Row>
-              {filteredProducts.map((product) => (
+              {currentPosts.map((product) => (
                 <Col key={product.slug} sm={12} md={6} lg={3} className="mb-3">
                   <Product product={product} />
                 </Col>
@@ -87,6 +109,14 @@ export default function ProductsPage() {
             </Row>
           </div>
         )}
+        <div className="pagination-container">
+          <Pagination
+            totalPosts={filteredProducts.length}
+            postsPerPage={postsPerPage}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+          />
+        </div>
       </div>
     </div>
   );

@@ -71,7 +71,7 @@ const HomePage = () => {
       <Slider />
       {/* Display the title for the product list */}
       <h1>All Products</h1>
-      <div className="product-container">
+      <div>
         {/* Conditionally render the loading component if the data is being fetched, error component if there is an error, or the product list if the data is available */}
         {isLoading ? (
           <LoadingSpinner />

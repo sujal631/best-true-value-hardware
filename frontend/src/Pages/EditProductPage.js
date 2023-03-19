@@ -237,22 +237,17 @@ const EditProductPage = () => {
               />
             </div>
             <div className="mb-3">
-              <div className="custom-file-container">
-                <label htmlFor="imageFile" className="custom-file-upload">
-                  Upload Image
-                </label>
-                <input
-                  type="file"
-                  className="form-control file-input"
-                  id="imageFile"
-                  name="imageFile"
-                  onChange={handleUploadImages}
-                  required
-                  style={{ display: 'none' }}
-                />
-                <span className="file-name" id="file-name"></span>
-              </div>
-              {loadingUpload && <LoadingSpinner />}
+              <label htmlFor="imageFile" className="form-label">
+                Upload Image
+              </label>
+              <input
+                type="file"
+                className="form-control"
+                id="imageFile"
+                name="imageFile"
+                onChange={handleUploadImages}
+                required
+              />
             </div>
 
             <div className="row">
