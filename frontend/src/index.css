@@ -276,7 +276,7 @@ body {
 .search-input {
   border-radius: 1rem;
   box-shadow: none;
-  height: 2.3rem;
+  height: 38px;
   font-size: 0.9rem;
   padding: 0.5rem 0.75rem;
 }
@@ -284,9 +284,9 @@ body {
 .search-button {
   background-color: #bb0000;
   color: #fff;
-  border-radius: 1rem;
+  border-radius: 0 1rem 1rem 0;
   box-shadow: none;
-  height: 2.3rem;
+  height: 38px;
   font-size: 0.9rem;
   padding: 0.5rem 0.75rem;
 }

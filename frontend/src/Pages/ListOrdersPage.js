@@ -5,10 +5,11 @@ import axios from 'axios';
 import { getErrorMessage } from '../utils';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import AdminPagination from '../Components/AdminPagination.js';
+import { BiSearch } from 'react-icons/bi';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -103,16 +104,19 @@ const ListOrdersPage = () => {
 
       <Row>
         <Col md={4} className="my-3">
-          <div>
-            <input
+          <InputGroup>
+            <InputGroup.Text>
+              <BiSearch />
+            </InputGroup.Text>
+            <Form.Control
               id="search"
               type="text"
-              placeholder="Search by Customer name ..."
+              placeholder="Search by Customer's name ..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="form-control "
             />
-          </div>
+          </InputGroup>
         </Col>
         <Col md={3} className="my-3">
           <div>

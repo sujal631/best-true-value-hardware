@@ -38,12 +38,34 @@ routeUser.get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const { query } = req;
+    const page = parseInt(query.page) || 1;
+    const limit = parseInt(query.limit) || 10;
+    const search = query.search || '';
+    const filter = query.filter || '';
     const skip = (page - 1) * limit;
 
-    const users = await User.find({}).skip(skip).limit(limit);
-    const totalUsers = await User.countDocuments({});
+    const searchRegex = new RegExp(search, 'i');
+
+    let filterObject = {};
+    if (filter === 'admin') {
+      filterObject.isAdmin = true;
+    } else if (filter === 'user') {
+      filterObject.isAdmin = false;
+    }
+
+    const users = await User.find({
+      ...filterObject,
+      $or: [{ firstName: searchRegex }, { lastName: searchRegex }],
+    })
+      .skip(skip)
+      .limit(limit);
+
+    const totalUsers = await User.countDocuments({
+      ...filterObject,
+      $or: [{ firstName: searchRegex }, { lastName: searchRegex }],
+    });
+
     res.send({ users, totalUsers });
   })
 );

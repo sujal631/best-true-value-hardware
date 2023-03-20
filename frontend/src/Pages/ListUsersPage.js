@@ -6,8 +6,9 @@ import axios from 'axios';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import ReactModal from 'react-modal';
-import { Button } from 'react-bootstrap';
+import { Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
 import AdminPagination from '../Components/AdminPagination';
+import { BiSearch } from 'react-icons/bi';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -37,6 +38,8 @@ export default function ListUsersPage() {
   const [modalAction, setModalAction] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showAccessDeniedModal, setShowAccessDeniedModal] = useState(false);
+  const [search, setSearch] = useState('');
+  const [isAdminFilter, setIsAdminFilter] = useState('');
 
   const updateUserRole = async (userId, makeAdmin) => {
     try {
@@ -81,12 +84,25 @@ export default function ListUsersPage() {
     closeModal();
   };
 
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+  };
+
+  const handleFilterChange = (event) => {
+    setIsAdminFilter(event.target.value);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const { data } = await axios.get(`/api/users`, {
           headers: { Authorization: `Bearer ${userInfo.token}` },
-          params: { page: currentPage, limit: usersPerPage },
+          params: {
+            page: currentPage,
+            limit: usersPerPage,
+            search,
+            filter: isAdminFilter,
+          },
         });
         setTotalUsers(data.totalUsers);
 
@@ -111,7 +127,7 @@ export default function ListUsersPage() {
       }
     };
     fetchData();
-  }, [currentPage, userInfo]);
+  }, [currentPage, userInfo, search, isAdminFilter]);
 
   const customStyles = {
     overlay: {
@@ -141,6 +157,38 @@ export default function ListUsersPage() {
 
       {/* Displaying the page header */}
       <h1>Users</h1>
+
+      <Row>
+        <Col md={4} className="my-3">
+          <InputGroup>
+            <InputGroup.Text>
+              <BiSearch />
+            </InputGroup.Text>
+            <Form.Control
+              id="search"
+              type="text"
+              className="form-control"
+              placeholder="Search by User's name ..."
+              value={search}
+              onChange={handleSearchChange}
+            />
+          </InputGroup>
+        </Col>
+        <Col md={3} className="my-3">
+          <div>
+            <select
+              className="form-control"
+              value={isAdminFilter}
+              onChange={handleFilterChange}
+            >
+              <option value="">Filter by ADMIN status</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+        </Col>
+      </Row>
+
       <>
         <ReactModal
           isOpen={showConfirmModal}

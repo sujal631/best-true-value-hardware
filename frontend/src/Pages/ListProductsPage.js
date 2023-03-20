@@ -322,7 +322,7 @@ export default function ListProductsPage() {
             </InputGroup.Text>
             <Form.Control
               type="text"
-              placeholder="Search by Product name ..."
+              placeholder="Search by Product's name ..."
               value={search}
               onChange={handleSearch}
             />
