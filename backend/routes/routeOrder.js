@@ -15,7 +15,7 @@ routeOrder.route('/').get(
   expressAsyncHandler(async (req, res) => {
     const orders = await Order.find({ isPaid: true })
       .populate('user', 'firstName lastName')
-      .sort({ createdAt: -1 });
+      .sort({ paidAt: -1 });
     res.send(orders);
   })
 );
@@ -29,17 +29,66 @@ routeOrder.get(
     const { query } = req;
     const page = parseInt(query.page) || 1;
     const pageSize = parseInt(query.limit) || PAGE_SIZE;
-    const orders = await Order.find({ isPaid: true })
-      .populate('user', 'firstName lastName')
-      .sort({ _id: -1 })
-      .skip(pageSize * (page - 1))
-      .limit(pageSize);
-    const countOrders = await Order.countDocuments();
+    const searchTerm = query.searchTerm || '';
+    const isPickupReadyFilter = query.isPickupReadyFilter;
+
+    const searchFilter = searchTerm
+      ? {
+          $or: [
+            { 'user.firstName': { $regex: searchTerm, $options: 'i' } },
+            { 'user.lastName': { $regex: searchTerm, $options: 'i' } },
+          ],
+        }
+      : {};
+
+    const isPickupReadyFilterObj = isPickupReadyFilter
+      ? { isPickupReady: isPickupReadyFilter === 'true' }
+      : {};
+
+    const finalFilter = {
+      ...searchFilter,
+      ...isPickupReadyFilterObj,
+      isPaid: true,
+    };
+
+    const orders = await Order.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      { $match: finalFilter },
+      { $sort: { _id: -1 } },
+      { $skip: pageSize * (page - 1) },
+      { $limit: pageSize },
+      { $project: { 'user.password': 0 } },
+    ]);
+
+    const countOrders = await Order.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      { $match: finalFilter },
+      { $count: 'countOrders' },
+    ]);
+
     res.send({
       orders,
-      countOrders,
+      countOrders: countOrders.length > 0 ? countOrders[0].countOrders : 0,
       page,
-      pages: Math.ceil(countOrders / pageSize),
+      pages: Math.ceil(
+        (countOrders.length > 0 ? countOrders[0].countOrders : 0) / pageSize
+      ),
     });
   })
 );
@@ -98,20 +147,58 @@ routeOrder.route('/dashboard').get(
       },
       {
         $match: {
-          createdAt: { $gte: dateBoundary },
+          paidAt: { $gte: dateBoundary },
         },
       },
       {
         $addFields: {
           convertedDate: {
-            $cond: [
-              { $eq: [timeRange, 'yearly'] },
-              { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
-              { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-            ],
+            $switch: {
+              branches: [
+                {
+                  case: { $eq: [timeRange, 'yearly'] },
+                  then: { $dateToString: { format: '%Y-%m', date: '$paidAt' } },
+                },
+                {
+                  case: { $eq: [timeRange, 'monthly'] },
+                  then: {
+                    $dateToString: { format: '%Y-%m-%d', date: '$paidAt' },
+                  },
+                },
+                {
+                  case: { $eq: [timeRange, 'weekly'] },
+                  then: {
+                    $dateToString: {
+                      format: '%Y-%m-%d',
+                      date: {
+                        $subtract: [
+                          '$paidAt',
+                          {
+                            $multiply: [
+                              86400000,
+                              { $mod: [{ $dayOfWeek: '$paidAt' }, 7] },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  },
+                },
+                {
+                  case: { $eq: [timeRange, 'all'] },
+                  then: {
+                    $dateToString: { format: '%Y-%m-%d', date: '$paidAt' },
+                  },
+                },
+              ],
+              default: {
+                $dateToString: { format: '%Y-%m-%d', date: '$paidAt' },
+              },
+            },
           },
         },
       },
+
       {
         $group: {
           _id: '$convertedDate',
@@ -197,7 +284,7 @@ routeOrder.route('/dashboard').get(
     const highestRevenueCustomer = await Order.aggregate([
       {
         $match: {
-          createdAt: { $gte: dateBoundary },
+          paidAt: { $gte: dateBoundary },
         },
       },
       {
@@ -225,16 +312,47 @@ routeOrder.route('/dashboard').get(
       },
     ]);
 
+    const newReturningCustomers = await Order.aggregate([
+      {
+        $match: {
+          isPaid: true,
+        },
+      },
+      {
+        $match: {
+          paidAt: { $gte: dateBoundary },
+        },
+      },
+      {
+        $group: {
+          _id: '$user',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $cond: [
+              { $eq: ['$count', 1] },
+              'New Customer',
+              'Returning Customer',
+            ],
+          },
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
     res.send({
       users: users.length ? users : [{ numUsers: 0 }],
       orders: orders.length ? orders : [{ numOrders: 0, totalSales: 0 }],
       dailyOrders,
       productDepartments,
-
       revenueByDepartment,
       highestRevenueCustomer: highestRevenueCustomer.length
         ? highestRevenueCustomer
         : [{ user: null, revenue: 0 }],
+      newReturningCustomers,
     });
   })
 );

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { getErrorMessage } from '../utils';
 import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
-import { Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import AdminPagination from '../Components/AdminPagination.js';
@@ -43,11 +43,16 @@ const ListOrdersPage = () => {
   const location = useLocation();
   const pageSize = 10;
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isPickupReadyFilter, setIsPickupReadyFilter] = useState('');
 
-  const fetchOrders = (page, limit, token) => {
-    return axios.get(`/api/orders/admin?page=${page}&limit=${limit}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const fetchOrders = (page, limit, token, searchTerm, isPickupReadyFilter) => {
+    return axios.get(
+      `/api/orders/admin?page=${page}&limit=${limit}&searchTerm=${searchTerm}&isPickupReadyFilter=${isPickupReadyFilter}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
   };
 
   const setCurrentPageAndUpdateUrl = (pageNumber) => {
@@ -67,7 +72,9 @@ const ListOrdersPage = () => {
         const { data } = await fetchOrders(
           currentPage,
           pageSize,
-          userInfo.token
+          userInfo.token,
+          searchTerm,
+          isPickupReadyFilter
         );
         dispatch({
           type: 'SUCCESS',
@@ -82,7 +89,7 @@ const ListOrdersPage = () => {
     } else {
       fetchData();
     }
-  }, [currentPage, location, userInfo]);
+  }, [currentPage, location, userInfo, searchTerm, isPickupReadyFilter]);
 
   return (
     <div>
@@ -93,6 +100,35 @@ const ListOrdersPage = () => {
 
       {/* Page header */}
       <h1>Orders</h1>
+
+      <Row>
+        <Col md={4} className="my-3">
+          <div>
+            <input
+              id="search"
+              type="text"
+              placeholder="Search by Customer name ..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="form-control "
+            />
+          </div>
+        </Col>
+        <Col md={3} className="my-3">
+          <div>
+            <select
+              id="isPickupReadyFilter"
+              value={isPickupReadyFilter}
+              onChange={(e) => setIsPickupReadyFilter(e.target.value)}
+              className="form-control custom-select"
+            >
+              <option value="">Filter by PICKUP status</option>
+              <option value="true">Pickup Ready</option>
+              <option value="false">Not Ready</option>
+            </select>
+          </div>
+        </Col>
+      </Row>
       {loading ? (
         <LoadingSpinner />
       ) : error ? (

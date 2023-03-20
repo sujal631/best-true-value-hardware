@@ -82,7 +82,6 @@ routeProduct.delete(
   })
 );
 
-const PAGE_SIZE = 10;
 routeProduct.get(
   '/admin',
   isAuth,
@@ -91,16 +90,31 @@ routeProduct.get(
     const { query } = req;
     const page = parseInt(query.page) || 1;
     const pageSize = parseInt(query.limit) || PAGE_SIZE;
-    const products = await Product.find()
+    const search = query.search || '';
+    const filter = query.filter || '';
+
+    const searchRegex = new RegExp(search, 'i');
+
+    let filterObject = {};
+    if (filter) {
+      filterObject = { department: filter };
+    }
+
+    const products = await Product.find({ ...filterObject, name: searchRegex })
       .sort({ _id: -1 })
       .skip(pageSize * (page - 1))
       .limit(pageSize);
-    const countProducts = await Product.countDocuments();
+
+    const countProducts = await Product.countDocuments({
+      ...filterObject,
+      name: searchRegex,
+    });
+
     res.send({
       products,
-      countProducts,
       page,
       pages: Math.ceil(countProducts / pageSize),
+      count: countProducts,
     });
   })
 );

@@ -83,16 +83,27 @@ export default function OrderHistoryPage() {
             </tr>
           </thead>
           <tbody>
-            {/* ".sort" function sorts the orders array in reverse chronological order based on the "createdAt" field */}
+            {/* ".sort" function sorts the orders array in reverse chronological order based on the "paidAt" field */}
             {/* Map over orders and create a row for each */}
             {orders
-              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              .sort((a, b) => {
+                if (!a.isPaid && !b.isPaid) return 0; // If both orders are unpaid, leave them in the same order
+                if (!a.isPaid) return -1; // If "a" is unpaid, move it to the top
+                if (!b.isPaid) return 1; // If "b" is unpaid, move it to the top
+                return new Date(b.paidAt) - new Date(a.paidAt); // Sort the paid orders by paidAt date
+              })
               .map((order) => (
                 // Set to the "_id" field of each order to uniquely identify each row
                 <tr key={order._id}>
                   <td className="btn-text">{order._id}</td>
                   <td className="btn-text">{order.totalPrice.toFixed(2)}</td>
-                  <td className="btn-text">{formatDate(order.createdAt)}</td>
+                  <td className="btn-text">
+                    {order.isPaid ? (
+                      formatDate(order.paidAt)
+                    ) : (
+                      <span style={{ color: 'red', fontWeight: '600' }}>-</span>
+                    )}
+                  </td>
                   <td className="btn-text">
                     {isOrderPaid(order) ? (
                       <span style={{ color: 'green', fontWeight: '600' }}>
@@ -115,9 +126,10 @@ export default function OrderHistoryPage() {
                       </span>
                     )}
                   </td>
-                  <td className="btn-text">
+                  <td>
                     {/* Navigates to the OrderPage.js when the button is clicked */}
                     <Button
+                      className="btn-text"
                       type="button"
                       variant="secondary"
                       onClick={() => handleDetailsClick(order._id)}

@@ -13,6 +13,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import ReactModal from 'react-modal';
 import ProductRow from '../Components/ProductRow';
 import queryString from 'query-string';
+import { Form, InputGroup } from 'react-bootstrap';
+import { BiSearch } from 'react-icons/bi';
 
 // Reducer function declarations
 const actionsMap = {
@@ -84,11 +86,33 @@ export default function ListProductsPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('');
 
-  const fetchProducts = (page, limit, token) => {
-    return axios.get(`/api/products/admin?page=${page}&limit=${limit}`, {
+  const fetchProducts = (page, limit, search, filter, token) => {
+    let url = `/api/products/admin?page=${page}&limit=${limit}`;
+
+    if (search) {
+      url += `&search=${search}`;
+    }
+
+    if (filter) {
+      url += `&filter=${filter}`;
+    }
+
+    return axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
+  };
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleFilter = (e) => {
+    setFilter(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleFetchSuccess = (data) => {
@@ -179,8 +203,11 @@ export default function ListProductsPage() {
         const { data } = await fetchProducts(
           currentPage,
           pageSize,
+          search,
+          filter,
           userInfo.token
         );
+
         handleFetchSuccess(data);
       } catch (error) {
         handleFetchError(error);
@@ -197,7 +224,7 @@ export default function ListProductsPage() {
       dispatch({ type: 'RESET' });
       fetchData();
     }
-  }, [currentPage, location, userInfo, successDelete]);
+  }, [currentPage, location, userInfo, successDelete, search, filter]);
 
   const customStyles = {
     overlay: {
@@ -285,6 +312,37 @@ export default function ListProductsPage() {
               </div>
             </ReactModal>
           </div>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={4} className="mb-3">
+          <InputGroup>
+            <InputGroup.Text>
+              <BiSearch />
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Search by Product name ..."
+              value={search}
+              onChange={handleSearch}
+            />
+          </InputGroup>
+        </Col>
+        <Col md={3} className="mb-3">
+          <select
+            value={filter}
+            onChange={handleFilter}
+            className="form-control custom-select"
+          >
+            <option value="">Filter by Department</option>
+            <option value="Lawn and Garden">Lawn and Garden</option>
+            <option value="Lighting">Lighting</option>
+            <option value="Outdoor and Patio">Outdoor and Patio</option>
+            <option value="Paint">Paint</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Power Tools">Power Tools</option>
+            <option value="Tools">Tools</option>
+          </select>
         </Col>
       </Row>
 

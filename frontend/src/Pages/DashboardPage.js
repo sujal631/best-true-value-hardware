@@ -9,6 +9,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import { Helmet } from 'react-helmet-async';
+import { Container } from 'react-bootstrap';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -239,7 +240,7 @@ export default function DashboardPage() {
             </Col>
           </Row>
           <Row className="mb-2">
-            <Col md={12}>
+            <Container className="container small-container">
               <SummaryCard
                 title="Highest Revenue Customer"
                 value={
@@ -270,11 +271,11 @@ export default function DashboardPage() {
                   <p>No customer data available</p>
                 )}
               </SummaryCard>
-            </Col>
+            </Container>
           </Row>
 
           <Row>
-            <Col md={6}>
+            <Col md={12}>
               <div className="my-3">
                 <h2>Sales</h2>
                 <div className="d-flex align-items-center mb-3">
@@ -317,7 +318,7 @@ export default function DashboardPage() {
               </div>
             </Col>
 
-            <Col md={6}>
+            <Col md={12}>
               <div className="my-3">
                 <h2>Top Selling Products</h2>
                 {topSellingProducts.length === 0 ? (

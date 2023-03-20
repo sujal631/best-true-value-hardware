@@ -24,7 +24,7 @@ function ProductRow({ products, onEdit, onDelete }) {
             <td className="btn-text">{product.brand}</td>
             <td>
               <Button
-                className="btn-text"
+                className="btn-text mb-1"
                 type="button"
                 variant="secondary"
                 onClick={() => onEdit(product._id)}
@@ -33,10 +33,11 @@ function ProductRow({ products, onEdit, onDelete }) {
               </Button>
               <span style={{ margin: '5px' }}> </span>
               <Button
-                className="btn-text"
+                className="btn-text mb-1"
                 type="button"
                 variant="primary"
                 onClick={() => onDelete(product)}
+                style={{ padding: '7px 19px' }}
               >
                 <i className="fa fa-trash "></i>
               </Button>

@@ -375,16 +375,18 @@ export default function ProfilePage() {
                 {showNewPassword ? <EyeSlashFill /> : <EyeFill />}
               </span>
             </div>
-            <div className="mb-3 ">
-              <Message variant="warning">
-                Please note that the password you create must meet the following
-                requirements: <br />
-                &emsp;At least 8 characters long <br />
-                &emsp;Includes at least one lowercase letter <br />
-                &emsp;Includes at least one uppercase letter <br />
-                &emsp;Includes at least one number or special character
-              </Message>
-            </div>
+            {password.length > 0 && (
+              <div className="mb-3">
+                <Message variant="warning">
+                  Please note that the password you create must meet the
+                  following requirements: <br />
+                  &emsp;At least 8 characters long <br />
+                  &emsp;Includes at least one lowercase letter <br />
+                  &emsp;Includes at least one uppercase letter <br />
+                  &emsp;Includes at least one number or special character
+                </Message>
+              </div>
+            )}
 
             <div className="mb-3 position-relative">
               <label htmlFor="confirmPassword" className="form-label">

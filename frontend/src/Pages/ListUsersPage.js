@@ -232,7 +232,7 @@ export default function ListUsersPage() {
                   {user.email !== 'btvh@owner.com' &&
                     (!user.isAdmin ? (
                       <Button
-                        className="btn-text"
+                        className="btn-text mb-1"
                         variant="secondary"
                         onClick={() => openModal('makeAdmin', user)}
                         style={{ padding: '7px 19px', textTransform: 'none' }}
@@ -242,7 +242,7 @@ export default function ListUsersPage() {
                       </Button>
                     ) : (
                       <Button
-                        className="btn-text"
+                        className="btn-text mb-1"
                         variant="primary"
                         onClick={() => openModal('changeToUser', user)}
                         style={{ padding: '7px 7px', textTransform: 'none' }}
