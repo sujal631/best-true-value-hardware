@@ -177,7 +177,7 @@ export default function ListUsersPage() {
         <Col md={3} className="my-3">
           <div>
             <select
-              className="form-control"
+              className="form-control custom-select"
               value={isAdminFilter}
               onChange={handleFilterChange}
             >
