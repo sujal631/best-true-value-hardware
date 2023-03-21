@@ -21,7 +21,8 @@
     "multer": "^1.4.5-lts.1",
     "react-router": "^6.9.0",
     "react-router-dom": "^6.9.0",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "stripe": "^11.15.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
