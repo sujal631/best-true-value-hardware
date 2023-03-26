@@ -125,6 +125,10 @@ export default function OrderScreen() {
     toast.error(errorMessage);
   };
 
+  function handleClickPickupReady() {
+    setShowModal(true);
+  }
+
   async function handlePickupReady() {
     try {
       dispatch({ type: 'PICKUP_REQUEST' });
@@ -143,16 +147,31 @@ export default function OrderScreen() {
     }
   }
 
-  const onConfirm = (event) => {
+  // this function will send sms and show pop of pick up is ready feature
+  const onConfirm = async (event) => {
     event.preventDefault();
-    handlePickupReady();
-    setShowModal(false);
-    window.scrollTo(0, 0);
-  };
 
-  function handleClickPickupReady() {
-    setShowModal(true);
-  }
+    try {
+      const response = await axios.post('/api/twilio/sendSms', {
+        to: '+13373097760',
+        message: 'Your order is ready for pickup!',
+      });
+
+      if (response.data.success) {
+        console.log('SMS sent successfully:', response.data.messageSid);
+        toast.success(`SMS sent successfully: ${response.data.messageSid}`);
+        handlePickupReady();
+        setShowModal(false);
+        window.scrollTo(0, 0);
+      } else {
+        console.log('Error sending SMS:', response.data.error);
+        toast.error(`Error sending SMS: ${response.data.error}`);
+      }
+    } catch (error) {
+      console.log('Error sending SMS:', error.message);
+      toast.error(`Error sending SMS: ${error.message}`);
+    }
+  };
 
   // Define a useEffect hook to fetch the order data and configure the PayPal SDK
   useEffect(() => {

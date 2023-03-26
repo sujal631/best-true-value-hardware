@@ -8,16 +8,39 @@ import routeSliderImage from './routes/routeSliderImage.js';
 import routeUser from './routes/routeUser.js';
 import routeOrder from './routes/routeOrder.js';
 import routeCloudinary from './routes/routeCloudinary.js';
+import routeTwilio from './routes/routeTwilio.js';
+import twilio from 'twilio';
 
 // Load environment variables from .env file
 config();
+//Load twilio credentials
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
 
-// Connect to MongoDB
+// Create Twilio client
+const client = new twilio(accountSid, authToken);
+
+// Function to test Twilio connection by checking the account balance
+async function testTwilioConnection() {
+  try {
+    const balanceData = await client.balance.fetch();
+    console.log(
+      `Successfully connected to Twilio. Balance: $${balanceData.balance}`
+    );
+  } catch (error) {
+    console.log(`Error connecting to Twilio: ${error.message}`);
+  }
+}
+
+// Call the testTwilioConnection and MongoDB
 connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then(() => console.log('Successfully connected to MongoDB.'))
+  .then(() => {
+    console.log('Successfully connected to MongoDB.');
+    return testTwilioConnection(); // Make sure this line is present and correct
+  })
   .catch((error) =>
     console.log(`Error connecting to MongoDB: ${error.message}`)
   );
@@ -39,6 +62,7 @@ app.use('/api/products', routeProduct);
 app.use('/api/sliderImages', routeSliderImage);
 app.use('/api/users', routeUser);
 app.use('/api/orders', routeOrder);
+app.use('/api/twilio', routeTwilio);
 
 // Error handling middleware
 app.use((error, req, res, next) => {
