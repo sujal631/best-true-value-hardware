@@ -153,7 +153,7 @@ export default function OrderScreen() {
 
     try {
       const response = await axios.post('/api/twilio/sendSms', {
-        to: '+13373097760',
+        to: order.shippingInfo.phoneNumber,
         message: 'Your order is ready for pickup!',
       });
 
@@ -169,6 +169,7 @@ export default function OrderScreen() {
       }
     } catch (error) {
       console.log('Error sending SMS:', error.message);
+      toast.success(order.shippingInfo.phoneNumber);
       toast.error(`Error sending SMS: ${error.message}`);
     }
   };

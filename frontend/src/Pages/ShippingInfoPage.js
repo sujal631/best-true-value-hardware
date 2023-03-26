@@ -139,8 +139,9 @@ export default function ShippingInfoPage() {
 
   // Function to handle phone number input change
   const handlePhoneChange = (e) => {
+    const phonePattern = /^\+\d{1,3}\d{10}$/;
     setPhoneNumber(e.target.value);
-    setShowPhoneMessage(e.target.value.length > 0);
+    setShowPhoneMessage(phonePattern.test(e.target.value));
   };
 
   const handleZipChange = (e) => {
@@ -207,8 +208,8 @@ export default function ShippingInfoPage() {
               required
               onChange={handlePhoneChange}
               value={phoneNumber}
-              pattern="^\d{10}$"
-              title="Phone number should be 10 digits"
+              pattern="^\+\d{1,3}\d{10}$"
+              title="Phone number should include a country code (1-3 digits) followed by a 10-digit number"
             />
           </div>
 

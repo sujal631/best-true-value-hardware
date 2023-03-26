@@ -189,8 +189,8 @@ export default function Registration() {
             required
             onChange={handleChange}
             value={phoneNumber}
-            pattern="^\d{10}$"
-            title="Phone number should be 10 digits"
+            pattern="^\+\d{1,3}\d{10}$"
+            title="Phone number should include a country code (1-3 digits) followed by a 10-digit number"
           />
         </div>
 

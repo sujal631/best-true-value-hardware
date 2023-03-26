@@ -143,6 +143,7 @@ const ListOrdersPage = () => {
             <tr>
               <th className="btn-text">ORDER ID</th>
               <th className="btn-text">CUSTOMER NAME</th>
+              <th className="btn-text">PHONE NUMBER</th>
               <th className="btn-text">ORDER TOTAL </th>
               <th className="btn-text">DATE ORDERED</th>
               <th className="btn-text">PICKUP READY</th>
@@ -158,6 +159,7 @@ const ListOrdersPage = () => {
                     ? `${order.user.firstName} ${order.user.lastName}`
                     : 'NOT AVAILABLE'}
                 </td>
+                <td className="btn-text">{order.user.phoneNumber}</td>
                 <td className="btn-text">{order.totalPrice.toFixed(2)}</td>
                 <td className="btn-text">{order.paidAt.substring(0, 10)}</td>
                 <td className="btn-text">
