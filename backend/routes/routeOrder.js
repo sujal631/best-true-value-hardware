@@ -281,37 +281,6 @@ routeOrder.route('/dashboard').get(
       { $sort: { revenue: -1 } },
     ]);
 
-    const highestRevenueCustomer = await Order.aggregate([
-      {
-        $match: {
-          paidAt: { $gte: dateBoundary },
-        },
-      },
-      {
-        $group: {
-          _id: '$user',
-          revenue: { $sum: '$totalPrice' },
-        },
-      },
-      { $sort: { revenue: -1 } },
-      { $limit: 1 },
-      {
-        $lookup: {
-          from: 'users',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'user',
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          user: { $arrayElemAt: ['$user', 0] },
-          revenue: 1,
-        },
-      },
-    ]);
-
     const newReturningCustomers = await Order.aggregate([
       {
         $match: {
@@ -349,9 +318,6 @@ routeOrder.route('/dashboard').get(
       dailyOrders,
       productDepartments,
       revenueByDepartment,
-      highestRevenueCustomer: highestRevenueCustomer.length
-        ? highestRevenueCustomer
-        : [{ user: null, revenue: 0 }],
       newReturningCustomers,
     });
   })
@@ -403,14 +369,27 @@ routeOrder.route('/top-selling-products').get(
 );
 
 // Get orders of the authenticated user
+
 routeOrder.route('/mine').get(
   isAuth, // Middleware for checking if user is authenticated
   expressAsyncHandler(async (req, res) => {
     // Async function to handle the request
+    const page = parseInt(req.query.page) || 1;
+    const limit = PAGE_SIZE;
+
     // Find all orders with user ID from the request
-    const orders = await Order.find({ user: req.user._id });
-    // Send success response with the orders array
-    res.send(orders);
+    const orders = await Order.find({ user: req.user._id })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const count = await Order.countDocuments({ user: req.user._id });
+
+    // Send success response with the orders array, current page, and total pages
+    res.send({
+      orders,
+      page,
+      pages: Math.ceil(count / PAGE_SIZE),
+    });
   })
 );
 

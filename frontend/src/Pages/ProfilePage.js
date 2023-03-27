@@ -36,7 +36,6 @@ export default function ProfilePage() {
   const [toastMessage, setToastMessage] = useState({ type: '', message: '' });
   const [toastId, setToastId] = useState(null);
   const oldPasswordRef = useRef(null);
-
   const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
     loadingUpdate: false,
   });
@@ -64,6 +63,16 @@ export default function ProfilePage() {
 
   const showToast = (type, message) => {
     setToastMessage({ type, message });
+  };
+
+  const isEmailValid = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  const isPhoneNumberValid = (phoneNumber) => {
+    const phoneNumberRegex = /^\+\d{1,3}\d{10}$/;
+    return phoneNumberRegex.test(phoneNumber);
   };
 
   // verifyOldPassword function
@@ -126,6 +135,19 @@ export default function ProfilePage() {
 
   const handleSaveClick = async () => {
     if (editMode) {
+      if (!isEmailValid(email)) {
+        showToast('error', 'Please enter a valid email address.');
+        return;
+      }
+
+      if (!isPhoneNumberValid(phoneNumber)) {
+        showToast(
+          'error',
+          'Please enter a valid phone number, including the country code and a 10-digit number.'
+        );
+        return;
+      }
+
       const oldPasswordValid = await verifyOldPassword();
       if (oldPasswordValid) {
         updateUserInfo();

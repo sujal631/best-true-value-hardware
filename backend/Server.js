@@ -8,6 +8,7 @@ import routeSliderImage from './routes/routeSliderImage.js';
 import routeUser from './routes/routeUser.js';
 import routeOrder from './routes/routeOrder.js';
 import routeCloudinary from './routes/routeCloudinary.js';
+import routeStripe from './routes/routeStripe.js';
 import routeTwilio from './routes/routeTwilio.js';
 import twilio from 'twilio';
 
@@ -55,13 +56,14 @@ app.get('/api/keys/paypal', (req, res) =>
   res.send(`${process.env.PAYPAL_CLIENT_ID || 'sb'}`)
 );
 
-// Use routes for seed, products, slider images, users, and orders
+// Use routes for seed, cloudinary, products, slider images, users, orders, stripe and twilio
 app.use('/api/seed', routeSeed);
 app.use('/api/upload', routeCloudinary);
 app.use('/api/products', routeProduct);
 app.use('/api/sliderImages', routeSliderImage);
 app.use('/api/users', routeUser);
 app.use('/api/orders', routeOrder);
+app.use('/api/stripe', routeStripe);
 app.use('/api/twilio', routeTwilio);
 
 // Error handling middleware

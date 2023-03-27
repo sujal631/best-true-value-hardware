@@ -8,6 +8,7 @@ import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import { Store } from '../Store';
 import { getErrorMessage } from '../utils';
+import Pagination from '../Components/Pagination';
 
 // Main component
 export default function OrderHistoryPage() {
@@ -20,24 +21,29 @@ export default function OrderHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
 
   // Fetch data from API using useEffect hook
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Make GET request to API with user token
         const { data } = await axios.get(`/api/orders/mine`, {
-          headers: { Authorization: `Bearer ${userInfo.token} ` },
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+          params: { page },
         });
-        setOrders(data);
+        setOrders(data.orders);
+        setPages(data.pages);
       } catch (error) {
         setError(getErrorMessage(error));
       }
       setLoading(false);
     };
+
     fetchData();
-  }, [userInfo]);
+  }, [page, userInfo]);
 
   // Function to handle click event and navigate to order details page
   const handleDetailsClick = (id) => navigate(`/order/${id}`);
@@ -56,6 +62,10 @@ export default function OrderHistoryPage() {
   function isOrderReadyForPickup(order) {
     return order.isPickupReady;
   }
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   // Render page content
   return (
@@ -142,6 +152,14 @@ export default function OrderHistoryPage() {
           </tbody>
         </table>
       )}
+      <div>
+        <Pagination
+          totalPosts={pages * 10}
+          postsPerPage={10}
+          setCurrentPage={handlePageChange}
+          currentPage={page}
+        />
+      </div>
     </div>
   );
 }

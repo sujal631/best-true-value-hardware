@@ -18,7 +18,7 @@ export default function PaymentPage() {
 
   // Initializing the paymentMethodName state with the current payment method or 'Debit/Credit Card'
   const [paymentMethodName, setPaymentMethod] = useState(
-    state.cart.paymentMethod || 'Debit/Credit Card'
+    state.cart.paymentMethod || 'Debit/Credit'
   );
 
   // Function to handle the radio button change
@@ -57,14 +57,14 @@ export default function PaymentPage() {
         {/* Rendering a Form component to select a payment method */}
         <Form onSubmit={handleSubmit}>
           {/* Rendering radio buttons to select the payment method */}
-          {['Debit/Credit Card', 'PayPal'].map((method) => (
+          {['Debit/Credit', 'PayPal'].map((method) => (
             <div className="mb-3" key={method}>
               <Form.Check
                 type="radio"
                 id={method}
                 label={
                   <div>
-                    {method === 'Debit/Credit Card' && (
+                    {method === 'Debit/Credit' && (
                       <FontAwesomeIcon
                         icon={faCreditCard}
                         style={{ marginRight: '10px', fontSize: '22px' }}

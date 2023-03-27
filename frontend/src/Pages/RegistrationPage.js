@@ -192,6 +192,14 @@ export default function Registration() {
             pattern="^\+\d{1,3}\d{10}$"
             title="Phone number should include a country code (1-3 digits) followed by a 10-digit number"
           />
+          {phoneNumber.length > 0 && (
+            <div className="my-2">
+              <Message variant="warning">
+                Please note that the phone number should include a country code
+                (1-3 digits) followed by a 10-digit number
+              </Message>
+            </div>
+          )}
         </div>
 
         {/* A form input for the user's email address */}

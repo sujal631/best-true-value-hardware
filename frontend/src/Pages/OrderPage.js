@@ -12,10 +12,12 @@ import LoadingSpinner from '../Components/LoadingComponent.js';
 import Message from '../Components/MessageComponent.js';
 import { Store } from '../Store';
 import { getErrorMessage } from '../utils';
-import { usePayPalScriptReducer } from '@paypal/react-paypal-js';
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { toast } from 'react-toastify';
 import OrderSummaryCard from '../Components/OrderSummaryCard';
 import { Button } from 'react-bootstrap';
+import { loadStripe } from '@stripe/stripe-js/pure';
+import StripeCheckout from '../Components/StripeCheckout';
 import ReactModal from 'react-modal';
 
 // Reducer function for handling state changes
@@ -26,7 +28,7 @@ const reducer = (state, action) => {
     FAILURE: { ...state, loading: false, error: action.payload },
     PAY_REQUEST: { ...state, loadingPay: true },
     PAY_SUCCESS: { ...state, loadingPay: false, successPay: true },
-    PAY_FAIL: { ...state, loadingPay: false },
+    PAY_FAILURE: { ...state, loadingPay: false },
     PAY_RESET: { ...state, loadingPay: false, successPay: false },
     PICKUP_REQUEST: { ...state, loadingPickupReady: true },
     PICKUP_SUCCESS: {
@@ -37,7 +39,6 @@ const reducer = (state, action) => {
     PICKUP_FAILURE: {
       ...state,
       loadingPickupReady: false,
-      errorPickupReady: action.payload,
     },
     PICKUP_RESET: {
       ...state,
@@ -83,6 +84,7 @@ export default function OrderScreen() {
   const isPending = paypalScriptReducer[0].isPending;
   const paypalDispatch = paypalScriptReducer[1];
   const [showModal, setShowModal] = useState(false);
+  const [stripe, setStripe] = useState(null);
 
   // Function for handling PayPal order creation
   const createPayPalOrder = (data, actions) => {
@@ -91,6 +93,27 @@ export default function OrderScreen() {
     const purchaseUnits = [{ amount: { value: formattedPrice } }];
     const orderData = { purchase_units: purchaseUnits };
     return actions.order.create(orderData).then((orderId) => orderId);
+  };
+
+  const handleSuccessPayment = async (paymentIntent, orderObj) => {
+    try {
+      if (!orderObj) {
+        throw new Error('Order not found');
+      }
+      dispatch({ type: 'PAY_REQUEST' });
+      const { data } = await axios.put(
+        `/api/stripe/${orderObj._id}/secret`,
+        paymentIntent,
+        {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+      dispatch({ type: 'PAY_SUCCESS', payload: data });
+      toast.success('Payment Successful!');
+    } catch (err) {
+      dispatch({ type: 'PAY_FAILURE', payload: getErrorMessage(err) });
+      toast.error(getErrorMessage(err));
+    }
   };
 
   // Function for handling the approval of the PayPal payment
@@ -114,7 +137,7 @@ export default function OrderScreen() {
       // Dispatch a payment failure action and display an error message
     } catch (getErrorMessage) {
       const errorMessage = getErrorMessage(error);
-      dispatch({ type: 'PAY_FAIL', payload: errorMessage });
+      dispatch({ type: 'PAY_FAILURE', payload: errorMessage });
       toast.error(errorMessage);
     }
   };
@@ -140,7 +163,9 @@ export default function OrderScreen() {
         }
       );
       dispatch({ type: 'PICKUP_SUCCESS', payload: data });
-      toast.success('Ready for PICK UP');
+      toast.success(
+        'The order is now available for pickup, and a confirmation notice has been sent to the customer.'
+      );
     } catch (error) {
       toast.error(getErrorMessage(error));
       dispatch({ type: 'PICKUP_FAILURE' });
@@ -158,102 +183,87 @@ export default function OrderScreen() {
       });
 
       if (response.data.success) {
-        console.log('SMS sent successfully:', response.data.messageSid);
-        toast.success(`SMS sent successfully: ${response.data.messageSid}`);
         handlePickupReady();
         setShowModal(false);
         window.scrollTo(0, 0);
       } else {
-        console.log('Error sending SMS:', response.data.error);
         toast.error(`Error sending SMS: ${response.data.error}`);
       }
     } catch (error) {
-      console.log('Error sending SMS:', error.message);
-      toast.success(order.shippingInfo.phoneNumber);
       toast.error(`Error sending SMS: ${error.message}`);
     }
   };
 
   // Define a useEffect hook to fetch the order data and configure the PayPal SDK
   useEffect(() => {
-    // Check if the order ID is valid and needs to be fetched
-    const isOrderValid = order._id && order._id === orderId;
-    const shouldFetchOrder = !isOrderValid || successPay || successPickupReady;
-
-    // Define a helper function to fetch the PayPal client ID from the server
-    const fetchPaypalClientId = async (token) => {
-      const response = await axios.get('/api/keys/paypal', {
-        headers: { authorization: `Bearer ${token}` },
-      });
-      return response.data.clientId;
+    const addStripeScript = async () => {
+      try {
+        const { data: clientId } = await axios.get('/api/stripe/key');
+        const stripeObj = await loadStripe(clientId);
+        setStripe(stripeObj);
+      } catch (error) {}
     };
 
-    // Define a helper function to configure the PayPal SDK with the client ID
-    const configurePaypal = async (dispatch, token, paypalDispatch) => {
-      const clientId = await fetchPaypalClientId(token);
-      dispatch({
-        type: 'resetOptions',
-        value: {
-          'client-id': clientId,
-          currency: 'USD',
-        },
-      });
-      paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
-    };
-
-    // Define a helper function to load the PayPal SDK script
-    const loadPaypalScript = async () => {
-      await configurePaypal(dispatch, userInfo.token, paypalDispatch);
-    };
-
-    // If userInfo is not defined, navigate to the login page and return
-    if (!userInfo) {
-      navigate('/login');
-      return;
+    if (order.paymentMethod === 'Debit/Credit') {
+      if (!stripe) {
+        addStripeScript();
+      }
     }
 
-    // If the order should be fetched, fetch the order from the server
-    if (shouldFetchOrder) {
-      async function fetchOrder() {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        };
-
-        try {
-          // Make a GET request to the server to fetch the order details
-          const response = await axios.get(`/api/orders/${orderId}`, config);
-
-          // Dispatch the SUCCESS action with the order details as the payload
-          dispatch({ type: 'SUCCESS', payload: response.data });
-
-          // Dispatch the FAILURE action with the error message as the payload
-        } catch (error) {
-          dispatch({ type: 'FAILURE', payload: getErrorMessage(error) });
-        }
+    const fetchOrder = async () => {
+      try {
+        dispatch({ type: 'REQUEST' });
+        const { data } = await axios.get(`/api/orders/${orderId}`, {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        });
+        dispatch({ type: 'SUCCESS', payload: data });
+      } catch (err) {
+        dispatch({ type: 'FAILURE', payload: getErrorMessage(err) });
       }
+    };
 
+    if (!userInfo) {
+      return navigate('/login');
+    }
+    if (
+      !order._id ||
+      successPay ||
+      successPickupReady ||
+      (order._id && order._id !== orderId)
+    ) {
       fetchOrder();
-      // If a payment has just been made, reset the payment state
+
       if (successPay) {
         dispatch({ type: 'PAY_RESET' });
       }
+
       if (successPickupReady) {
         dispatch({ type: 'PICKUP_RESET' });
       }
-      // Otherwise, load the PayPal script
     } else {
+      const loadPaypalScript = async () => {
+        const { data: clientId } = await axios.get('/api/keys/paypal', {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        });
+        paypalDispatch({
+          type: 'resetOptions',
+          value: {
+            'client-id': clientId,
+            currency: 'USD',
+          },
+        });
+        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+      };
       loadPaypalScript();
     }
   }, [
-    dispatch,
-    navigate,
-    orderId,
     order,
+    userInfo,
+    orderId,
+    navigate,
     paypalDispatch,
     successPay,
-    userInfo,
+    stripe,
     successPickupReady,
   ]);
 
@@ -405,21 +415,38 @@ export default function OrderScreen() {
           </Card>
         </Col>
         <Col xs={12} lg={4}>
-          {/* Render the OrderSummaryCard component with the necessary props:
-              - order: contains order details (items, tax, total price, etc.)
-              - createPayPalOrder: a function to create a PayPal order
-              - handleApprove: a function to handle approval of the PayPal order
-              - handleError: a function to handle errors during the PayPal process
-              - isPending: a boolean indicating if the PayPal order creation is pending
-              - loadingPay: a boolean indicating if the payment process is loading */}
-          <OrderSummaryCard
-            order={order}
-            createPayPalOrder={createPayPalOrder}
-            handleApprove={handleApprove}
-            handleError={handleError}
-            isPending={isPending}
-            loadingPay={loadingPay}
-          />
+          <OrderSummaryCard order={order} />
+          {!order.isPaid && (
+            <ListGroup.Item>
+              {isPending ? (
+                <LoadingSpinner />
+              ) : (
+                <div>
+                  {order.paymentMethod === 'PayPal' && (
+                    <PayPalButtons
+                      createOrder={createPayPalOrder}
+                      onApprove={handleApprove}
+                      onError={handleError}
+                    ></PayPalButtons>
+                  )}
+                  {!order.isPaid &&
+                    order.paymentMethod === 'Debit/Credit' &&
+                    !stripe && <LoadingSpinner />}
+                  {!order.isPaid &&
+                    order.paymentMethod === 'Debit/Credit' &&
+                    stripe && (
+                      <StripeCheckout
+                        stripe={stripe}
+                        orderId={order._id}
+                        handleSuccessPayment={handleSuccessPayment}
+                      />
+                    )}
+                </div>
+              )}
+              {/* Display a loading spinner if loadingPay is true */}
+              {loadingPay && <LoadingSpinner></LoadingSpinner>}
+            </ListGroup.Item>
+          )}
           <ReactModal
             isOpen={showModal}
             onRequestClose={() => setShowModal(false)}

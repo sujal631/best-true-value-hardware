@@ -210,7 +210,7 @@ export default function PreviewOrderPage() {
                   </ListGroup.Item>
                 ))}
                 <ListGroup.Item>
-                  <div className="d-grid gap-2 mb-3">
+                  <div className="d-grid gap-2 my-3">
                     {/* If cartItems has a length greater than 0, the button is enabled and onClick calls the handlePlaceOrder function */}
                     <Button
                       type="button"
