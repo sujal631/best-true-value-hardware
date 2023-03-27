@@ -5,7 +5,7 @@ import {
   CardElement,
   Elements,
 } from '@stripe/react-stripe-js';
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import Axios from 'axios';
 
 function CheckoutForm(props) {
@@ -14,19 +14,13 @@ function CheckoutForm(props) {
   const elements = useElements();
 
   const handleSubmit = async (event) => {
-    // We don't want to let default form submission happen here,
-    // which would refresh the page.
     event.preventDefault();
-
     if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
       return;
     }
     setProcessing(true);
     const { data } = await Axios(`/api/stripe/secret/${props.orderId}`);
     const clientSecret = data.client_secret;
-    // Call stripe.confirmCardPayment() with the client secret.
 
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
@@ -54,17 +48,30 @@ function CheckoutForm(props) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <CardElement />
+    <Card>
+      <Card.Body>
+        <Card.Title>Payment Info</Card.Title>
+        <form onSubmit={handleSubmit}>
+          <div className="form-row">
+            <label htmlFor="card-element" style={{ marginBottom: '0.5rem' }}>
+              Credit or Debit card
+            </label>
+            <CardElement id="card-element" className="card-element" />
+            <div id="card-errors" role="alert" />
+          </div>
 
-      <Button
-        type="submit"
-        className="btn-block"
-        disabled={!stripe || processing}
-      >
-        Pay With Stripe
-      </Button>
-    </form>
+          <div className="d-grid">
+            <Button
+              type="submit"
+              className="btn-block mt-3"
+              disabled={!stripe || processing}
+            >
+              {processing ? 'Processing…' : 'Submit Payment'}
+            </Button>
+          </div>
+        </form>
+      </Card.Body>
+    </Card>
   );
 }
 
