@@ -176,10 +176,23 @@ export default function OrderScreen() {
   const onConfirm = async (event) => {
     event.preventDefault();
 
+    // Prepare the detailed message
+    const itemsInfo = order.orderItems
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item.name} x ${item.quantity} @ $${item.price}`
+      )
+      .join('\n');
+    const detailedMessage = `\nFrom: BEST TRUE VALUE HARDWARE \n\nYour order #${
+      order._id
+    } is ready for pickup!\n\nItems:\n${itemsInfo}\n\nTotal Price: $${order.totalPrice.toFixed(
+      2
+    )}\n\nThank you for shopping with us!\n`;
+
     try {
       const response = await axios.post('/api/twilio/sendSms', {
         to: order.shippingInfo.phoneNumber,
-        message: 'Your order is ready for pickup!',
+        message: detailedMessage,
       });
 
       if (response.data.success) {

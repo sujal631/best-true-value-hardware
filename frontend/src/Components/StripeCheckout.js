@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import {
   useStripe,
   useElements,
-  CardElement,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
   Elements,
 } from '@stripe/react-stripe-js';
 import { Button, Card } from 'react-bootstrap';
@@ -10,6 +12,7 @@ import Axios from 'axios';
 
 function CheckoutForm(props) {
   const [processing, setProcessing] = useState(false);
+  const [cardholderName, setCardholderName] = useState('');
   const stripe = useStripe();
   const elements = useElements();
 
@@ -24,24 +27,21 @@ function CheckoutForm(props) {
 
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
-        card: elements.getElement(CardElement),
+        card: elements.getElement(CardNumberElement),
         billing_details: {
-          name: data.order.user.name,
+          name: cardholderName,
           email: data.order.user.email,
         },
       },
     });
 
     if (result.error) {
-      // Show error to your customer (e.g., insufficient funds)
       console.log(result.error.message);
       alert(result.error.message);
     } else {
-      // The payment has been processed!
       if (result.paymentIntent.status === 'succeeded') {
-        props.handleSuccessPayment(result.paymentIntent, data.order); // Pass the order object as an additional argument
+        props.handleSuccessPayment(result.paymentIntent, data.order);
         console.log(result.paymentIntent);
-        // alert(result.paymentIntent.status);
       }
     }
     setProcessing(false);
@@ -51,14 +51,48 @@ function CheckoutForm(props) {
     <Card>
       <Card.Body>
         <Card.Title>Payment Info</Card.Title>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="checkout-form">
           <div className="form-row">
-            <label htmlFor="card-element" style={{ marginBottom: '0.5rem' }}>
-              Credit or Debit card
+            <label htmlFor="cardholder-name" style={{ marginBottom: '0.5rem' }}>
+              Name on card
             </label>
-            <CardElement id="card-element" className="card-element" />
-            <div id="card-errors" role="alert" />
+            <input
+              type="text"
+              id="cardholder-name"
+              className="form-control card-element"
+              value={cardholderName}
+              onChange={(e) => setCardholderName(e.target.value)}
+              required
+            />
           </div>
+
+          <div className="form-row">
+            <label
+              htmlFor="card-number-element"
+              style={{ marginBottom: '0.5rem' }}
+            >
+              Card number
+            </label>
+            <CardNumberElement
+              id="card-number-element"
+              className="card-element"
+            />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="card-expiry-element">Expiration date</label>
+            <CardExpiryElement
+              id="card-expiry-element"
+              className="card-element"
+            />
+          </div>
+
+          <div className="form-row">
+            <label htmlFor="card-cvc-element">CVC</label>
+            <CardCvcElement id="card-cvc-element" className="card-element" />
+          </div>
+
+          <div id="card-errors" role="alert" />
 
           <div className="d-grid">
             <Button

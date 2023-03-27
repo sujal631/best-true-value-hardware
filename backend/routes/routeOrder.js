@@ -379,6 +379,7 @@ routeOrder.route('/mine').get(
 
     // Find all orders with user ID from the request
     const orders = await Order.find({ user: req.user._id })
+      .sort({ isPaid: 1, isPickupReady: 1, createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 

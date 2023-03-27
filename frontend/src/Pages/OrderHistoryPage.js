@@ -97,10 +97,20 @@ export default function OrderHistoryPage() {
             {/* Map over orders and create a row for each */}
             {orders
               .sort((a, b) => {
-                if (!a.isPaid && !b.isPaid) return 0; // If both orders are unpaid, leave them in the same order
-                if (!a.isPaid) return -1; // If "a" is unpaid, move it to the top
-                if (!b.isPaid) return 1; // If "b" is unpaid, move it to the top
-                return new Date(b.paidAt) - new Date(a.paidAt); // Sort the paid orders by paidAt date
+                if (!isOrderPaid(a) && !isOrderPaid(b)) return 0; // Both orders are unpaid, leave them in the same order
+                if (!isOrderPaid(a)) return -1; // If "a" is unpaid, move it to the top
+                if (!isOrderPaid(b)) return 1; // If "b" is unpaid, move it to the top
+
+                // Both orders are paid
+                const aReady = isOrderReadyForPickup(a);
+                const bReady = isOrderReadyForPickup(b);
+
+                if (!aReady && !bReady) return 0; // Both orders are not ready for pickup, leave them in the same order
+                if (!aReady) return -1; // If "a" is not ready for pickup, move it to the top
+                if (!bReady) return 1; // If "b" is not ready for pickup, move it to the top
+
+                // Both orders are paid and ready for pickup, sort by createdAt date (newest first)
+                return new Date(b.createdAt) - new Date(a.createdAt);
               })
               .map((order) => (
                 // Set to the "_id" field of each order to uniquely identify each row
