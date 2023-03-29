@@ -1,3 +1,4 @@
+//Import necessary modules and dependencies
 import axios from 'axios';
 import React, { useEffect, useReducer, useState } from 'react';
 import { useContext } from 'react';
@@ -10,22 +11,32 @@ import { getErrorMessage } from '../utils';
 import { useRef } from 'react';
 import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons';
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'REQUEST':
-      return { ...state, loadingUpdate: true };
-    case 'SUCCESS':
-    case 'FAILURE':
-      return { ...state, loadingUpdate: false };
-    default:
-      return state;
-  }
+// Define the default state of the reducer
+const initialState = {
+  loadingUpdate: false,
 };
 
+// Map the action types to specific functions to update the state
+const actionsMap = {
+  // Update the loadingUpdate state to true
+  REQUEST: (state) => ({ ...state, loadingUpdate: true }),
+  // Set the loadingUpdate state to false for both success and failure cases
+  SUCCESS: (state) => ({ ...state, loadingUpdate: false }),
+  FAILURE: (state) => ({ ...state, loadingUpdate: false }),
+};
+
+// Reducer function for handling state updates based on dispatched actions
+const reducer = (state = initialState, action) => {
+  const updateState = actionsMap[action.type];
+  return updateState ? updateState(state, action) : state;
+};
+
+// ProfilePage component
 export default function ProfilePage() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { userInfo } = state;
 
+  // Declare state variables for user information and form fields
   const [firstName, setFirstName] = useState(userInfo.firstName);
   const [lastName, setLastName] = useState(userInfo.lastName);
   const [phoneNumber, setPhoneNumber] = useState(userInfo.phoneNumber);
@@ -36,9 +47,7 @@ export default function ProfilePage() {
   const [toastMessage, setToastMessage] = useState({ type: '', message: '' });
   const [toastId, setToastId] = useState(null);
   const oldPasswordRef = useRef(null);
-  const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
-    loadingUpdate: false,
-  });
+  const [{ loadingUpdate }, dispatch] = useReducer(reducer, initialState);
 
   // Add state variables to control edit mode and password change mode
   const [editMode, setEditMode] = useState(false);
@@ -48,6 +57,7 @@ export default function ProfilePage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
+  // Show toast messages based on the type and message
   useEffect(() => {
     if (toastMessage.type !== '') {
       let newToastId;
@@ -61,21 +71,24 @@ export default function ProfilePage() {
     }
   }, [toastMessage.type, toastMessage.message]);
 
+  // Helper function to display toast messages
   const showToast = (type, message) => {
     setToastMessage({ type, message });
   };
 
+  // Helper function to validate email
   const isEmailValid = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
     return emailRegex.test(email);
   };
 
+  // Helper function to validate phone number
   const isPhoneNumberValid = (phoneNumber) => {
     const phoneNumberRegex = /^\+\d{1,3}\d{10}$/;
     return phoneNumberRegex.test(phoneNumber);
   };
 
-  // verifyOldPassword function
+  // verifyOldPassword function: checks if the old password is correct
   const verifyOldPassword = async () => {
     const userData = { password: oldPassword };
     const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
@@ -88,6 +101,7 @@ export default function ProfilePage() {
     }
   };
 
+  // updateUserInfo function: sends a request to update user information
   const updateUserInfo = async () => {
     const userData = { firstName, lastName, email, phoneNumber };
     const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
@@ -108,6 +122,7 @@ export default function ProfilePage() {
     }
   };
 
+  // updatePassword function: sends a request to update the user's password
   const updatePassword = async () => {
     const userData = { password };
     const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
@@ -133,6 +148,7 @@ export default function ProfilePage() {
     }
   };
 
+  // handleSaveClick function: validates inputs and updates user information
   const handleSaveClick = async () => {
     if (editMode) {
       if (!isEmailValid(email)) {
@@ -160,6 +176,7 @@ export default function ProfilePage() {
     }
   };
 
+  // handleUpdatePasswordClick function: validates inputs and updates the user's password
   const handleUpdatePasswordClick = async (e) => {
     e.preventDefault();
 
@@ -188,14 +205,19 @@ export default function ProfilePage() {
 
   return (
     <Container className="container small-container">
+      {/* Set the page title */}
       <Helmet>
         <title>Your Profile</title>
       </Helmet>
 
+      {/* Page heading */}
       <h1 className="my-3">Your Profile</h1>
 
+      {/* User information form */}
       <Form>
+        {/* First name and last name input fields in a row */}
         <div className="row">
+          {/* First name input */}
           <div className=" col-md-6 mb-2">
             <label htmlFor="firstName" className="form-label">
               First Name
@@ -212,6 +234,7 @@ export default function ProfilePage() {
             />
           </div>
 
+          {/* Last name input */}
           <div className=" col-md-6 mb-2">
             <label htmlFor="lastName" className="form-label">
               Last Name
@@ -228,7 +251,7 @@ export default function ProfilePage() {
             />
           </div>
         </div>
-
+        {/* Phone number input */}
         <div className="mb-2">
           <label htmlFor="phoneNumber" className="form-label">
             Phone Number
@@ -246,7 +269,7 @@ export default function ProfilePage() {
             title="Phone number should include a country code (1-3 digits) followed by a 10-digit number"
           />
         </div>
-
+        {/* Email input */}
         <div className="mb-3">
           <label htmlFor="email" className="form-label">
             Email
@@ -272,7 +295,7 @@ export default function ProfilePage() {
             value={email}
           />
         </div>
-
+        {/* Confirm password input (for editing user info) */}
         {editMode && (
           <div className="mb-3 position-relative">
             <label htmlFor="oldPassword" className="form-label">
@@ -306,8 +329,7 @@ export default function ProfilePage() {
             </span>
           </div>
         )}
-
-        {/* Conditionally render the password fields if passwordChangeMode is true */}
+        {/* Old password input (for updating the password) */}
         {passwordChangeMode && (
           <>
             <div className="mb-2 position-relative">
@@ -342,7 +364,7 @@ export default function ProfilePage() {
             </div>
           </>
         )}
-
+        {/* New password input */}
         {passwordChangeMode && (
           <>
             <div className="mb-2 position-relative">
@@ -399,6 +421,7 @@ export default function ProfilePage() {
                 {showNewPassword ? <EyeSlashFill /> : <EyeFill />}
               </span>
             </div>
+            {/* Password requirements message */}
             {password.length > 0 && (
               <div className="mb-3">
                 <Message variant="warning">
@@ -412,6 +435,7 @@ export default function ProfilePage() {
               </div>
             )}
 
+            {/* Confirm new password input */}
             <div className="mb-3 position-relative">
               <label htmlFor="confirmPassword" className="form-label">
                 Confirm New Password
@@ -445,8 +469,8 @@ export default function ProfilePage() {
             </div>
           </>
         )}
-
         {/* Conditionally render buttons based on editMode and passwordChangeMode */}
+        {/* Edit and Change Password buttons when not in editMode or passwordChangeMode */}{' '}
         {!editMode && !passwordChangeMode && (
           <>
             <div className="d-grid gap-2 mb-3">
@@ -459,7 +483,7 @@ export default function ProfilePage() {
             </div>
           </>
         )}
-
+        {/* Update Your Info and Cancel buttons when in editMode */}
         {editMode && (
           <div className="d-grid gap-2 mb-3">
             <Button type="button" onClick={handleSaveClick}>
@@ -475,7 +499,7 @@ export default function ProfilePage() {
             </Button>
           </div>
         )}
-
+        {/* Update Password and Cancel buttons when in passwordChangeMode */}
         {passwordChangeMode && (
           <div className="d-grid gap-2 mb-3">
             <Button type="button" onClick={handleUpdatePasswordClick}>

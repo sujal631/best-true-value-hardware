@@ -23,20 +23,19 @@ routeStripe.get('/secret/:id', async (req, res) => {
 });
 
 routeStripe.put('/:id/secret', async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-    if (order) {
-      // Update the order's properties
-      order.isPaid = true;
-      order.paidAt = Date.now();
-      order.paymentResult = {
-        id: req.body.id,
-        status: req.body.status,
-        update_time: req.body.update_time,
-        email_address: req.body.email_address,
-      };
+  const { id, status, update_time, email_address } = req.body;
 
-      const updatedOrder = await order.save();
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      {
+        isPaid: true,
+        paidAt: Date.now(),
+        paymentResult: { id, status, update_time, email_address },
+      },
+      { new: true }
+    );
+    if (updatedOrder) {
       res.send(updatedOrder);
     } else {
       res.status(404).send({ message: 'Order not found' });

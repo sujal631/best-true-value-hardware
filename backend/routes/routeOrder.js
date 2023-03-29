@@ -299,6 +299,19 @@ routeOrder.route('/dashboard').get(
         },
       },
       {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'customer',
+        },
+      },
+      {
+        $match: {
+          customer: { $ne: [] },
+        },
+      },
+      {
         $group: {
           _id: {
             $cond: [

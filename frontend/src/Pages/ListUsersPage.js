@@ -1,3 +1,4 @@
+//Import necessary modules and components
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Store } from '../Store';
@@ -10,37 +11,61 @@ import { Row, Col, Button, Form, InputGroup } from 'react-bootstrap';
 import AdminPagination from '../Components/AdminPagination';
 import { BiSearch } from 'react-icons/bi';
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'REQUEST':
-      return { ...state, loading: true };
-    case 'SUCCESS':
-      return { ...state, loading: false, users: action.payload };
-    case 'FAILURE':
-      return { ...state, loading: false, error: action.payload };
-    default:
-      return state;
-  }
+// Define the default state of the reducer
+const initialState = {
+  loading: true,
+  error: '',
+  users: null,
 };
-export default function ListUsersPage() {
-  const [{ loading, error, users }, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-  });
 
+// Map the action types to specific functions to update the state
+const actionsMap = {
+  // Update the loading state to true
+  REQUEST: (state) => ({ ...state, loading: true }),
+  // Update the users state and set the loading state to false
+  SUCCESS: (state, action) => ({
+    ...state,
+    users: action.payload,
+    loading: false,
+  }),
+  // Update the error state and set the loading state to false
+  FAILURE: (state, action) => ({
+    ...state,
+    loading: false,
+    error: action.payload,
+  }),
+};
+
+// Reducer function for handling state updates based on dispatched actions
+const reducer = (state = initialState, action) => {
+  const updateState = actionsMap[action.type];
+  return updateState ? updateState(state, action) : state;
+};
+
+export default function ListUsersPage() {
+  // Initialize state, dispatch and apply the reducer to manage the component state
+  const [{ loading, error, users }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
+
+  // Get the global state from the Store context
   const { state } = useContext(Store);
   const { userInfo } = state;
+  // Set pagination variables
   const usersPerPage = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
-
+  // State variables for handling modal dialogs
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showAccessDeniedModal, setShowAccessDeniedModal] = useState(false);
+  // State variables for handling search and filtering
   const [search, setSearch] = useState('');
   const [isAdminFilter, setIsAdminFilter] = useState('');
 
+  // Function to update a user's role (admin or non-admin) in the backend
   const updateUserRole = async (userId, makeAdmin) => {
     try {
       await axios.put(
@@ -60,6 +85,7 @@ export default function ListUsersPage() {
     }
   };
 
+  // Function to open the modal dialog for changing a user's role
   const openModal = (action, user) => {
     if (userInfo.email !== 'btvh@owner.com') {
       setShowAccessDeniedModal(true);
@@ -71,27 +97,33 @@ export default function ListUsersPage() {
     setShowConfirmModal(true);
   };
 
+  // Function to close the access denied modal dialog
   const closeAccessDeniedModal = () => {
     setShowAccessDeniedModal(false);
   };
 
+  // Function to close the confirm change role modal dialog
   const closeModal = () => {
     setShowConfirmModal(false);
   };
 
+  // Function to handle changing a user's role after confirming in the modal dialog
   const handleConfirmChangeRole = async () => {
     await updateUserRole(selectedUser._id, modalAction === 'makeAdmin');
     closeModal();
   };
 
+  // Function to handle changes in the search input field
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
   };
 
+  // Function to handle changes in the admin filter dropdown
   const handleFilterChange = (event) => {
     setIsAdminFilter(event.target.value);
   };
 
+  // useEffect hook to fetch user data when component mounts or relevant state variables change
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -129,6 +161,7 @@ export default function ListUsersPage() {
     fetchData();
   }, [currentPage, userInfo, search, isAdminFilter]);
 
+  // Custom styles for the modal dialogs
   const customStyles = {
     overlay: {
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -160,6 +193,7 @@ export default function ListUsersPage() {
 
       <Row>
         <Col md={4} className="my-3">
+          {/* Search input for filtering users by name */}
           <InputGroup>
             <InputGroup.Text>
               <BiSearch />
@@ -174,6 +208,7 @@ export default function ListUsersPage() {
             />
           </InputGroup>
         </Col>
+        {/* Dropdown for filtering users by admin status */}
         <Col md={3} className="my-3">
           <div>
             <select
@@ -190,6 +225,7 @@ export default function ListUsersPage() {
       </Row>
 
       <>
+        {/* Modal for confirming a change in user role */}
         <ReactModal
           isOpen={showConfirmModal}
           onRequestClose={closeModal}
@@ -220,7 +256,8 @@ export default function ListUsersPage() {
             </button>
           </div>
         </ReactModal>
-        {/* Access Denied Modal */}
+
+        {/* Modal for displaying access denied message */}
         <ReactModal
           isOpen={showAccessDeniedModal}
           onRequestClose={closeAccessDeniedModal}
@@ -244,6 +281,7 @@ export default function ListUsersPage() {
         </ReactModal>
       </>
 
+      {/* Display a loading spinner if loading, an error message if there's an error, or the user table */}
       {loading ? (
         <LoadingSpinner />
       ) : error ? (
@@ -260,52 +298,57 @@ export default function ListUsersPage() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td className="btn-text">{user._id}</td>
-                <td className="btn-text">
-                  {user.firstName} {user.lastName}
-                </td>
-                <td className="btn-text">{user.email}</td>
-                <td className="btn-text">
-                  {user.isAdmin ? (
-                    <span style={{ color: 'green', fontWeight: '600' }}>
-                      YES
+            {/* Map through users to create table rows */}
+            {users.map((user) => {
+              const { _id, firstName, lastName, email, isAdmin } = user;
+              const adminStatusColor = isAdmin ? 'green' : 'red';
+
+              return (
+                <tr key={_id}>
+                  <td className="btn-text">{_id}</td>
+                  <td className="btn-text">
+                    {firstName} {lastName}
+                  </td>
+                  <td className="btn-text">{email}</td>
+                  <td className="btn-text">
+                    <span
+                      style={{ color: adminStatusColor, fontWeight: '600' }}
+                    >
+                      {isAdmin ? 'YES' : 'NO'}
                     </span>
-                  ) : (
-                    <span style={{ color: 'red', fontWeight: '600' }}>NO</span>
-                  )}
-                </td>
-                <td>
-                  {user.email !== 'btvh@owner.com' &&
-                    (!user.isAdmin ? (
-                      <Button
-                        className="btn-text mb-1"
-                        variant="secondary"
-                        onClick={() => openModal('makeAdmin', user)}
-                        style={{ padding: '7px 19px', textTransform: 'none' }}
-                        disabled={userInfo.email !== 'btvh@owner.com'}
-                      >
-                        Make Admin
-                      </Button>
-                    ) : (
-                      <Button
-                        className="btn-text mb-1"
-                        variant="primary"
-                        onClick={() => openModal('changeToUser', user)}
-                        style={{ padding: '7px 7px', textTransform: 'none' }}
-                        disabled={userInfo.email !== 'btvh@owner.com'}
-                      >
-                        Change to User
-                      </Button>
-                    ))}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>
+                    {email !== 'btvh@owner.com' &&
+                      (!isAdmin ? (
+                        <Button
+                          className="btn-text mb-1"
+                          variant="secondary"
+                          onClick={() => openModal('makeAdmin', user)}
+                          style={{ padding: '7px 19px', textTransform: 'none' }}
+                          disabled={userInfo.email !== 'btvh@owner.com'}
+                        >
+                          Make Admin
+                        </Button>
+                      ) : (
+                        <Button
+                          className="btn-text mb-1"
+                          variant="primary"
+                          onClick={() => openModal('changeToUser', user)}
+                          style={{ padding: '7px 7px', textTransform: 'none' }}
+                          disabled={userInfo.email !== 'btvh@owner.com'}
+                        >
+                          Change to User
+                        </Button>
+                      ))}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
       <div>
+        {/* Display pagination component */}
         <AdminPagination
           totalPages={Math.ceil(totalUsers / usersPerPage)}
           setCurrentPage={setCurrentPage}

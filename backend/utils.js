@@ -30,10 +30,16 @@ export const isAuth = (req, res, next) => {
     next();
   });
 };
+
+/**
+ * Middleware function to check if user is an admin.
+ * If user is an admin, proceed to the next middleware.
+ * If not, send an error response with a 401 status code and a message.
+ */
 export const isAdmin = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
-    next();
-  } else {
-    res.status(401).send({ message: 'Invalid Admin Token' });
-  }
+  // Check if user is logged in and isAdmin property is true
+  req.user && req.user.isAdmin
+    ? next()
+    : // If user is not an admin, send an error response
+      res.status(401).send({ message: 'User is not authorized as an Admin' });
 };

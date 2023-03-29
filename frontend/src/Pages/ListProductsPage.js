@@ -16,7 +16,19 @@ import queryString from 'query-string';
 import { Form, InputGroup } from 'react-bootstrap';
 import { BiSearch } from 'react-icons/bi';
 
-// Reducer function declarations
+// Initialize the initial state of the component
+const initialState = {
+  loading: true,
+  error: '',
+  products: [],
+  page: 0,
+  pages: 0,
+  loadingCreate: false,
+  loadingDelete: false,
+  successDelete: false,
+};
+
+// Define a map of reducer functions for each possible action
 const actionsMap = {
   REQUEST: (state) => ({ ...state, loading: true }),
   SUCCESS: (state, { payload: { products, page, pages } }) => ({
@@ -52,30 +64,32 @@ const actionsMap = {
   RESET: (state) => ({ ...state, loadingDelete: false, successDelete: false }),
 };
 
-const reducer = (state, action) =>
+// Define the reducer function using the initial state and the actions map
+const reducer = (state = initialState, action) =>
   actionsMap[action.type] ? actionsMap[action.type](state, action) : state;
 
+// Set the application element for ReactModal
 ReactModal.setAppElement('#root');
 
 export default function ListProductsPage() {
+  // Define the state variables and the dispatch function
   const [
     {
       loading,
+      loadingCreate,
+      loadingDelete,
       error,
       products,
       pages,
-      loadingCreate,
-      loadingDelete,
       successDelete,
     },
     dispatch,
-  ] = useReducer(reducer, {
-    loading: true,
-    error: '',
-  });
+  ] = useReducer(reducer, initialState);
 
+  // Use hooks to access the current navigation state and location state
   const navigate = useNavigate();
   const location = useLocation();
+  // Access the user info from the Store context
   const {
     state: { userInfo },
   } = useContext(Store);
@@ -89,6 +103,7 @@ export default function ListProductsPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('');
 
+  //Function to fetch Products
   const fetchProducts = (page, limit, search, filter, token) => {
     let url = `/api/products/admin?page=${page}&limit=${limit}`;
 
@@ -105,45 +120,50 @@ export default function ListProductsPage() {
     });
   };
 
+  // Function to handle changes in the search bar
   const handleSearch = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
   };
 
+  // Function to handle changes in the filter
   const handleFilter = (e) => {
     setFilter(e.target.value);
     setCurrentPage(1);
   };
 
+  // Function to handle a successful response from fetchProducts
   const handleFetchSuccess = (data) => {
     dispatch({ type: 'SUCCESS', payload: data });
     setCountProducts(data.count);
   };
 
+  // Function to handle an error response from fetchProducts
   const handleFetchError = (error) => {
     dispatch({ type: 'FAILURE', payload: error.message });
   };
 
+  // Function to set the current page and update the URL accordingly
   const setCurrentPageAndUpdateUrl = (pageNumber) => {
     setCurrentPage(pageNumber);
     navigate(`${location.pathname}?page=${pageNumber}`, { replace: true });
   };
 
+  // Function to navigate to the Edit Product page
   const onEdit = (productId) => {
     navigate(`/admin/product/${productId}`, { state: { currentPage } });
   };
 
+  // Function to create a new product
   const createProduct = () => {
     dispatch({ type: 'CREATE_REQUEST' });
 
     axios
-      .post(
-        '/api/products',
-        {},
-        {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
-        }
-      )
+      .post('/api/products', null, {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      })
       .then(({ data }) => {
         dispatch({ type: 'CREATE_SUCCESS' });
         navigate(`/admin/product/${data.product._id}`);
@@ -154,47 +174,57 @@ export default function ListProductsPage() {
       });
   };
 
+  // Function to handle the "Create Product" button click
   const handleCreateProduct = () => {
     setShowConfirmModal(true);
   };
 
+  // Function to handle the confirmation of creating a new product
   const handleConfirmCreateProduct = () => {
     createProduct();
     setShowConfirmModal(false);
   };
 
+  // Function to handle canceling the creation of a new product
   const handleCancelCreateProduct = () => {
     setShowConfirmModal(false);
   };
 
+  // Function to handle showing the delete confirmation modal
   const handleShowDeleteConfirmModal = (product) => {
     setProductToDelete(product);
     setShowDeleteConfirmModal(true);
   };
 
+  // Function to handle closing the delete confirmation modal
   const handleCloseDeleteConfirmModal = () => {
     setShowDeleteConfirmModal(false);
   };
 
-  const handleProductDelete = async () => {
-    try {
-      await axios.delete(`/api/products/${productToDelete._id}`, {
+  // Function to handle deleting a product
+  const handleProductDelete = () => {
+    axios
+      .delete(`/api/products/${productToDelete._id}`, {
         headers: { Authorization: `Bearer ${userInfo.token}` },
+      })
+      .then(() => {
+        toast.success('Delete Successful');
+        dispatch({ type: 'DELETE_SUCCESS' });
+        setShowDeleteConfirmModal(false);
+      })
+      .catch((error) => {
+        toast.error(getErrorMessage(error));
+        dispatch({ type: 'DELETE_FAILURE' });
       });
-      toast.success('Delete Successful');
-      dispatch({ type: 'DELETE_SUCCESS' });
-      setShowDeleteConfirmModal(false);
-    } catch (error) {
-      toast.error(getErrorMessage(error));
-      dispatch({
-        type: 'DELETE_FAILURE',
-      });
-    }
   };
 
+  // useEffect hook to fetch the list of products
   useEffect(() => {
+    // Scrolls the window to the top of the page
     window.scrollTo(0, 0);
+    // Parses the page number from the URL and sets the current page accordingly
     const parsed = queryString.parse(location.search);
+    // If the current page is not equal to the page from the URL, sets the current page to the page from the URL
     const pageFromUrl = parsed.page ? parseInt(parsed.page, 10) : 1;
     const pageFromState = location.state?.currentPage || pageFromUrl;
 
@@ -220,6 +250,7 @@ export default function ListProductsPage() {
       fetchData();
     }
 
+    // If a successful delete has occurred, dispatch 'RESET' action and fetch the products again
     if (successDelete) {
       dispatch({ type: 'RESET' });
       fetchData();
@@ -259,9 +290,11 @@ export default function ListProductsPage() {
           <h1>Products</h1>
         </Col>
       </Row>
+      {/* Create a new product button and modals for confirmation */}
       <Row className="mb-3">
         <Col className="text-end">
           <div>
+            {/* Button to create a new product */}
             <Button
               className="mb-3"
               variant="primary"
@@ -271,6 +304,7 @@ export default function ListProductsPage() {
               CREATE A NEW PRODUCT
             </Button>
 
+            {/* Modal to confirm the creation of a new product */}
             <ReactModal
               isOpen={showConfirmModal}
               onRequestClose={handleCancelCreateProduct}
@@ -290,6 +324,7 @@ export default function ListProductsPage() {
               </div>
             </ReactModal>
 
+            {/* Modal to confirm the deletion of a product */}
             <ReactModal
               isOpen={showDeleteConfirmModal}
               onRequestClose={handleCloseDeleteConfirmModal}
@@ -314,6 +349,7 @@ export default function ListProductsPage() {
           </div>
         </Col>
       </Row>
+      {/* Search and filter options */}
       <Row>
         <Col md={4} className="mb-3">
           <InputGroup>
@@ -346,6 +382,7 @@ export default function ListProductsPage() {
         </Col>
       </Row>
 
+      {/* Conditionally render loading spinner, error message, or product list and pagination */}
       {(() => {
         if (loadingCreate) {
           return <LoadingSpinner />;
@@ -367,6 +404,7 @@ export default function ListProductsPage() {
               onDelete={handleShowDeleteConfirmModal}
             />
             <div>
+              {/* Pagination Component */}
               <AdminPagination
                 totalPages={pages}
                 setCurrentPage={setCurrentPageAndUpdateUrl}

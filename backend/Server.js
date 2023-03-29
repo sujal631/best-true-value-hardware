@@ -40,7 +40,7 @@ connect(process.env.MONGODB_URI, {
 })
   .then(() => {
     console.log('Successfully connected to MongoDB.');
-    return testTwilioConnection(); // Make sure this line is present and correct
+    return testTwilioConnection();
   })
   .catch((error) =>
     console.log(`Error connecting to MongoDB: ${error.message}`)

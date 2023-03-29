@@ -1,8 +1,11 @@
+// Import required dependencies
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
+// Define ProductRow functional component
 function ProductRow({ products, onEdit, onDelete }) {
   return (
+    // Create a table to display product information
     <table className="table table-striped table-bordered table-hover">
       <thead>
         <tr>
@@ -15,38 +18,48 @@ function ProductRow({ products, onEdit, onDelete }) {
         </tr>
       </thead>
       <tbody>
-        {products.map((product) => (
-          <tr key={product._id}>
-            <td className="btn-text">{product._id}</td>
-            <td className="btn-text">{product.name}</td>
-            <td className="btn-text">{product.price.toFixed(2)}</td>
-            <td className="btn-text">{product.department}</td>
-            <td className="btn-text">{product.brand}</td>
-            <td>
-              <Button
-                className="btn-text mb-1"
-                type="button"
-                variant="secondary"
-                onClick={() => onEdit(product._id)}
-              >
-                Edit
-              </Button>
-              <span style={{ margin: '5px' }}> </span>
-              <Button
-                className="btn-text mb-1"
-                type="button"
-                variant="primary"
-                onClick={() => onDelete(product)}
-                style={{ padding: '7px 19px' }}
-              >
-                <i className="fa fa-trash "></i>
-              </Button>
-            </td>
-          </tr>
-        ))}
+        {/* Map through products to create table rows */}
+        {products.map((product) => {
+          // Destructure product properties
+          const { _id, name, price, department, brand } = product;
+
+          // Return a table row for each product
+          return (
+            <tr key={_id}>
+              <td className="btn-text">{_id}</td>
+              <td className="btn-text">{name}</td>
+              <td className="btn-text">{price.toFixed(2)}</td>
+              <td className="btn-text">{department}</td>
+              <td className="btn-text">{brand}</td>
+              <td>
+                {/* Add Edit button for each product */}
+                <Button
+                  className="btn-text mb-1"
+                  type="button"
+                  variant="secondary"
+                  onClick={() => onEdit(_id)}
+                >
+                  Edit
+                </Button>
+                <span style={{ margin: '5px' }}> </span>
+                {/* Add Delete button for each product */}
+                <Button
+                  className="btn-text mb-1"
+                  type="button"
+                  variant="primary"
+                  onClick={() => onDelete(product)}
+                  style={{ padding: '7px 19px' }}
+                >
+                  <i className="fa fa-trash "></i>
+                </Button>
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );
 }
 
+// Export ProductRow component
 export default ProductRow;

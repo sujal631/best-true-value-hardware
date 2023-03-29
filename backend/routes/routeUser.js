@@ -71,19 +71,19 @@ routeUser.get(
 );
 
 // Handle user login
-routeUser.post(
-  '/login',
-  expressAsyncHandler(async (req, res) => {
+routeUser.post('/login', async (req, res) => {
+  try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-
     if (user && bcrypt.compareSync(password, user.password)) {
       res.send(extractUserData(user));
     } else {
       res.status(401).send({ message: 'Invalid email or password' });
     }
-  })
-);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
 
 // Handle user registration
 routeUser.post(

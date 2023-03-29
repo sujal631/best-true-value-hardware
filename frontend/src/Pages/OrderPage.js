@@ -20,34 +20,56 @@ import { loadStripe } from '@stripe/stripe-js/pure';
 import StripeCheckout from '../Components/StripeCheckout';
 import ReactModal from 'react-modal';
 
-// Reducer function for handling state changes
-const reducer = (state, action) => {
-  const cases = {
-    REQUEST: { ...state, loading: true, error: '' },
-    SUCCESS: { ...state, loading: false, order: action.payload, error: '' },
-    FAILURE: { ...state, loading: false, error: action.payload },
-    PAY_REQUEST: { ...state, loadingPay: true },
-    PAY_SUCCESS: { ...state, loadingPay: false, successPay: true },
-    PAY_FAILURE: { ...state, loadingPay: false },
-    PAY_RESET: { ...state, loadingPay: false, successPay: false },
-    PICKUP_REQUEST: { ...state, loadingPickupReady: true },
-    PICKUP_SUCCESS: {
-      ...state,
-      loadingPickupReady: false,
-      successPickupReady: true,
-    },
-    PICKUP_FAILURE: {
-      ...state,
-      loadingPickupReady: false,
-    },
-    PICKUP_RESET: {
-      ...state,
-      loadingPickupReady: false,
-      successPickupReady: false,
-    },
-    default: state,
-  };
-  return cases[action.type] || cases.default;
+// Define the default state of the reducer
+const initialState = {
+  loading: true,
+  loadingPay: false,
+  loadingPickupReady: false,
+  successPay: false,
+  successPickupReady: false,
+  order: {},
+  error: '',
+};
+
+// Map the action types to specific functions to update the state
+const actionsMap = {
+  REQUEST: (state) => ({ ...state, loading: true, error: '' }),
+  SUCCESS: (state, action) => ({
+    ...state,
+    loading: false,
+    order: action.payload,
+    error: '',
+  }),
+  FAILURE: (state, action) => ({
+    ...state,
+    loading: false,
+    error: action.payload,
+  }),
+  PAY_REQUEST: (state) => ({ ...state, loadingPay: true }),
+  PAY_SUCCESS: (state) => ({ ...state, loadingPay: false, successPay: true }),
+  PAY_FAILURE: (state) => ({ ...state, loadingPay: false }),
+  PAY_RESET: (state) => ({ ...state, loadingPay: false, successPay: false }),
+  PICKUP_REQUEST: (state) => ({ ...state, loadingPickupReady: true }),
+  PICKUP_SUCCESS: (state) => ({
+    ...state,
+    loadingPickupReady: false,
+    successPickupReady: true,
+  }),
+  PICKUP_FAILURE: (state) => ({
+    ...state,
+    loadingPickupReady: false,
+  }),
+  PICKUP_RESET: (state) => ({
+    ...state,
+    loadingPickupReady: false,
+    successPickupReady: false,
+  }),
+};
+
+// Reducer function for handling state updates based on dispatched actions
+const reducer = (state = initialState, action) => {
+  const updateState = actionsMap[action.type];
+  return updateState ? updateState(state, action) : state;
 };
 
 export default function OrderScreen() {
@@ -71,19 +93,17 @@ export default function OrderScreen() {
       successPickupReady,
     },
     dispatch,
-  ] = useReducer(reducer, {
-    loading: true,
-    order: {},
-    error: '',
-    successPay: false,
-    loadingPay: false,
-  });
+  ] = useReducer(reducer, initialState);
 
-  // Extracting the 'isPending' state variable and 'paypalDispatch' function from the usePayPalScriptReducer hook
+  // Get the PayPal Script reducer state and dispatch function
   const paypalScriptReducer = usePayPalScriptReducer();
+  // Get the isPending value from the PayPal Script reducer state
   const isPending = paypalScriptReducer[0].isPending;
+  // Get the PayPal Script dispatch function
   const paypalDispatch = paypalScriptReducer[1];
+  // Declare state for controlling the visibility of the modal
   const [showModal, setShowModal] = useState(false);
+  // Declare state for holding the Stripe instance
   const [stripe, setStripe] = useState(null);
 
   // Function for handling PayPal order creation
@@ -95,12 +115,15 @@ export default function OrderScreen() {
     return actions.order.create(orderData).then((orderId) => orderId);
   };
 
+  // Function to handle successful payments
   const handleSuccessPayment = async (paymentIntent, orderObj) => {
     try {
+      // If the order object is not found, throw an error
       if (!orderObj) {
         throw new Error('Order not found');
       }
       dispatch({ type: 'PAY_REQUEST' });
+      // Send the payment intent to the server for processing
       const { data } = await axios.put(
         `/api/stripe/${orderObj._id}/secret`,
         paymentIntent,
@@ -109,6 +132,7 @@ export default function OrderScreen() {
         }
       );
       dispatch({ type: 'PAY_SUCCESS', payload: data });
+      // Show a success message
       toast.success('Payment Successful!');
     } catch (err) {
       dispatch({ type: 'PAY_FAILURE', payload: getErrorMessage(err) });
@@ -116,14 +140,13 @@ export default function OrderScreen() {
     }
   };
 
-  // Function for handling the approval of the PayPal payment
+  // Function to handle the approval of the PayPal payment
   const handleApprove = async (data, actions) => {
     try {
-      // Dispatch a payment request action to update the payment status
       dispatch({ type: 'PAY_REQUEST' });
-      // Capture the payment details from the PayPal API
+      // Capture the payment details from PayPal
       const captureDetails = await actions.order.capture();
-      // Send a PUT request to the server to update the order's payment status
+      // Send the captured payment details to the server for processing
       const { data: payData } = await axios.put(
         `/api/orders/${order._id}/pay`,
         captureDetails,
@@ -131,10 +154,9 @@ export default function OrderScreen() {
           headers: { authorization: `Bearer ${userInfo.token}` },
         }
       );
-      // Dispatch a payment success action and display a success message
       dispatch({ type: 'PAY_SUCCESS', payload: payData });
+      // Show a success message
       toast.success('Payment Successful!');
-      // Dispatch a payment failure action and display an error message
     } catch (getErrorMessage) {
       const errorMessage = getErrorMessage(error);
       dispatch({ type: 'PAY_FAILURE', payload: errorMessage });
@@ -142,19 +164,22 @@ export default function OrderScreen() {
     }
   };
 
-  // Function for handling errors during the PayPal payment process
+  // Function to handle errors during the PayPal payment process
   const handleError = (err) => {
     const errorMessage = getErrorMessage(err);
     toast.error(errorMessage);
   };
 
+  // Function to handle clicking the "Pickup Ready" button
   function handleClickPickupReady() {
     setShowModal(true);
   }
 
+  // Asynchronous function to handle setting the order status to "pickup ready"
   async function handlePickupReady() {
     try {
       dispatch({ type: 'PICKUP_REQUEST' });
+      // Send a request to the server to update the order status
       const { data } = await axios.put(
         `/api/orders/${order._id}/pickupReady`,
         {},
@@ -163,6 +188,7 @@ export default function OrderScreen() {
         }
       );
       dispatch({ type: 'PICKUP_SUCCESS', payload: data });
+      // Show a success message informing the user that the order is ready for pickup
       toast.success(
         'The order is now available for pickup, and a confirmation notice has been sent to the customer.'
       );
@@ -172,11 +198,11 @@ export default function OrderScreen() {
     }
   }
 
-  // this function will send sms and show pop of pick up is ready feature
+  // Asynchronous function to send an SMS notification and show a confirmation popup for the pickup-ready feature
   const onConfirm = async (event) => {
     event.preventDefault();
 
-    // Prepare the detailed message
+    // Prepare the detailed message to be sent via SMS
     const itemsInfo = order.orderItems
       .map(
         (item, index) =>
@@ -190,11 +216,13 @@ export default function OrderScreen() {
     )}\n\nThank you for shopping with us!\n`;
 
     try {
+      // Send the SMS message using the Twilio API
       const response = await axios.post('/api/twilio/sendSms', {
         to: order.shippingInfo.phoneNumber,
         message: detailedMessage,
       });
 
+      // If the SMS sending is successful, update the order status and close the modal
       if (response.data.success) {
         handlePickupReady();
         setShowModal(false);
@@ -207,25 +235,32 @@ export default function OrderScreen() {
     }
   };
 
-  // Define a useEffect hook to fetch the order data and configure the PayPal SDK
+  // Define a useEffect hook to fetch the order data
   useEffect(() => {
+    // Asynchronous function to add the Stripe script to the page
     const addStripeScript = async () => {
       try {
+        // Get the Stripe client ID from the server
         const { data: clientId } = await axios.get('/api/stripe/key');
+        // Load the Stripe script with the client ID
         const stripeObj = await loadStripe(clientId);
+        // Set the Stripe object in the component state
         setStripe(stripeObj);
       } catch (error) {}
     };
 
+    // If the payment method is Debit/Credit and the Stripe object is not loaded, add the Stripe script
     if (order.paymentMethod === 'Debit/Credit') {
       if (!stripe) {
         addStripeScript();
       }
     }
 
+    // Asynchronous function to fetch the order details
     const fetchOrder = async () => {
       try {
         dispatch({ type: 'REQUEST' });
+        // Send a GET request to fetch the order data
         const { data } = await axios.get(`/api/orders/${orderId}`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
@@ -235,29 +270,36 @@ export default function OrderScreen() {
       }
     };
 
+    // If the user is not logged in, navigate to the login page
     if (!userInfo) {
       return navigate('/login');
     }
+    // Check if the order needs to be fetched or the payment state needs to be reset
     if (
       !order._id ||
       successPay ||
       successPickupReady ||
       (order._id && order._id !== orderId)
     ) {
+      // Fetch the order data
       fetchOrder();
 
+      // If the payment was successful, reset the payment state
       if (successPay) {
         dispatch({ type: 'PAY_RESET' });
       }
 
+      // If the pickup was successful, reset the pickup state
       if (successPickupReady) {
         dispatch({ type: 'PICKUP_RESET' });
       }
     } else {
+      // Asynchronous function to load the PayPal script
       const loadPaypalScript = async () => {
         const { data: clientId } = await axios.get('/api/keys/paypal', {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
+        // Reset the PayPal script options with the new client ID and currency
         paypalDispatch({
           type: 'resetOptions',
           value: {
@@ -269,6 +311,7 @@ export default function OrderScreen() {
       };
       loadPaypalScript();
     }
+    // Dependencies for the useEffect hook
   }, [
     order,
     userInfo,
@@ -280,6 +323,7 @@ export default function OrderScreen() {
     successPickupReady,
   ]);
 
+  // Define the custom styles for the modal
   const customStyles = {
     overlay: {
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -300,15 +344,20 @@ export default function OrderScreen() {
     },
   };
 
+  // Define a useEffect hook to scroll the window to the top on component mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Check the loading state to display the appropriate content
   return loading ? (
+    // Display a loading spinner if the component is still loading
     <LoadingSpinner></LoadingSpinner>
   ) : error ? (
+    // Display an error message if there is an error
     <Message variant="danger">{error}</Message>
   ) : (
+    // Display the order details if the component has finished loading and there is no error
     <div>
       <Helmet>
         <title>Order {orderId}</title>
@@ -323,6 +372,7 @@ export default function OrderScreen() {
                 Your Information
               </Card.Title>
               <Card.Text>
+                {/* Display the customer's name, phone number, and address */}
                 <div>
                   <span>
                     <strong>Name: </strong>
@@ -343,7 +393,7 @@ export default function OrderScreen() {
                 </div>
               </Card.Text>
 
-              {/* Message component displays a message based on whether the order is available for pickup or not */}
+              {/* Display a message based on whether the order is available for pickup or not */}
               {order.isPickupReady ? (
                 <Message variant="success" className="mb-3">
                   Your order is now <strong>READY FOR STORE PICKUP.</strong>{' '}
@@ -361,15 +411,16 @@ export default function OrderScreen() {
               )}
               <hr></hr>
 
+              {/* Display the payment details */}
               <Card.Title className="my-1" style={{ color: '#dd2222' }}>
-                {/*Display the payment details */}
                 Your Payment
               </Card.Title>
               <Card.Text>
                 <strong>Selected Method: </strong>
                 {order.paymentMethod}
               </Card.Text>
-              {/* Message component displays a message based on whether the order has been paid for or not */}
+
+              {/* Display a message based on whether the order has been paid for or not */}
               {order.isPaid ? (
                 <Message variant="success" className="mb-3">
                   Thank you for your payment. Please note that your order will
@@ -388,8 +439,9 @@ export default function OrderScreen() {
                 </Message>
               )}
               <hr></hr>
+
+              {/* Display the items in the order including the item's image, name, quantity, and price */}
               <Card.Title className="my-1" style={{ color: '#dd2222' }}>
-                {/* Displays the items in the order including the item's image, name, quantity, and price */}
                 Your Items
               </Card.Title>
               <ListGroup>
@@ -427,14 +479,20 @@ export default function OrderScreen() {
             </Card.Body>
           </Card>
         </Col>
+        {/* Display order summary, payment options, and pickup ready button */}
         <Col xs={12} lg={4}>
+          {/* Display the order summary card */}
           <OrderSummaryCard order={order} />
+
+          {/* Check if the order has not been paid */}
           {!order.isPaid && (
             <ListGroup.Item>
+              {/* Display a loading spinner if the payment is pending */}
               {isPending ? (
                 <LoadingSpinner />
               ) : (
                 <div>
+                  {/* Display PayPal payment option if the selected payment method is PayPal */}
                   {order.paymentMethod === 'PayPal' && (
                     <PayPalButtons
                       createOrder={createPayPalOrder}
@@ -442,9 +500,13 @@ export default function OrderScreen() {
                       onError={handleError}
                     ></PayPalButtons>
                   )}
+
+                  {/* Display a loading spinner if the selected payment method is Debit/Credit and Stripe has not loaded yet */}
                   {!order.isPaid &&
                     order.paymentMethod === 'Debit/Credit' &&
                     !stripe && <LoadingSpinner />}
+
+                  {/* Display Stripe payment option if the selected payment method is Debit/Credit and Stripe has loaded */}
                   {!order.isPaid &&
                     order.paymentMethod === 'Debit/Credit' &&
                     stripe && (
@@ -460,6 +522,8 @@ export default function OrderScreen() {
               {loadingPay && <LoadingSpinner></LoadingSpinner>}
             </ListGroup.Item>
           )}
+
+          {/* Render the modal for confirming the order is ready for pickup */}
           <ReactModal
             isOpen={showModal}
             onRequestClose={() => setShowModal(false)}
@@ -493,9 +557,12 @@ export default function OrderScreen() {
             </div>
           </ReactModal>
 
+          {/* Check if the user is an admin, the order is paid, and the order is not marked as ready for pickup */}
           {userInfo.isAdmin && order.isPaid && !order.isPickupReady && (
             <ListGroup.Item>
               {loadingPickupReady && <LoadingSpinner />}
+
+              {/* Button to mark the order as ready for pickup */}
               <div className="d-grid">
                 <Button
                   className="my-3"

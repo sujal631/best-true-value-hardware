@@ -163,6 +163,7 @@ export default function OrderHistoryPage() {
         </table>
       )}
       <div>
+        {/* Display pagination component */}
         <Pagination
           totalPosts={pages * 10}
           postsPerPage={10}

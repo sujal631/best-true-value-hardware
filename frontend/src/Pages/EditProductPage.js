@@ -1,3 +1,4 @@
+// Importing necessary dependencies and components
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Store } from '../Store';
@@ -10,6 +11,7 @@ import { toast } from 'react-toastify';
 import { Container, Form } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 
+// Creating an object to map different actions
 const actionsMap = {
   REQUEST: (state) => ({ ...state, loading: true }),
   SUCCESS: (state) => ({ ...state, loading: false }),
@@ -38,13 +40,17 @@ const actionsMap = {
   }),
 };
 
+// Creating a reducer that will update the state based on the actions
 const reducer = (state, action) => {
   const updateState = actionsMap[action.type];
   return updateState ? updateState(state, action) : state;
 };
 
+// EditProductPage functional component
 const EditProductPage = () => {
+  // Extracting productId from the URL parameters
   const { id: productId } = useParams();
+  // Extracting userInfo from Store context
   const {
     state: { userInfo },
   } = useContext(Store);
@@ -60,6 +66,7 @@ const EditProductPage = () => {
 
   const { loading, error, loadingUpdate, loadingUpload } = state;
 
+  // Initializing productData state object with some default values
   const [productData, setProductData] = useState({
     name: '',
     slug: '',
@@ -72,12 +79,15 @@ const EditProductPage = () => {
   });
 
   useEffect(() => {
+    // Define a function to fetch product data
     const fetchData = () => {
       dispatch({ type: 'REQUEST' });
 
+      // Make an API request to fetch product details using the productId
       axios
         .get(`/api/products/${productId}`)
         .then((response) => {
+          // Update the product data state with the fetched data
           setProductData(response.data);
           dispatch({ type: 'SUCCESS' });
         })
@@ -89,30 +99,36 @@ const EditProductPage = () => {
         });
     };
 
+    // Call the fetchData function to fetch the product data
     fetchData();
   }, [productId]);
 
+  // Function to handle image uploads
   const handleUploadImages = async (e) => {
+    // Get the selected image file
     const imageFile = e.target.files[0];
 
+    // Define a function to upload the image file to the server
     const uploadImage = async (file) => {
+      const apiUrl = '/api/upload';
+      const headers = {
+        'Content-Type': 'multipart/form-data',
+        authorization: `Bearer ${userInfo.token}`,
+      };
       const formData = new FormData();
       formData.append('image_file', file);
 
       try {
-        const { data } = await axios.post('/api/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            authorization: `Bearer ${userInfo.token}`,
-          },
+        const { data } = await axios.post(apiUrl, formData, {
+          headers,
         });
-
         return data.secure_url;
       } catch (error) {
         throw new Error(getErrorMessage(error));
       }
     };
 
+    // Attempt to upload the image and update the product data state with the uploaded image URL
     try {
       dispatch({ type: 'UPLOAD_REQUEST' });
       const uploadedImageUrl = await uploadImage(imageFile);
@@ -124,11 +140,13 @@ const EditProductPage = () => {
     }
   };
 
+  // Function to handle changes in form input fields
   const handleChange = (event) => {
     const { name, value } = event.target;
     setProductData({ ...productData, [name]: value });
   };
 
+  // Function to update the product data on the server
   const updateProduct = async (productId, productData, token) => {
     const response = await axios.put(
       `/api/products/${productId}`,
@@ -143,13 +161,16 @@ const EditProductPage = () => {
     return response;
   };
 
+  // Function to handle cancel button clicks and navigate back to the previous
   const handleCancel = () => {
     navigate(-1);
   };
 
+  // Function to handle form submissions for updating product data
   const handleUpdateProduct = (e) => {
     e.preventDefault();
 
+    // Functions to handle success and failure of product updates
     const onUpdateSuccess = () => {
       toast.success('Update Successful');
       navigate('/admin/listProducts', { state: { currentPage: currentPage } });
@@ -159,6 +180,7 @@ const EditProductPage = () => {
       dispatch({ type: 'UPDATE_FAILURE' });
     };
 
+    // Dispatch an 'UPDATE_REQUEST' action and attempt to update the product on the server
     dispatch({ type: 'UPDATE_REQUEST' });
 
     updateProduct(productId, productData, userInfo.token)
@@ -182,6 +204,7 @@ const EditProductPage = () => {
 
   return (
     <div>
+      {/* Set the page title using Helmet */}
       <Helmet>
         <title>Product {productId}</title>
       </Helmet>
@@ -189,11 +212,14 @@ const EditProductPage = () => {
         <h1>Product {productId}</h1>
 
         {loading ? (
-          <LoadingSpinner />
+          <LoadingSpinner /> // Display a loading spinner or an error message if necessary
         ) : error ? (
           <Message variant="danger">{error}</Message>
         ) : (
+          // Render the form for updating product information
           <Form onSubmit={handleUpdateProduct}>
+            {/* Render input fields for product name, slug, image, brand, department, price, and count in stock */}
+            {/* Each input field has an onChange event handler to update the product data state */}
             <div className="mb-3">
               <label htmlFor="name" className="form-label">
                 Name
@@ -236,6 +262,8 @@ const EditProductPage = () => {
                 required
               />
             </div>
+
+            {/* Render a file input field for uploading an image and the onChange event handler to handle image uploads */}
             <div className="mb-3">
               <label htmlFor="imageFile" className="form-label">
                 Upload Image
@@ -314,6 +342,7 @@ const EditProductPage = () => {
               <label htmlFor="description" className="form-label">
                 Description
               </label>
+              {/* Render a textarea for product description input field */}
               <textarea
                 type="text"
                 className="form-control"
@@ -325,6 +354,8 @@ const EditProductPage = () => {
                 style={{ height: '150px', resize: 'vertical' }}
               />
             </div>
+
+            {/* Render buttons for submitting the form and canceling the edit */}
             <div className="d-grid gap-2 mb-2">
               <button
                 type="submit"
@@ -333,6 +364,8 @@ const EditProductPage = () => {
               >
                 UPDATE
               </button>
+
+              {/* The cancel button has an onClick event handler to navigate back to the previous page */}
               <button
                 type="button"
                 className="btn btn-primary"
