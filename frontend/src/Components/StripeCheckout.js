@@ -1,3 +1,4 @@
+// Import necessary modules
 import React, { useState } from 'react';
 import {
   useStripe,
@@ -10,21 +11,26 @@ import {
 import { Button, Card } from 'react-bootstrap';
 import Axios from 'axios';
 
+// CheckoutForm component to handle Stripe payment form
 function CheckoutForm(props) {
   const [processing, setProcessing] = useState(false);
   const [cardholderName, setCardholderName] = useState('');
   const stripe = useStripe();
   const elements = useElements();
 
+  // Handle form submission to process the payment
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!stripe || !elements) {
       return;
     }
     setProcessing(true);
+
+    // Fetch the client secret from the server for the specific order
     const { data } = await Axios(`/api/stripe/secret/${props.orderId}`);
     const clientSecret = data.client_secret;
 
+    // Confirm card payment with Stripe using the client secret
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
         card: elements.getElement(CardNumberElement),
@@ -35,10 +41,12 @@ function CheckoutForm(props) {
       },
     });
 
+    // Handle errors if the payment fails
     if (result.error) {
       console.log(result.error.message);
       alert(result.error.message);
     } else {
+      // Process the successful payment
       if (result.paymentIntent.status === 'succeeded') {
         props.handleSuccessPayment(result.paymentIntent, data.order);
         console.log(result.paymentIntent);
@@ -47,11 +55,13 @@ function CheckoutForm(props) {
     setProcessing(false);
   };
 
+  // Render the payment form
   return (
     <Card>
       <Card.Body>
         <Card.Title>Payment Info</Card.Title>
         <form onSubmit={handleSubmit} className="checkout-form">
+          {/* Form fields for cardholder's name, card number, expiration date, and CVC */}
           <div className="form-row">
             <label htmlFor="cardholder-name" style={{ marginBottom: '0.5rem' }}>
               Name on card
@@ -94,6 +104,7 @@ function CheckoutForm(props) {
 
           <div id="card-errors" role="alert" />
 
+          {/* Submit button */}
           <div className="d-grid">
             <Button
               type="submit"
@@ -109,6 +120,7 @@ function CheckoutForm(props) {
   );
 }
 
+// StripeCheckout component to wrap the CheckoutForm with Stripe Elements
 const StripeCheckout = (props) => (
   <Elements stripe={props.stripe}>
     <CheckoutForm
@@ -117,4 +129,5 @@ const StripeCheckout = (props) => (
     />
   </Elements>
 );
+
 export default StripeCheckout;

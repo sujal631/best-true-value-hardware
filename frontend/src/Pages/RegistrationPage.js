@@ -193,7 +193,7 @@ export default function Registration() {
             title="Phone number should include a country code (1-3 digits) followed by a 10-digit number"
           />
           {phoneNumber.length > 0 && (
-            <div className="my-2">
+            <div className="my-2 btn-text">
               <Message variant="warning">
                 Please note that the phone number should include a country code
                 (1-3 digits) followed by a 10-digit number

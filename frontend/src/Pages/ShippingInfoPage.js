@@ -143,6 +143,7 @@ export default function ShippingInfoPage() {
     setShowPhoneMessage(e.target.value.length > 0);
   };
 
+  // Function to handle zip code input change
   const handleZipChange = (e) => {
     setZip(e.target.value);
     setShowZipMessage(e.target.value.length > 0);
@@ -195,7 +196,6 @@ export default function ShippingInfoPage() {
           </div>
 
           {/* A form input for the user's phone number */}
-
           <div className="mb-3">
             <label htmlFor="phoneNumber" className="form-label">
               Phone Number
@@ -213,7 +213,7 @@ export default function ShippingInfoPage() {
           </div>
 
           {showPhoneMessage && (
-            <div className="mb-3">
+            <div className="mb-3 btn-text">
               <Message variant="warning">
                 Please provide a valid cell phone number so that a
                 representative from the store can call you to{' '}
@@ -295,7 +295,7 @@ export default function ShippingInfoPage() {
               }}
             />
             {showZipMessage && (
-              <div className="my-3">
+              <div className="my-3 btn-text">
                 <Message variant="warning">
                   Please enter your 5-digit zip code (e.g., 12345) or your
                   9-digit zip code (e.g., 12345-6789).

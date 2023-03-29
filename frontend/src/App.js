@@ -1,3 +1,4 @@
+//Import necessary modules
 import React from 'react';
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -5,7 +6,7 @@ import Container from 'react-bootstrap/Container';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Pages
+// Importing pages for routing
 import HomePage from './Pages/HomePage';
 import ProductDetailsPage from './Pages/ProductDetailsPage';
 import ShoppingCartPage from './Pages/ShoppingCartPage';
@@ -25,7 +26,7 @@ import ListUsersPage from './Pages/ListUsersPage';
 import EditProductPage from './Pages/EditProductPage';
 import AboutPage from './Pages/AboutPage';
 
-// Components
+// Importing components for layout
 import Navigation from './Components/Navigation';
 import Footer from './Components/Footer';
 import ProductsPage from './Pages/ProductsPage';
@@ -38,10 +39,12 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="site-container">
+        {/* Initialize the ToastContainer for notifications */}
         <ToastContainer position="bottom-center" limit={1} />
         {/* Header with Navbar as Navigation */}
         <header>
           <Navigation />
+          {/* Component to scroll to the top of the page */}
           <ScrollToTop />
         </header>
         {/* Main content section */}
@@ -49,6 +52,7 @@ const App = () => {
           <Container>
             {/* All the routes are defined here */}
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/products" element={<ProductsPage />} />
@@ -59,6 +63,7 @@ const App = () => {
               <Route path="/shippingInfo" element={<ShippingInfoPage />} />
               <Route path="/paymentMethod" element={<PaymentPage />} />
               <Route path="/previewOrder" element={<PreviewOrderPage />} />
+              {/* User protected routes */}
               <Route
                 path="/order/:id"
                 element={
@@ -83,7 +88,9 @@ const App = () => {
                   </UserAuthorizedAccess>
                 }
               />
+              {/* Search route */}
               <Route path="/search" element={<SearchPage />} />
+              {/* Admin protected routes */}
               <Route
                 path="/admin/dashboard"
                 element={

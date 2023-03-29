@@ -11,6 +11,15 @@ import { toast } from 'react-toastify';
 import { Container, Form } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 
+// Define the default state of the reducer
+const initialState = {
+  loading: false,
+  error: '',
+  loadingUpdate: false,
+  loadingUpload: false,
+  errorUpload: '',
+};
+
 // Creating an object to map different actions
 const actionsMap = {
   REQUEST: (state) => ({ ...state, loading: true }),
@@ -59,10 +68,7 @@ const EditProductPage = () => {
   const location = useLocation();
   const currentPage = location.state?.currentPage || 1;
 
-  const [state, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-  });
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const { loading, error, loadingUpdate, loadingUpload } = state;
 

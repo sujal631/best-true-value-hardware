@@ -88,8 +88,8 @@ const HomePage = () => {
             </Row>
           </div>
         )}
-        {/* Render the pagination component */}
 
+        {/* Render the pagination component */}
         <div className="pagination-container">
           <Pagination
             totalPosts={productList.length}

@@ -110,6 +110,7 @@ export default function ProductsPage() {
           </div>
         )}
         <div className="pagination-container">
+          {/* Render Pagination Component*/}
           <Pagination
             totalPosts={filteredProducts.length}
             postsPerPage={postsPerPage}

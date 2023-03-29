@@ -9,10 +9,12 @@ import { isAuth, isAdmin } from '../utils.js';
 // Create a new router instance
 const routeOrder = express.Router();
 
+// Route for getting all paid orders
 routeOrder.route('/').get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    // Find all paid orders and populate the user field with the firstName and lastName fields
     const orders = await Order.find({ isPaid: true })
       .populate('user', 'firstName lastName')
       .sort({ paidAt: -1 });
@@ -21,6 +23,7 @@ routeOrder.route('/').get(
 );
 
 const PAGE_SIZE = 10;
+// Route for getting orders for the admin dashboard
 routeOrder.get(
   '/admin',
   isAuth,
@@ -28,10 +31,14 @@ routeOrder.get(
   expressAsyncHandler(async (req, res) => {
     const { query } = req;
     const page = parseInt(query.page) || 1;
+    // The number of orders to show per page
     const pageSize = parseInt(query.limit) || PAGE_SIZE;
+    // The search term used to filter orders
     const searchTerm = query.searchTerm || '';
+    // Filter to show only pickup-ready orders
     const isPickupReadyFilter = query.isPickupReadyFilter;
 
+    // If a search term is provided, add it to the search filter
     const searchFilter = searchTerm
       ? {
           $or: [
@@ -41,16 +48,19 @@ routeOrder.get(
         }
       : {};
 
+    // If the pickup-ready filter is provided, add it to the filter
     const isPickupReadyFilterObj = isPickupReadyFilter
       ? { isPickupReady: isPickupReadyFilter === 'true' }
       : {};
 
+    // Combine all filters
     const finalFilter = {
       ...searchFilter,
       ...isPickupReadyFilterObj,
       isPaid: true,
     };
 
+    // Get the orders, populate the user field with the firstName and lastName fields, and exclude the user password field
     const orders = await Order.aggregate([
       {
         $lookup: {
@@ -68,6 +78,7 @@ routeOrder.get(
       { $project: { 'user.password': 0 } },
     ]);
 
+    // Get the count of orders that match the filters
     const countOrders = await Order.aggregate([
       {
         $lookup: {
@@ -82,6 +93,7 @@ routeOrder.get(
       { $count: 'countOrders' },
     ]);
 
+    // Response with an array of orders that meet the specified search criteria and are sorted by descending order of '_id'
     res.send({
       orders,
       countOrders: countOrders.length > 0 ? countOrders[0].countOrders : 0,
@@ -93,33 +105,36 @@ routeOrder.get(
   })
 );
 
-// Define routes for handling order-related requests
+// Route for handling order-related requests
 // Create a new order
 routeOrder.route('/').post(
-  isAuth, // Middleware for checking if user is authenticated
+  isAuth,
   expressAsyncHandler(async (req, res) => {
-    // Async function to handle the request
     // Create a new order from the request body
     const order = await Order.create({
       ...req.body,
-      user: req.user._id, // Add user ID from request to the new order
-      orderItems: req.body.orderItems.map((x) => ({ ...x, product: x._id })), // Add product ID to each order item
+      user: req.user._id,
+      orderItems: req.body.orderItems.map((x) => ({ ...x, product: x._id })),
     });
     // Send success response with status code 201 and the new order object
     res.status(201).send({ message: 'Order added successfully', order });
   })
 );
 
+//Route for the dashboard
 routeOrder.route('/dashboard').get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    // Get the time range for the dashboard, default is 'daily'
     const timeRange = req.query.timeRange || 'daily';
 
+    // Function to calculate the date boundary based on the time range
     const getDateBoundary = (timeRange) => {
       const now = new Date();
       const boundary = new Date(now);
 
+      // Adjust the boundary date based on the time range
       switch (timeRange) {
         case 'weekly':
           boundary.setDate(now.getDate() - 7);
@@ -131,29 +146,35 @@ routeOrder.route('/dashboard').get(
           boundary.setFullYear(now.getFullYear() - 1);
           break;
         default:
-          boundary.setFullYear(1970); // Set to the Unix epoch to include all records
+          boundary.setFullYear(1970);
       }
 
       return boundary;
     };
 
+    // Get the date boundary based on the time range
     const dateBoundary = getDateBoundary(timeRange);
 
+    // Aggregation pipeline to get daily orders within the date boundary
     const dailyOrders = await Order.aggregate([
       {
+        // Filter only paid orders
         $match: {
-          isPaid: true, //filter paid orders only
+          isPaid: true,
         },
       },
       {
+        // Filter orders within the date boundary
         $match: {
           paidAt: { $gte: dateBoundary },
         },
       },
       {
+        // Add a field with the converted date based on the time range
         $addFields: {
           convertedDate: {
             $switch: {
+              // Different branches for each time range
               branches: [
                 {
                   case: { $eq: [timeRange, 'yearly'] },
@@ -191,6 +212,7 @@ routeOrder.route('/dashboard').get(
                   },
                 },
               ],
+              // Default case
               default: {
                 $dateToString: { format: '%Y-%m-%d', date: '$paidAt' },
               },
@@ -200,15 +222,18 @@ routeOrder.route('/dashboard').get(
       },
 
       {
+        // Group by the converted date and sum the orders and sales
         $group: {
           _id: '$convertedDate',
           orders: { $sum: 1 },
           sales: { $sum: '$totalPrice' },
         },
       },
+      // Sort by date
       { $sort: { _id: 1 } },
     ]);
 
+    // Aggregation pipeline to get total orders and sales
     const orders = await Order.aggregate([
       {
         $match: {
@@ -216,6 +241,7 @@ routeOrder.route('/dashboard').get(
         },
       },
       {
+        // Group and sum the number of orders and total sales
         $group: {
           _id: null,
           numOrders: { $sum: 1 },
@@ -223,28 +249,35 @@ routeOrder.route('/dashboard').get(
         },
       },
       {
+        // Add default values if no data is available
         $addFields: {
           numOrders: { $ifNull: ['$numOrders', 0] },
           totalSales: { $ifNull: ['$totalSales', 0] },
         },
       },
     ]);
+
+    // Aggregation pipeline to get the total number of users
     const users = await User.aggregate([
       {
+        // Group and sum the number of users
         $group: {
           _id: null,
           numUsers: { $sum: 1 },
         },
       },
       {
+        // Add default value if no data is available
         $addFields: {
           numUsers: { $ifNull: ['$numUsers', 0] },
         },
       },
     ]);
 
+    // Aggregation pipeline to get the product count by department
     const productDepartments = await Product.aggregate([
       {
+        // Group by department and count products
         $group: {
           _id: '$department',
           count: { $sum: 1 },
@@ -252,14 +285,20 @@ routeOrder.route('/dashboard').get(
       },
     ]);
 
+    // Aggregation pipeline to get the revenue by department
     const revenueByDepartment = await Order.aggregate([
+      // Filter only paid orders
       {
         $match: {
-          isPaid: true, //filter paid orders only
+          isPaid: true,
         },
       },
-      { $unwind: '$orderItems' },
       {
+        // Unwind the order items array
+        $unwind: '$orderItems',
+      },
+      {
+        // Lookup product information
         $lookup: {
           from: 'products',
           localField: 'orderItems.product',
@@ -271,6 +310,7 @@ routeOrder.route('/dashboard').get(
         $unwind: '$productInfo',
       },
       {
+        // Group by department and sum the revenue
         $group: {
           _id: '$productInfo.department',
           revenue: {
@@ -278,27 +318,35 @@ routeOrder.route('/dashboard').get(
           },
         },
       },
-      { $sort: { revenue: -1 } },
+      {
+        // Sort by revenue in descending order
+        $sort: { revenue: -1 },
+      },
     ]);
 
+    // Aggregation pipeline to get the new and returning customers
     const newReturningCustomers = await Order.aggregate([
       {
+        // Filter only paid orders
         $match: {
           isPaid: true,
         },
       },
       {
+        // Filter orders within the date boundary
         $match: {
           paidAt: { $gte: dateBoundary },
         },
       },
       {
+        // Group by user and count orders
         $group: {
           _id: '$user',
           count: { $sum: 1 },
         },
       },
       {
+        // Lookup customer information
         $lookup: {
           from: 'users',
           localField: '_id',
@@ -307,11 +355,13 @@ routeOrder.route('/dashboard').get(
         },
       },
       {
+        // Filter only valid customers
         $match: {
           customer: { $ne: [] },
         },
       },
       {
+        // Group by new or returning customer and count
         $group: {
           _id: {
             $cond: [
@@ -336,18 +386,24 @@ routeOrder.route('/dashboard').get(
   })
 );
 
+//Route for displaying top selling products
 routeOrder.route('/top-selling-products').get(
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
+    // Aggregate pipeline for fetching top-selling products
     const topSellingProducts = await Order.aggregate([
       {
         $match: {
           isPaid: true, //filter paid orders only
         },
       },
-      { $unwind: '$orderItems' },
       {
+        // Unwind the order items array
+        $unwind: '$orderItems',
+      },
+      {
+        // Group by product ID and sum the quantities and total revenues
         $group: {
           _id: '$orderItems.product',
           totalQuantity: { $sum: '$orderItems.quantity' },
@@ -359,6 +415,7 @@ routeOrder.route('/top-selling-products').get(
       { $sort: { totalRevenue: -1 } }, // Sort by descending revenue, change to totalQuantity to sort by quantity
       { $limit: 10 }, // Limit the results to the top 10 products
       {
+        // Lookup product information
         $lookup: {
           from: 'products',
           localField: '_id',
@@ -367,6 +424,7 @@ routeOrder.route('/top-selling-products').get(
         },
       },
       {
+        // Project the desired fields
         $project: {
           _id: 0,
           product: { $arrayElemAt: ['$product', 0] },
@@ -381,12 +439,10 @@ routeOrder.route('/top-selling-products').get(
   })
 );
 
-// Get orders of the authenticated user
-
+// Route to get orders of the authenticated user
 routeOrder.route('/mine').get(
-  isAuth, // Middleware for checking if user is authenticated
+  isAuth,
   expressAsyncHandler(async (req, res) => {
-    // Async function to handle the request
     const page = parseInt(req.query.page) || 1;
     const limit = PAGE_SIZE;
 
@@ -407,12 +463,10 @@ routeOrder.route('/mine').get(
   })
 );
 
-// Get a specific order by ID
+// Route to get a specific order by ID
 routeOrder.route('/:id').get(
-  isAuth, // Middleware for checking if user is authenticated
+  isAuth,
   expressAsyncHandler(async (req, res) => {
-    // Async function to handle the request
-    // Find order with ID from the request
     const order = await Order.findById(req.params.id);
     if (order) {
       // If order exists, send success response with the order object
@@ -424,6 +478,7 @@ routeOrder.route('/:id').get(
   })
 );
 
+//Route to update pickup status of a specific order by ID
 routeOrder.route('/:id/pickupReady').put(
   isAuth,
   expressAsyncHandler(async (req, res) => {
@@ -431,6 +486,7 @@ routeOrder.route('/:id/pickupReady').put(
     if (order) {
       order.isPickupReady = true;
       await order.save();
+      // If order is ready for pickup, send success response
       res.send({ message: 'Ready for PICK UP' });
     } else {
       res.status(404).send({ message: 'Order Not Found' });
@@ -438,12 +494,10 @@ routeOrder.route('/:id/pickupReady').put(
   })
 );
 
-// Update payment status of a specific order by ID
+// Route to update payment status of a specific order by ID
 routeOrder.route('/:id/pay').put(
-  isAuth, // Middleware for checking if user is authenticated
+  isAuth,
   expressAsyncHandler(async (req, res) => {
-    // Async function to handle the request
-    // Find order with ID from the request
     const order = await Order.findById(req.params.id);
     if (order) {
       // If order exists, update payment status and payment details
@@ -465,5 +519,4 @@ routeOrder.route('/:id/pay').put(
   })
 );
 
-// Export the router instance
 export default routeOrder;

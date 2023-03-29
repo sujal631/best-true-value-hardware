@@ -33,6 +33,7 @@ const extractUserData = ({
   }),
 });
 
+// Route for retrieving users with pagination, search and filter
 routeUser.get(
   '/',
   isAuth,
@@ -70,7 +71,7 @@ routeUser.get(
   })
 );
 
-// Handle user login
+// Route for user login
 routeUser.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -85,7 +86,7 @@ routeUser.post('/login', async (req, res) => {
   }
 });
 
-// Handle user registration
+// Route for user registration
 routeUser.post(
   '/registration',
   expressAsyncHandler(async (req, res) => {
@@ -102,7 +103,7 @@ routeUser.post(
   })
 );
 
-// Handle updating user info
+// Route for updating user info
 routeUser.put(
   '/profile/info',
   isAuth,
@@ -126,7 +127,7 @@ routeUser.put(
   })
 );
 
-// Handle updating user password
+// Route for updating user password
 routeUser.put(
   '/profile/password',
   isAuth,
@@ -145,7 +146,7 @@ routeUser.put(
   })
 );
 
-// Handle updating user admin status
+// Route for updating user's admin status
 routeUser.put(
   '/:id',
   isAuth,
@@ -165,7 +166,7 @@ routeUser.put(
   })
 );
 
-// Handle verifying old password
+// Route for verifying old password
 routeUser.post(
   '/profile/verify-password',
   isAuth,

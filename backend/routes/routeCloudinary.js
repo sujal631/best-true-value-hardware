@@ -5,6 +5,7 @@ import streamifier from 'streamifier';
 import { isAuth, isAdmin } from '../utils.js';
 import multer from 'multer';
 
+// Configure multer for handling file uploads
 const upload = multer();
 
 // Create express router instance
@@ -13,7 +14,9 @@ const routeCloudinary = express.Router();
 // Function to handle file upload to Cloudinary
 const uploadToCloudinary = async (fileBuffer) => {
   try {
+    // Use a Promise to handle the async upload to Cloudinary
     const result = await new Promise((resolve, reject) => {
+      // Define the callback function for the upload_stream method
       const uploadCallback = (error, result) => {
         if (error) {
           reject(error);
@@ -22,10 +25,13 @@ const uploadToCloudinary = async (fileBuffer) => {
         }
       };
 
+      // Create a stream for uploading the file to Cloudinary
       const stream = cloudinary.uploader.upload_stream(uploadCallback);
+      // Pipe the file buffer into the stream
       streamifier.createReadStream(fileBuffer).pipe(stream);
     });
 
+    // Return the result of the upload
     return result;
   } catch (error) {
     throw error;
