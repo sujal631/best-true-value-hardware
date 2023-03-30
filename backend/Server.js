@@ -10,16 +10,22 @@ import routeOrder from './routes/routeOrder.js';
 import routeCloudinary from './routes/routeCloudinary.js';
 import routeStripe from './routes/routeStripe.js';
 import routeTwilio from './routes/routeTwilio.js';
+import routeSendGrid from './routes/routeSendGrid.js';
 import twilio from 'twilio';
+import sendgrid from 'sendgrid';
 
 // Load environment variables from .env file
 config();
-//Load twilio credentials
+//Load twilio and SendGrid credentials
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
+const sendgridKey = process.env.SENDGRID_API_KEY;
 
 // Create Twilio client
 const client = new twilio(accountSid, authToken);
+
+//Create SendGrid Clienr
+const client1 = new sendgrid(sendgridKey);
 
 // Function to test Twilio connection by checking the account balance
 async function testTwilioConnection() {
@@ -33,6 +39,15 @@ async function testTwilioConnection() {
   }
 }
 
+// Function to test SendGrid connection by checking the account
+async function testSendGridConnection() {
+  try {
+    console.log(`Successfully connected to SendGrid.`);
+  } catch (error) {
+    console.log(`Error connecting to SendGrid: ${error.message}`);
+  }
+}
+
 // Call the testTwilioConnection and MongoDB
 connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -40,7 +55,7 @@ connect(process.env.MONGODB_URI, {
 })
   .then(() => {
     console.log('Successfully connected to MongoDB.');
-    return testTwilioConnection();
+    return testTwilioConnection() && testSendGridConnection();
   })
   .catch((error) =>
     console.log(`Error connecting to MongoDB: ${error.message}`)
@@ -65,6 +80,7 @@ app.use('/api/users', routeUser);
 app.use('/api/orders', routeOrder);
 app.use('/api/stripe', routeStripe);
 app.use('/api/twilio', routeTwilio);
+app.use('/api/sendgrid', routeSendGrid);
 
 // Error handling middleware
 app.use((error, req, res, next) => {

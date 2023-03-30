@@ -115,6 +115,84 @@ export default function OrderScreen() {
     return actions.order.create(orderData).then((orderId) => orderId);
   };
 
+  //Create the invoice for the user
+  const handleInvoice = async () => {
+    //Give user invoice
+    const itemsInfo = order.orderItems
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item.name} x ${item.quantity} @ $${item.price}`
+      )
+      .join('\n');
+    const detailedMessage = `\nFrom: BEST TRUE VALUE HARDWARE \n\nThank you ${
+      order.shippingInfo.firstName
+    } ${order.shippingInfo.lastName} for shopping. Your order id #${
+      order._id
+    } has been successfully paid.\n\nItems:\n${itemsInfo}\n\nTotal Price: $${order.totalPrice.toFixed(
+      2
+    )}\n\nOnce again thank you for shopping with us!\n`;
+
+    try {
+      // Send the SMS message using the Twilio API
+      const response = await axios.post('/api/twilio/sendSms', {
+        to: order.shippingInfo.phoneNumber,
+        message: detailedMessage,
+      });
+
+      // If the SMS sending is successful, update the order status and close the modal
+      if (response.data.success) {
+        toast.success(
+          'The invoice has been sucessfully sent to customer phone number!'
+        );
+        setShowModal(false);
+        window.scrollTo(0, 0);
+      } else {
+        toast.error(`Error sending SMS: ${response.data.error}`);
+      }
+    } catch (error) {
+      toast.error(`Error sending SMS: ${error.message}`);
+    }
+  };
+
+  const handleEmailInvoice = async () => {
+    //Give user invoice
+    const itemsInfo = order.orderItems
+      .map(
+        (item, index) =>
+          `${index + 1}. ${item.name} x ${item.quantity} @ $${item.price}`
+      )
+      .join('\n');
+    const detailedMessage = `\nFrom: BEST TRUE VALUE HARDWARE \n\nThank you ${
+      order.shippingInfo.firstName
+    } ${order.shippingInfo.lastName} for shopping. Your order id #${
+      order._id
+    } has been successfully paid.\n\nItems:\n${itemsInfo}\n\nTotal Price: $${order.totalPrice.toFixed(
+      2
+    )}\n\nOnce again thank you for shopping with us!\n`;
+
+    try {
+      // Send the Email message using the SendGrid API
+      const response = await axios.post('/api/sendgrid/sendEmail', {
+        to: order.shippingInfo.email,
+        subject: 'Invoice',
+        text: detailedMessage,
+      });
+
+      // If the Email sending is successful, update the order status and close the modal
+      if (response.data.success) {
+        toast.success(
+          'The invoice has been sucessfully sent to customer email address'
+        );
+        setShowModal(false);
+        window.scrollTo(0, 0);
+      } else {
+        toast.error(`Error sending Email: ${response.data.error}`);
+      }
+    } catch (error) {
+      toast.error(`Error sending Email: ${error.message}`);
+    }
+  };
+
   // Function to handle successful payments
   const handleSuccessPayment = async (paymentIntent, orderObj) => {
     try {
@@ -134,6 +212,9 @@ export default function OrderScreen() {
       dispatch({ type: 'PAY_SUCCESS', payload: data });
       // Show a success message
       toast.success('Payment Successful!');
+      //Give invoice to the user
+      handleInvoice();
+      handleEmailInvoice();
     } catch (err) {
       dispatch({ type: 'PAY_FAILURE', payload: getErrorMessage(err) });
       toast.error(getErrorMessage(err));
@@ -157,6 +238,9 @@ export default function OrderScreen() {
       dispatch({ type: 'PAY_SUCCESS', payload: payData });
       // Show a success message
       toast.success('Payment Successful!');
+      //Give invoice to the user
+      handleInvoice();
+      handleEmailInvoice();
     } catch (getErrorMessage) {
       const errorMessage = getErrorMessage(error);
       dispatch({ type: 'PAY_FAILURE', payload: errorMessage });
@@ -202,7 +286,7 @@ export default function OrderScreen() {
   const onConfirm = async (event) => {
     event.preventDefault();
 
-    // Prepare the detailed message to be sent via SMS
+    // Prepare the detailed message to be sent via SMS and Email
     const itemsInfo = order.orderItems
       .map(
         (item, index) =>
@@ -215,6 +299,7 @@ export default function OrderScreen() {
       2
     )}\n\nThank you for shopping with us!\n`;
 
+    //send SMS
     try {
       // Send the SMS message using the Twilio API
       const response = await axios.post('/api/twilio/sendSms', {
@@ -232,6 +317,25 @@ export default function OrderScreen() {
       }
     } catch (error) {
       toast.error(`Error sending SMS: ${error.message}`);
+    }
+
+    // Send Email
+    try {
+      const emailResponse = await axios.post('/api/sendgrid/sendEmail', {
+        to: order.shippingInfo.email,
+        subject: 'Pickup',
+        text: detailedMessage,
+      });
+
+      if (emailResponse.data.success) {
+        toast.success('Email sent successfully');
+        setShowModal(false);
+        window.scrollTo(0, 0);
+      } else {
+        toast.error(`Error sending Email: ${emailResponse.data.error}`);
+      }
+    } catch (error) {
+      toast.error(`Error sending Email: ${error.message}`);
     }
   };
 
@@ -383,6 +487,12 @@ export default function OrderScreen() {
                   <span>
                     <strong>Phone Number: </strong>
                     {order.shippingInfo.phoneNumber}
+                  </span>
+                </div>
+                <div>
+                  <span>
+                    <strong>Email: </strong>
+                    {order.shippingInfo.email}
                   </span>
                 </div>
                 <div>

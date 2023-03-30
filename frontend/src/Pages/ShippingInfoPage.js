@@ -78,11 +78,13 @@ export default function ShippingInfoPage() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [region, setRegion] = useState('');
   const [zip, setZip] = useState('');
   const [showPhoneMessage, setShowPhoneMessage] = useState(false);
+  const [showEmailMessage, setShowEmailMessage] = useState(false);
   const [showZipMessage, setShowZipMessage] = useState(false);
 
   // Use the useEffect hook to set the form inputs to the shipping info stored in the global state
@@ -95,6 +97,7 @@ export default function ShippingInfoPage() {
       setFirstName(userInfo.firstName || '');
       setLastName(userInfo.lastName || '');
       setPhoneNumber(userInfo.phoneNumber || '');
+      setEmail(userInfo.email || '');
       setAddress(shippingInfo.address || '');
       setCity(shippingInfo.city || '');
       setRegion(shippingInfo.region || '');
@@ -113,6 +116,7 @@ export default function ShippingInfoPage() {
         firstName,
         lastName,
         phoneNumber,
+        email,
         address,
         city,
         region,
@@ -127,6 +131,7 @@ export default function ShippingInfoPage() {
         firstName,
         lastName,
         phoneNumber,
+        email,
         address,
         city,
         region,
@@ -141,6 +146,11 @@ export default function ShippingInfoPage() {
   const handlePhoneChange = (e) => {
     setPhoneNumber(e.target.value);
     setShowPhoneMessage(e.target.value.length > 0);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    setShowEmailMessage(e.target.value.length > 0);
   };
 
   // Function to handle zip code input change
@@ -212,12 +222,36 @@ export default function ShippingInfoPage() {
             />
           </div>
 
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              className="form-control"
+              id="email"
+              required
+              onChange={handleEmailChange}
+              value={email}
+              title="Please enter a valid email address."
+            />
+          </div>
+
           {showPhoneMessage && (
             <div className="mb-3 btn-text">
               <Message variant="warning">
                 Please provide a valid cell phone number so that a
                 representative from the store can call you to{' '}
                 <strong>PICKUP</strong> your item(s) when they are ready.
+              </Message>
+            </div>
+          )}
+
+          {showEmailMessage && (
+            <div className="mb-3 btn-text">
+              <Message variant="warning">
+                Please provide a valid email address so that a representative
+                from the store can send you invoice and notification{' '}
               </Message>
             </div>
           )}
