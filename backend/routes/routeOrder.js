@@ -72,7 +72,7 @@ routeOrder.get(
       },
       { $unwind: '$user' },
       { $match: finalFilter },
-      { $sort: { _id: -1 } },
+      { $sort: { isPickupReady: 1, paidAt: -1 } },
       { $skip: pageSize * (page - 1) },
       { $limit: pageSize },
       { $project: { 'user.password': 0 } },
@@ -134,19 +134,27 @@ routeOrder.route('/dashboard').get(
       const now = new Date();
       const boundary = new Date(now);
 
+      let dateFormat;
       // Adjust the boundary date based on the time range
       switch (timeRange) {
+        case 'daily':
+          boundary.setDate(now.getDate() - 3);
+          break;
         case 'weekly':
           boundary.setDate(now.getDate() - 7);
           break;
         case 'monthly':
           boundary.setMonth(now.getMonth() - 1);
+          boundary.setDate(1);
           break;
         case 'yearly':
           boundary.setFullYear(now.getFullYear() - 1);
           break;
         default:
-          boundary.setFullYear(1970);
+          boundary.setFullYear(2023);
+          boundary.setMonth(1);
+          boundary.setDate(1);
+          break;
       }
 
       return boundary;
@@ -173,50 +181,7 @@ routeOrder.route('/dashboard').get(
         // Add a field with the converted date based on the time range
         $addFields: {
           convertedDate: {
-            $switch: {
-              // Different branches for each time range
-              branches: [
-                {
-                  case: { $eq: [timeRange, 'yearly'] },
-                  then: { $dateToString: { format: '%Y-%m', date: '$paidAt' } },
-                },
-                {
-                  case: { $eq: [timeRange, 'monthly'] },
-                  then: {
-                    $dateToString: { format: '%Y-%m-%d', date: '$paidAt' },
-                  },
-                },
-                {
-                  case: { $eq: [timeRange, 'weekly'] },
-                  then: {
-                    $dateToString: {
-                      format: '%Y-%m-%d',
-                      date: {
-                        $subtract: [
-                          '$paidAt',
-                          {
-                            $multiply: [
-                              86400000,
-                              { $mod: [{ $dayOfWeek: '$paidAt' }, 7] },
-                            ],
-                          },
-                        ],
-                      },
-                    },
-                  },
-                },
-                {
-                  case: { $eq: [timeRange, 'all'] },
-                  then: {
-                    $dateToString: { format: '%Y-%m-%d', date: '$paidAt' },
-                  },
-                },
-              ],
-              // Default case
-              default: {
-                $dateToString: { format: '%Y-%m-%d', date: '$paidAt' },
-              },
-            },
+            $dateToString: { format: '%Y-%m-%d', date: '$paidAt' },
           },
         },
       },
@@ -232,6 +197,31 @@ routeOrder.route('/dashboard').get(
       // Sort by date
       { $sort: { _id: 1 } },
     ]);
+
+    // After sorting, fill in the missing dates with zero sales and orders
+    let currentDate = new Date(dateBoundary);
+    let filledDailyOrders = [];
+    dailyOrders.forEach((dailyOrder) => {
+      while (currentDate.toISOString().slice(0, 10) !== dailyOrder._id) {
+        filledDailyOrders.push({
+          _id: currentDate.toISOString().slice(0, 10),
+          orders: 0,
+          sales: 0,
+        });
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      filledDailyOrders.push(dailyOrder);
+      currentDate.setDate(currentDate.getDate() + 1);
+    });
+
+    while (currentDate <= new Date()) {
+      filledDailyOrders.push({
+        _id: currentDate.toISOString().slice(0, 10),
+        orders: 0,
+        sales: 0,
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
 
     // Aggregation pipeline to get total orders and sales
     const orders = await Order.aggregate([
@@ -378,7 +368,7 @@ routeOrder.route('/dashboard').get(
     res.send({
       users: users.length ? users : [{ numUsers: 0 }],
       orders: orders.length ? orders : [{ numOrders: 0, totalSales: 0 }],
-      dailyOrders,
+      dailyOrders: filledDailyOrders,
       productDepartments,
       revenueByDepartment,
       newReturningCustomers,

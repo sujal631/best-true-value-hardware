@@ -27,9 +27,7 @@ const actionsMap = {
   // Sorts the orders by whether they are ready for pickup or not, and set the loading state to false
   SUCCESS: (state, action) => ({
     ...state,
-    orders: action.payload.orders.sort(
-      (a, b) => a.isPickupReady - b.isPickupReady
-    ),
+    orders: action.payload.orders,
     pages: action.payload.pages,
     loading: false,
   }),

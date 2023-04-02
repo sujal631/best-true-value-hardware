@@ -141,9 +141,6 @@ export default function OrderScreen() {
 
       // If the SMS sending is successful, update the order status and close the modal
       if (response.data.success) {
-        toast.success(
-          'The invoice has been sucessfully sent to customer phone number!'
-        );
         setShowModal(false);
         window.scrollTo(0, 0);
       } else {
@@ -180,9 +177,6 @@ export default function OrderScreen() {
 
       // If the Email sending is successful, update the order status and close the modal
       if (response.data.success) {
-        toast.success(
-          'The invoice has been sucessfully sent to customer email address'
-        );
         setShowModal(false);
         window.scrollTo(0, 0);
       } else {
@@ -328,7 +322,6 @@ export default function OrderScreen() {
       });
 
       if (emailResponse.data.success) {
-        toast.success('Email sent successfully');
         setShowModal(false);
         window.scrollTo(0, 0);
       } else {
