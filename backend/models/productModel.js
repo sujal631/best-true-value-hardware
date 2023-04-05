@@ -1,6 +1,17 @@
 // Import the mongoose library
 import mongoose from 'mongoose';
-
+// Define the product schema using the mongoose schema constructor
+const reviewSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    rating: { type: Number, required: true },
+    title: { type: String, required: true },
+    comment: { type: String, required: true },
+  },
+  {
+    timestamps: true,
+  }
+);
 // Define the product schema using the mongoose schema constructor
 const productSchema = new mongoose.Schema(
   {
@@ -56,6 +67,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    reviews: [reviewSchema],
   },
   {
     // Enable timestamps for the schema

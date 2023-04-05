@@ -388,6 +388,11 @@ body {
   margin-top: 12px;
 }
 
+.text-bold {
+  font-weight: 800;
+  color: #bb0000;
+}
+
 @media (max-width: 767px) {
   .btn-text {
     font-size: 12px;

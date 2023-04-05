@@ -135,6 +135,47 @@ routeProduct.delete(
   expressAsyncHandler(deleteProduct)
 );
 
+routeProduct.post(
+  '/:id/reviews',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    if (product) {
+      if (
+        product.reviews.find(
+          (x) => x.name === `${req.user.firstName} ${req.user.lastName}`
+        )
+      ) {
+        return res
+          .status(400)
+          .send({ message: 'You can only submit one review per product.' });
+      }
+
+      const review = {
+        name: `${req.user.firstName} ${req.user.lastName}`,
+        rating: Number(req.body.rating),
+        title: req.body.title,
+        comment: req.body.comment,
+      };
+      product.reviews.push(review);
+      product.numReviews = product.reviews.length;
+      product.rating =
+        product.reviews.reduce((a, c) => c.rating + a, 0) /
+        product.reviews.length;
+      const updatedProduct = await product.save();
+      res.status(201).send({
+        message: 'Review Created',
+        review: updatedProduct.reviews[updatedProduct.reviews.length - 1],
+        numReviews: product.numReviews,
+        rating: product.rating,
+      });
+    } else {
+      res.status(404).send({ message: 'Product Not Found' });
+    }
+  })
+);
+
 const PAGE_SIZE = 10;
 //Route handler to get all products for admin view
 routeProduct.get(
@@ -191,6 +232,108 @@ routeProduct.get(
     }
   })
 );
+
+const SEARCH_PAGE_SIZE = 9;
+routeProduct.get(
+  '/search',
+  expressAsyncHandler(async (req, res) => {
+    const { query } = req;
+    const pageSize = query.pageSize || SEARCH_PAGE_SIZE;
+    const page = query.page || 1;
+    const department = query.department || '';
+    const price = query.price || '';
+    const rating = query.rating || '';
+    const order = query.order || '';
+    const searchQuery = query.query || '';
+
+    const queryFilter =
+      searchQuery && searchQuery !== 'all'
+        ? {
+            name: {
+              $regex: searchQuery,
+              $options: 'i',
+            },
+          }
+        : {};
+    const departmentFilter =
+      department && department !== 'all' ? { department } : {};
+    const ratingFilter =
+      rating && rating !== 'all'
+        ? {
+            rating: {
+              $gte: Number(rating),
+            },
+          }
+        : {};
+    const priceFilter =
+      price && price !== 'all'
+        ? {
+            // 1-50
+            price: {
+              $gte: Number(price.split('-')[0]),
+              $lte: Number(price.split('-')[1]),
+            },
+          }
+        : {};
+    const sortOrder =
+      order === 'lowest'
+        ? { price: 1 }
+        : order === 'highest'
+        ? { price: -1 }
+        : order === 'toprated'
+        ? { numReviews: -1 }
+        : order === 'newest'
+        ? { createdAt: -1 }
+        : { _id: -1 };
+
+    const products = await Product.find({
+      ...queryFilter,
+      ...departmentFilter,
+      ...priceFilter,
+      ...ratingFilter,
+    })
+      .sort(sortOrder)
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+
+    const countProducts = await Product.countDocuments({
+      ...queryFilter,
+      ...departmentFilter,
+      ...priceFilter,
+      ...ratingFilter,
+    });
+    res.send({
+      products,
+      countProducts,
+      page,
+      pages: Math.ceil(countProducts / pageSize),
+    });
+  })
+);
+
+routeProduct.get(
+  '/departments',
+  expressAsyncHandler(async (req, res) => {
+    const departments = await Product.find().distinct('department');
+    res.send(departments);
+  })
+);
+routeProduct.get('/slug/:slug', async (req, res) => {
+  const product = await Product.findOne({ slug: req.params.slug });
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: 'Product Not Found' });
+  }
+});
+routeProduct.get('/:id', async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: 'Product Not Found' });
+  }
+});
 
 // Route handler to fetch a specific product by its slug
 routeProduct.get('/slug/:slug', async (req, res) => {

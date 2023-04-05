@@ -1,8 +1,22 @@
 //Import necessary modules and dependencies
 import axios from 'axios';
-import React, { useState, useEffect, useContext } from 'react';
-import { Col, ListGroup, Badge, Card, Button, Row } from 'react-bootstrap';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useReducer,
+} from 'react';
+import {
+  Col,
+  ListGroup,
+  Badge,
+  Card,
+  Button,
+  Row,
+  Form,
+} from 'react-bootstrap';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Rating from '../Components/Rating';
 import { Helmet } from 'react-helmet-async';
 import { getErrorMessage } from '../utils';
@@ -10,16 +24,80 @@ import LoadingSpinner from '../Components/LoadingComponent';
 import Message from '../Components/MessageComponent';
 import { Store } from '../Store';
 import ReactModal from 'react-modal';
+import { toast } from 'react-toastify';
+import StarRatings from 'react-rating-stars-component';
+import ReviewComponent from '../Components/Review';
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'REFRESH':
+      return { ...state, product: action.payload };
+    case 'REVIEW_REQUEST':
+      return { ...state, loadingReview: true };
+    case 'REVIEW_SUCCESS':
+      return { ...state, loadingReview: false };
+    case 'REVIEW_FAILURE':
+      return { ...state, loadingReview: false };
+    case 'REQUEST':
+      return { ...state, loading: true };
+    case 'SUCCESS':
+      return { ...state, product: action.payload, loading: false };
+    case 'FAILURE':
+      return { ...state, loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
 
 const ProductDetailsPage = () => {
+  let customerReviews = useRef();
+
   const navigate = useNavigate();
   // useParams hook to retrieve the product's slug from the URL
   const { slug } = useParams();
-  // useState hook to store the product data, loading state, and error message
-  const [product, setProduct] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [title, setTitle] = useState('');
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+
+  const [{ loading, error, product, loadingReview }, dispatch] = useReducer(
+    reducer,
+    {
+      product: [],
+      loading: true,
+      error: '',
+    }
+  );
+
+  const openReviewModal = () => {
+    setShowReviewModal(true);
+  };
+
+  const closeReviewModal = () => {
+    setShowReviewModal(false);
+  };
+
+  const reviewCustomStyles = {
+    overlay: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    content: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      minWidth: '300px',
+      maxWidth: '800px',
+      height: '620px',
+      padding: '20px',
+      backgroundColor: '#f5f5f5',
+      borderRadius: '4px',
+      border: '1px solid #ccc',
+    },
+  };
 
   const customStyles = {
     overlay: {
@@ -43,22 +121,21 @@ const ProductDetailsPage = () => {
 
   // useEffect hook to fetch the product data based on the slug
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`/api/products/slug/${slug}`)
-      .then((res) => {
-        setProduct(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(getErrorMessage(err));
-        setLoading(false);
-      });
+    const fetchData = async () => {
+      dispatch({ type: 'REQUEST' });
+      try {
+        const result = await axios.get(`/api/products/slug/${slug}`);
+        dispatch({ type: 'SUCCESS', payload: result.data });
+      } catch (err) {
+        dispatch({ type: 'FAILURE', payload: getErrorMessage(err) });
+      }
+    };
+    fetchData();
   }, [slug]);
 
   // Access the state and dispatch from the Store context
   const { state, dispatch: ctxDispatch } = useContext(Store);
-  const { cart } = state;
+  const { cart, userInfo } = state;
 
   // Function to check the stock availability of a product
   const checkStockAvailability = async (productId, quantity) => {
@@ -96,6 +173,48 @@ const ProductDetailsPage = () => {
   if (loading) return <LoadingSpinner />;
   if (error) return <Message variant="danger">{error}</Message>;
 
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    if (!comment || !rating || !title) {
+      toast.error('Please enter a rating, review title, and comment.');
+      return;
+    }
+    try {
+      console.log(userInfo);
+      const { data } = await axios.post(
+        `/api/products/${product._id}/reviews`,
+        {
+          rating,
+          title,
+          comment,
+          name: `${userInfo.firstName} ${userInfo.lastName}`,
+        },
+        {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+
+      dispatch({
+        type: 'REVIEW_SUCCESS',
+      });
+      toast.success('Review submitted successfully');
+      product.reviews.unshift(data.review);
+      product.numReviews = data.numReviews;
+      product.rating = data.rating;
+      dispatch({ type: 'REFRESH', payload: product });
+      setRating(0); // Reset rating
+      setTitle(''); // Reset title
+      setComment(''); // Reset comment
+      closeReviewModal(); // Close the review modal
+      window.scrollTo({
+        behavior: 'smooth',
+        top: customerReviews.current.offsetTop,
+      });
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      dispatch({ type: 'REVIEW_FAILURE' });
+    }
+  };
   return (
     <>
       {/* Update the page title with the product name */}
@@ -166,6 +285,88 @@ const ProductDetailsPage = () => {
           </Card>
         </Col>
       </Row>
+      <div className="mt-5">
+        <h4 ref={customerReviews}>Customer Reviews</h4>
+        <div className="my-3">
+          {userInfo ? (
+            <>
+              <div>
+                <Button
+                  variant="primary"
+                  onClick={openReviewModal}
+                  className="mb-2"
+                >
+                  Write a Review
+                </Button>
+              </div>
+              <ReactModal
+                isOpen={showReviewModal}
+                onRequestClose={closeReviewModal}
+                style={reviewCustomStyles}
+              >
+                <form onSubmit={handleSubmitForm}>
+                  <h4>Write a review: </h4>
+                  <Form.Group className="mb-3" controlId="rating">
+                    <Form.Label>
+                      <strong>How would you rate this product?</strong>
+                    </Form.Label>
+                    <StarRatings
+                      count={5}
+                      value={rating}
+                      onChange={(newRating) => setRating(newRating)}
+                      size={48}
+                      activeColor="#bb0000"
+                      isHalf={false}
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="reviewTitle">
+                    <Form.Label>
+                      <strong>Title your review</strong>
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="What's most important to know?"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                    ></Form.Control>
+                  </Form.Group>
+                  <Form.Label>
+                    <strong>Write your review</strong>
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    placeholder="What did you like or dislike? What did you use this product for?"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    style={{ minHeight: '200px' }}
+                  ></Form.Control>
+
+                  <div className="mt-4 d-flex justify-content-center gap-5">
+                    <Button
+                      disabled={loadingReview}
+                      type="submit"
+                      variant="warning"
+                    >
+                      CONFIRM
+                    </Button>
+                    <Button onClick={closeReviewModal}>CANCEL</Button>
+                    {loadingReview && <LoadingSpinner />}
+                  </div>
+                </form>
+              </ReactModal>
+            </>
+          ) : (
+            <Message variant="warning">
+              Yoe need to{' '}
+              <Link to="/login" className="remove-link-style">
+                <strong>LOG IN</strong>{' '}
+              </Link>
+              to review this product.
+            </Message>
+          )}
+        </div>
+        <ReviewComponent reviews={product.reviews} userInfo={userInfo} />
+      </div>
     </>
   );
 };

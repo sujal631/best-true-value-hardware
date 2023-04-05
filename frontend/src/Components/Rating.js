@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Function component for displaying the rating of a product
-const Rating = ({ rating, numReviews }) => {
+const Rating = ({ rating, numReviews, caption }) => {
   // Map over the range of 1 to 5 to display the stars for the rating
   const stars = Array.from({ length: 5 }, (_, i) => i + 1).map(
     (star, index) => (
@@ -26,7 +26,11 @@ Otherwise, render an empty star. */}
   return (
     <div className="rating">
       {stars}
-      <span> {numReviews}</span>
+      {caption ? (
+        <span>{caption}</span>
+      ) : (
+        <span>{' ' + numReviews + ' reviews'}</span>
+      )}
     </div>
   );
 };

@@ -5,9 +5,11 @@ import jwt from 'jsonwebtoken';
 const secretKey = `${process.env.JWT_SECRET_KEY}`;
 
 // Create a function to generate a token based on a user's information
-export const generateToken = ({ _id, name, email, isAdmin }) =>
+export const generateToken = ({ _id, firstName, lastName, email, isAdmin }) =>
   // Use the sign() method to create a token
-  jwt.sign({ _id, name, email, isAdmin }, secretKey, { expiresIn: '30d' });
+  jwt.sign({ _id, firstName, lastName, email, isAdmin }, secretKey, {
+    expiresIn: '30d',
+  });
 
 // Create a middleware function to authenticate user requests
 export const isAuth = (req, res, next) => {
