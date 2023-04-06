@@ -124,8 +124,9 @@ export default function PreviewOrderPage() {
                 </div>
               </Card.Text>
               <Button
-                className="mb-1"
-                variant="secondary"
+                className="btn btn-outline-success btn-text mb-1"
+                style={{ padding: '2px 5px' }}
+                variant="light"
                 as={Link}
                 to="/shippingInfo"
               >
@@ -140,8 +141,9 @@ export default function PreviewOrderPage() {
                 {cart.paymentMethod}
               </Card.Text>
               <Button
-                className="mb-1"
-                variant="secondary"
+                className="btn btn-outline-success btn-text mb-1"
+                style={{ padding: '2px 5px' }}
+                variant="light"
                 as={Link}
                 to="/paymentMethod"
               >
@@ -184,7 +186,13 @@ export default function PreviewOrderPage() {
                   );
                 })}
               </ListGroup>
-              <Button variant="secondary" className="mt-3" as={Link} to="/cart">
+              <Button
+                className="btn btn-outline-success btn-text mt-3"
+                style={{ padding: '2px 5px' }}
+                variant="light"
+                as={Link}
+                to="/cart"
+              >
                 Edit
               </Button>
             </Card.Body>

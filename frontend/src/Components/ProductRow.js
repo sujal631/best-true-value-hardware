@@ -34,9 +34,10 @@ function ProductRow({ products, onEdit, onDelete }) {
               <td>
                 {/* Add Edit button for each product */}
                 <Button
-                  className="btn-text mb-1"
+                  variant="light"
+                  className="btn btn-outline-success btn-text mb-1"
+                  style={{ padding: '2px 5px' }}
                   type="button"
-                  variant="secondary"
                   onClick={() => onEdit(_id)}
                 >
                   Edit
@@ -44,11 +45,11 @@ function ProductRow({ products, onEdit, onDelete }) {
                 <span style={{ margin: '5px' }}> </span>
                 {/* Add Delete button for each product */}
                 <Button
-                  className="btn-text mb-1"
+                  className="btn btn-outline-danger btn-text mb-1"
+                  style={{ padding: '2px 12px' }}
                   type="button"
-                  variant="primary"
+                  variant="light"
                   onClick={() => onDelete(product)}
-                  style={{ padding: '7px 19px' }}
                 >
                   <i className="fa fa-trash "></i>
                 </Button>

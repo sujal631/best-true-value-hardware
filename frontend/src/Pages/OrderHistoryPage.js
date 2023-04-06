@@ -149,9 +149,10 @@ export default function OrderHistoryPage() {
                   <td>
                     {/* Navigates to the OrderPage.js when the button is clicked */}
                     <Button
-                      className="btn-text"
+                      variant="light"
+                      className="btn btn-outline-success btn-text mb-1"
+                      style={{ padding: '2px 5px' }}
                       type="button"
-                      variant="secondary"
                       onClick={() => handleDetailsClick(order._id)}
                     >
                       Details

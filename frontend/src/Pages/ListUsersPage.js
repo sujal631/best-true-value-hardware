@@ -321,20 +321,20 @@ export default function ListUsersPage() {
                     {email !== 'btvh@owner.com' &&
                       (!isAdmin ? (
                         <Button
-                          className="btn-text mb-1"
-                          variant="secondary"
+                          className="btn btn-outline-success btn-text mb-1"
+                          style={{ padding: '2px 16px' }}
+                          variant="light"
                           onClick={() => openModal('makeAdmin', user)}
-                          style={{ padding: '7px 19px', textTransform: 'none' }}
                           disabled={userInfo.email !== 'btvh@owner.com'}
                         >
                           Make Admin
                         </Button>
                       ) : (
                         <Button
-                          className="btn-text mb-1"
-                          variant="primary"
+                          className="btn btn-outline-danger btn-text mb-1"
+                          style={{ padding: '2px 5px' }}
+                          variant="light"
                           onClick={() => openModal('changeToUser', user)}
-                          style={{ padding: '7px 7px', textTransform: 'none' }}
                           disabled={userInfo.email !== 'btvh@owner.com'}
                         >
                           Change to User

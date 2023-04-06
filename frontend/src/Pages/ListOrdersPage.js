@@ -201,9 +201,10 @@ const ListOrdersPage = () => {
                   </td>
                   <td>
                     <Button
-                      className="btn-text"
+                      className="btn btn-outline-success btn-text mb-1"
+                      style={{ padding: '2px 5px' }}
                       type="button"
-                      variant="secondary"
+                      variant="light"
                       onClick={() => {
                         navigate(`/order/${_id}`);
                       }}

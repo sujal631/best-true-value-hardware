@@ -177,8 +177,10 @@ export default function ShoppingCartPage() {
                     <Col xs={12} lg={4} className="mb-1 ">
                       {/* Remove item button */}
                       <Button
+                        className="btn btn-outline-danger"
                         onClick={() => handleRemoveItem(item)}
                         variant="light"
+                        style={{ padding: '0px 5px' }}
                       >
                         <i className="fa fa-trash btn-text">
                           {' '}
@@ -195,7 +197,8 @@ export default function ShoppingCartPage() {
                       {/* Decrease and increase item quantity buttons */}
                       <Button
                         variant="light"
-                        className="btn-text"
+                        className="btn btn-outline-danger btn-text"
+                        style={{ padding: '2px 5px' }}
                         disabled={item.quantity === 1}
                         onClick={() =>
                           handleUpdateCart(item, item.quantity - 1)
@@ -208,7 +211,8 @@ export default function ShoppingCartPage() {
                       </span>{' '}
                       <Button
                         variant="light"
-                        className="btn-text"
+                        className="btn btn-outline-success btn-text"
+                        style={{ padding: '2px 5px' }}
                         disabled={item.quantity === item.countInStock}
                         onClick={() =>
                           handleUpdateCart(item, item.quantity + 1)
