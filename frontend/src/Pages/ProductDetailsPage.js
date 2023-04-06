@@ -59,6 +59,7 @@ const ProductDetailsPage = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [title, setTitle] = useState('');
+  const [refresh, setRefresh] = useState(false);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -131,7 +132,7 @@ const ProductDetailsPage = () => {
       }
     };
     fetchData();
-  }, [slug]);
+  }, [slug, refresh]);
 
   // Access the state and dispatch from the Store context
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -180,7 +181,6 @@ const ProductDetailsPage = () => {
       return;
     }
     try {
-      console.log(userInfo);
       const { data } = await axios.post(
         `/api/products/${product._id}/reviews`,
         {
@@ -210,6 +210,7 @@ const ProductDetailsPage = () => {
         behavior: 'smooth',
         top: customerReviews.current.offsetTop,
       });
+      setRefresh(!refresh);
     } catch (error) {
       toast.error(getErrorMessage(error));
       dispatch({ type: 'REVIEW_FAILURE' });
@@ -365,7 +366,12 @@ const ProductDetailsPage = () => {
             </Message>
           )}
         </div>
-        <ReviewComponent reviews={product.reviews} userInfo={userInfo} />
+        <ReviewComponent
+          reviews={product.reviews}
+          userInfo={userInfo}
+          productId={product._id}
+          token={userInfo.token}
+        />
       </div>
     </>
   );

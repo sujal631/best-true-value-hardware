@@ -153,6 +153,7 @@ routeProduct.post(
       }
 
       const review = {
+        user: req.user._id,
         name: `${req.user.firstName} ${req.user.lastName}`,
         rating: Number(req.body.rating),
         title: req.body.title,
@@ -172,6 +173,86 @@ routeProduct.post(
       });
     } else {
       res.status(404).send({ message: 'Product Not Found' });
+    }
+  })
+);
+
+routeProduct.get(
+  '/likes-dislikes',
+  expressAsyncHandler(async (req, res) => {
+    const products = await Product.find({});
+    const likesDislikes = products.reduce(
+      (acc, product) => {
+        product.reviews.forEach((review) => {
+          acc.likes[review._id] = review.likes.length;
+          acc.dislikes[review._id] = review.dislikes.length;
+        });
+        return acc;
+      },
+      {
+        likes: {},
+        dislikes: {},
+      }
+    );
+
+    res.status(200).send(likesDislikes);
+  })
+);
+
+routeProduct.put(
+  '/:id/reviews/:reviewId/like',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    const review = product.reviews.find(
+      (r) => r._id.toString() === req.params.reviewId
+    );
+    if (!review) {
+      res.status(404).send({ message: 'Review not found' });
+    } else {
+      if (!review.likes.includes(req.user._id)) {
+        review.likes.push(req.user._id);
+        if (review.dislikes.includes(req.user._id)) {
+          review.dislikes.pull(req.user._id);
+        }
+      } else {
+        review.likes.pull(req.user._id);
+      }
+      const updatedProduct = await product.save();
+      res.status(200).send({
+        message: 'Review like updated',
+        updatedLikes: review.likes,
+        updatedDislikes: review.dislikes,
+      });
+    }
+  })
+);
+
+routeProduct.put(
+  '/:id/reviews/:reviewId/dislike',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    const review = product.reviews.find(
+      (r) => r._id.toString() === req.params.reviewId
+    );
+    if (!review) {
+      res.status(404).send({ message: 'Review not found' });
+    } else {
+      if (!review.dislikes.includes(req.user._id)) {
+        review.dislikes.push(req.user._id);
+        if (review.likes.includes(req.user._id)) {
+          review.likes.pull(req.user._id);
+        }
+      } else {
+        review.dislikes.pull(req.user._id);
+      }
+      const updatedProduct = await product.save();
+      res.status(200).send({
+        message: 'Review dislike updated',
+        updatedLikes: review.likes,
+        updatedDislikes: review.dislikes,
+      });
     }
   })
 );
