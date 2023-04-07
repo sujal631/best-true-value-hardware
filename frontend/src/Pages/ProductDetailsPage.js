@@ -81,6 +81,11 @@ const ProductDetailsPage = () => {
     setShowReviewModal(false);
   };
 
+  const userHasWrittenReview = () => {
+    if (!userInfo) return false;
+    return product.reviews.some((review) => review.user === userInfo._id);
+  };
+
   const reviewCustomStyles = {
     overlay: {
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -176,8 +181,8 @@ const ProductDetailsPage = () => {
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
-    if (!comment || !rating || !title) {
-      toast.error('Please enter a rating, review title, and comment.');
+    if (!rating) {
+      toast.error('Please enter a rating for this product.');
       return;
     }
     try {
@@ -197,7 +202,6 @@ const ProductDetailsPage = () => {
       dispatch({
         type: 'REVIEW_SUCCESS',
       });
-      toast.success('Review submitted successfully');
       product.reviews.unshift(data.review);
       product.numReviews = data.numReviews;
       product.rating = data.rating;
@@ -252,7 +256,7 @@ const ProductDetailsPage = () => {
               <br />
               {/* Display the product description */}
               <strong>Description:</strong>
-              <p>{product.description}</p>
+              <p style={{ whiteSpace: 'pre-line' }}>{product.description}</p>
             </ListGroup.Item>
           </ListGroup>
           <Card>
@@ -289,7 +293,7 @@ const ProductDetailsPage = () => {
       <div className="mt-5">
         <h4 ref={customerReviews}>Customer Reviews</h4>
         <div className="my-3">
-          {userInfo ? (
+          {userInfo && !userHasWrittenReview() ? (
             <>
               <div>
                 <Button
@@ -356,9 +360,11 @@ const ProductDetailsPage = () => {
                 </form>
               </ReactModal>
             </>
+          ) : userInfo ? (
+            <></>
           ) : (
             <Message variant="warning">
-              Yoe need to{' '}
+              You need to{' '}
               <Link to="/login" className="remove-link-style">
                 <strong>LOG IN</strong>{' '}
               </Link>
@@ -370,7 +376,7 @@ const ProductDetailsPage = () => {
           reviews={product.reviews}
           userInfo={userInfo}
           productId={product._id}
-          token={userInfo.token}
+          token={userInfo?.token}
         />
       </div>
     </>

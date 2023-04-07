@@ -28,14 +28,17 @@ export default function Footer() {
         <Row>
           {/* Nav Links */}
           <Col sm={12} md={8}>
-            <p className="text-center footer-text my-2">
+            <p
+              className="footer-text my-2"
+              style={{ fontSize: '0.9rem', textAlign: 'left' }}
+            >
               &copy; {new Date().getFullYear()} Best True Value Hardware. All
               rights reserved. Developed by Joshi & Dev
             </p>
           </Col>
           {/* Social Media Links */}
           <Col sm={12} md={4}>
-            <ul className="list-inline mb-2">
+            <ul className="list-inline mb-2" style={{ textAlign: 'right' }}>
               <li className="list-inline-item px-2">
                 <a
                   href="https://www.facebook.com/TrueValue"

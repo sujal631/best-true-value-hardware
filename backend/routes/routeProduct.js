@@ -257,6 +257,37 @@ routeProduct.put(
   })
 );
 
+routeProduct.delete(
+  '/:id/reviews/:reviewId',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const product = await Product.findById(req.params.id);
+    const reviewIndex = product.reviews.findIndex(
+      (r) => r._id.toString() === req.params.reviewId
+    );
+
+    if (reviewIndex === -1) {
+      res.status(404).send({ message: 'Review not found' });
+    } else {
+      const review = product.reviews[reviewIndex];
+
+      // Check if the user is the author of the review
+      if (review.user.toString() === req.user._id.toString()) {
+        product.reviews.splice(reviewIndex, 1);
+        const updatedProduct = await product.save();
+        res.status(200).send({
+          message: 'Review deleted',
+          updatedReviews: updatedProduct.reviews,
+        });
+      } else {
+        res
+          .status(403)
+          .send({ message: 'Not authorized to delete this review' });
+      }
+    }
+  })
+);
+
 const PAGE_SIZE = 10;
 //Route handler to get all products for admin view
 routeProduct.get(

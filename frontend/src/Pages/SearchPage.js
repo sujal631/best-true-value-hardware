@@ -312,7 +312,7 @@ export default function SearchPage() {
       </Row>
       <Pagination
         totalPosts={countProducts}
-        postsPerPage={8}
+        postsPerPage={9}
         setCurrentPage={(newPage) => navigate(getFilterUrl({ page: newPage }))}
         currentPage={Number(page)}
       />

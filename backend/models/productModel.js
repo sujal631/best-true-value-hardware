@@ -7,8 +7,8 @@ const reviewSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: true },
     rating: { type: Number, required: true },
-    title: { type: String, required: true },
-    comment: { type: String, required: true },
+    title: { type: String, required: false },
+    comment: { type: String, required: false },
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
