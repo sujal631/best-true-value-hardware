@@ -33,6 +33,7 @@ import ProductsPage from './Pages/ProductsPage';
 import ScrollToTop from './Components/ScrollToTop';
 import UserAuthorizedAccess from './Components/UserAuthorizedAccess';
 import AdminAuthorizedAccess from './Components/AdminAuthorizedAccess';
+import AdminSliderImages from './Components/AdminSliderImages';
 
 // Main App component that contains all the routes
 const App = () => {
@@ -128,6 +129,14 @@ const App = () => {
                 element={
                   <AdminAuthorizedAccess>
                     <EditProductPage />
+                  </AdminAuthorizedAccess>
+                }
+              />
+              <Route
+                path="/admin/sliderImages"
+                element={
+                  <AdminAuthorizedAccess>
+                    <AdminSliderImages />
                   </AdminAuthorizedAccess>
                 }
               />

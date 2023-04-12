@@ -94,6 +94,12 @@ export default function Navigation() {
           >
             <NavDropdown.Item>Users</NavDropdown.Item>
           </LinkContainer>
+          <LinkContainer
+            to="/admin/sliderImages"
+            onClick={() => setExpanded(false)}
+          >
+            <NavDropdown.Item>Slider Images</NavDropdown.Item>
+          </LinkContainer>
           <NavDropdown.Divider />
           {/*Admin Log Out link */}
           <Link className="dropdown-item" to="/" onClick={logout}>

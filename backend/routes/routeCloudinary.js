@@ -59,6 +59,8 @@ routeCloudinary.post(
       // Send the result back to the client
       res.send(result);
     } catch (error) {
+      console.error('Error uploading image:', error);
+
       res.status(500).send({ message: 'Internal Server Error', error });
     }
   }
