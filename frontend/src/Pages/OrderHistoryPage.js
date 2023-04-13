@@ -50,7 +50,14 @@ export default function OrderHistoryPage() {
 
   // Function to format date string to show only the first 10 characters
   function formatDate(dateString) {
-    return dateString.substring(0, 10);
+    const date = new Date(dateString);
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    return formatter.format(date);
   }
 
   // Function to determine if order is paid

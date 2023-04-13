@@ -138,17 +138,17 @@ routeOrder.route('/dashboard').get(
       // Adjust the boundary date based on the time range
       switch (timeRange) {
         case 'daily':
-          boundary.setDate(now.getDate() - 3);
+          boundary.setDate(now.getDate() - 1);
           break;
         case 'weekly':
-          boundary.setDate(now.getDate() - 7);
+          boundary.setDate(now.getDate() - 6);
           break;
         case 'monthly':
-          boundary.setMonth(now.getMonth() - 1);
           boundary.setDate(1);
           break;
         case 'yearly':
-          boundary.setFullYear(now.getFullYear() - 1);
+          boundary.setMonth(0); // Set the boundary to the first month of the current year
+          boundary.setDate(1); // Set the boundary to the first day of the current year
           break;
         default:
           boundary.setFullYear(2023);
@@ -323,12 +323,6 @@ routeOrder.route('/dashboard').get(
         },
       },
       {
-        // Filter orders within the date boundary
-        $match: {
-          paidAt: { $gte: dateBoundary },
-        },
-      },
-      {
         // Group by user and count orders
         $group: {
           _id: '$user',
@@ -492,7 +486,21 @@ routeOrder.route('/:id/pay').put(
     if (order) {
       // If order exists, update payment status and payment details
       order.isPaid = true;
-      order.paidAt = Date.now();
+
+      const currentDate = new Date();
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      });
+      const formattedDate = formatter.format(currentDate);
+      order.paidAt = new Date(formattedDate);
+
       order.paymentResult = {
         id: req.body.id,
         status: req.body.status,

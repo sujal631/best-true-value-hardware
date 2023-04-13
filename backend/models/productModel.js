@@ -1,20 +1,25 @@
 // Import the mongoose library
 import mongoose from 'mongoose';
 import User from '../models/userModel.js';
+
 // Define the product schema using the mongoose schema constructor
 const reviewSchema = new mongoose.Schema(
   {
+    // The user who wrote the review, reference to User model
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    // The name of the user who wrote the review
     name: { type: String, required: true },
     rating: { type: Number, required: true },
     title: { type: String, required: false },
     comment: { type: String, required: false },
+    // An array of user references who liked the review
     likes: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
       },
     ],
+    // An array of user references who disliked the review
     dislikes: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,3 +1,4 @@
+// Import necessary libraries and components
 import React, { useState, useEffect } from 'react';
 import { ListGroup } from 'react-bootstrap';
 import Message from '../Components/MessageComponent';
@@ -7,6 +8,7 @@ import ReactModal from 'react-modal';
 import { Button } from 'react-bootstrap';
 
 const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
+  // Initialize state variables
   const [likes, setLikes] = useState({});
   const [dislikes, setDislikes] = useState({});
   const [updatedReviews, setUpdatedReviews] = useState(reviews);
@@ -14,6 +16,7 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [expandedComments, setExpandedComments] = useState({});
 
+  // Fetch likes and dislikes when the component mounts
   useEffect(() => {
     const fetchLikesDislikes = async () => {
       const response = await axios.get('/api/products/likes-dislikes');
@@ -24,6 +27,7 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
     fetchLikesDislikes();
   }, []);
 
+  // Handle like action for a review
   const handleLike = async (event, reviewId) => {
     event.preventDefault();
 
@@ -54,6 +58,7 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
     );
   };
 
+  // Handle dislike action for a review
   const handleDislike = async (event, reviewId) => {
     event.preventDefault();
 
@@ -84,15 +89,18 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
     );
   };
 
+  // Open the delete review confirmation modal
   const handleOpenDeleteModal = (reviewId) => {
     setReviewToDelete(reviewId);
     setShowDeleteModal(true);
   };
 
+  // Close the delete review confirmation modal
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
   };
 
+  // Handle deleting a review
   const handleDeleteReview = async () => {
     // Delete review using the reviewToDelete variable
     await axios.delete(`/api/products/${productId}/reviews/${reviewToDelete}`, {
@@ -104,6 +112,8 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
     handleCloseDeleteModal();
     refreshPage();
   };
+
+  // Toggle the expanded state of a comment
   const toggleExpandedComment = (reviewId) => {
     setExpandedComments({
       ...expandedComments,
@@ -111,6 +121,7 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
     });
   };
 
+  // Render a comment with a character limit
   const renderComment = (comment, limit) => {
     const lines = comment.split('\n');
     if (lines.length <= 7 && comment.length <= limit) {
@@ -150,11 +161,13 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
     return jsxResult;
   };
 
+  // Refresh the page after deleting a review
   const refreshPage = () => {
     window.location.reload();
     window.scrollTo(0, 0);
   };
 
+  // Define custom styles for the delete review confirmation modal
   const customStyles = {
     overlay: {
       backgroundColor: 'rgba(0, 0, 0, 0.5)',

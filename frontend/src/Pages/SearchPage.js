@@ -13,82 +13,85 @@ import Message from '../Components/MessageComponent';
 import Product from '../Components/Product';
 import Pagination from '../Components/Pagination';
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'REQUEST':
-      return { ...state, loading: true };
-    case 'SUCCESS':
-      return {
-        ...state,
-        products: action.payload.products,
-        page: action.payload.page,
-        pages: action.payload.pages,
-        countProducts: action.payload.countProducts,
-        loading: false,
-      };
-    case 'FAILURE':
-      return { ...state, loading: false, error: action.payload };
+const generatePrices = () => {
+  const priceRanges = [
+    { min: 1, max: 50 },
+    { min: 51, max: 100 },
+    { min: 101, max: 200 },
+    { min: 201, max: 500 },
+    { min: 501, max: 1000 },
+  ];
 
-    default:
-      return state;
-  }
+  return priceRanges.map((range) => ({
+    name: `$${range.min} - $${range.max}`,
+    value: `${range.min} - ${range.max}`,
+  }));
 };
 
-const prices = [
-  {
-    name: '$1 - $50',
-    value: '1 - 50',
-  },
-  {
-    name: '$51 - $100',
-    value: '51 - 100',
-  },
-  {
-    name: '$101 - $200',
-    value: '101 - 200',
-  },
-  {
-    name: '$201 - $500',
-    value: '201 - 500',
-  },
-  {
-    name: '$501 - $1000',
-    value: '501 - 1000',
-  },
-];
+const generateRatings = () => {
+  const ratingValues = [4, 3, 2, 1];
+  return ratingValues.map((rating) => ({
+    name: `${rating}stars or more`,
+    rating,
+  }));
+};
 
-export const ratings = [
-  {
-    name: '4stars & up',
-    rating: 4,
-  },
+const prices = generatePrices();
+export const ratings = generateRatings();
 
-  {
-    name: '3stars & up',
-    rating: 3,
-  },
+const initialState = {
+  loading: true,
+  error: '',
+  products: [],
+  page: 0,
+  pages: 0,
+  countProducts: 0,
+};
 
-  {
-    name: '2stars & up',
-    rating: 2,
-  },
+const actionsMap = {
+  REQUEST: (state) => ({ ...state, loading: true }),
+  SUCCESS: (state, action) => ({
+    ...state,
+    products: action.payload.products,
+    page: action.payload.page,
+    pages: action.payload.pages,
+    countProducts: action.payload.countProducts,
+    loading: false,
+  }),
+  FAILURE: (state, action) => ({
+    ...state,
+    loading: false,
+    error: action.payload,
+  }),
+};
 
-  {
-    name: '1stars & up',
-    rating: 1,
-  },
-];
+const reducer = (state = initialState, action) => {
+  const handler = actionsMap[action.type];
+  return handler ? handler(state, action) : state;
+};
+
+const useSearchParams = (params) => {
+  const { search } = useLocation();
+  const sp = new URLSearchParams(search);
+  const result = {};
+  params.forEach((param) => {
+    result[param] = sp.get(param) || 'all';
+  });
+  return result;
+};
 
 export default function SearchPage() {
   const navigate = useNavigate();
-  const { search } = useLocation();
-  const sp = new URLSearchParams(search);
-  const department = sp.get('department') || 'all';
-  const query = sp.get('query') || 'all';
-  const price = sp.get('price') || 'all';
-  const rating = sp.get('rating') || 'all';
-  const order = sp.get('order') || 'newest';
-  const page = sp.get('page') || 1;
+  const { department, query, price, rating, order, page } = useSearchParams([
+    'department',
+    'query',
+    'price',
+    'rating',
+    'order',
+    'page',
+  ]);
+
+  const [departments, setDepartments] = useState([]);
 
   const [{ loading, error, products, countProducts }, dispatch] = useReducer(
     reducer,
@@ -97,10 +100,6 @@ export default function SearchPage() {
       error: '',
     }
   );
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [department, order, page, price, query, rating]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,11 +115,7 @@ export default function SearchPage() {
         });
       }
     };
-    fetchData();
-  }, [department, error, order, page, price, query, rating]);
 
-  const [departments, setDepartments] = useState([]);
-  useEffect(() => {
     const fetchDepartments = async () => {
       try {
         const { data } = await axios.get(`/api/products/departments`);
@@ -129,20 +124,62 @@ export default function SearchPage() {
         toast.error(getErrorMessage(err));
       }
     };
-    fetchDepartments();
-  }, [dispatch]);
+
+    window.scrollTo(0, 0);
+    fetchData();
+    if (!departments.length) fetchDepartments();
+  }, [
+    department,
+    error,
+    order,
+    page,
+    price,
+    query,
+    rating,
+    dispatch,
+    departments,
+  ]);
 
   const getFilterUrl = (filter, skipPathname) => {
-    const filterPage = filter.page || page;
-    const filterDepartment = filter.department || department;
-    const filterQuery = filter.query || query;
-    const filterRating = filter.rating || rating;
-    const filterPrice = filter.price || price;
-    const sortOrder = filter.order || order;
-    return `${
-      skipPathname ? '' : '/search?'
-    }department=${filterDepartment}&query=${filterQuery}&price=${filterPrice}&rating=${filterRating}&order=${sortOrder}&page=${filterPage}`;
+    const defaultFilters = {
+      page: page,
+      department: department,
+      query: query,
+      rating: rating,
+      price: price,
+      order: order,
+    };
+
+    const appliedFilters = {
+      ...defaultFilters,
+      ...filter,
+    };
+
+    const queryString = Object.keys(appliedFilters)
+      .map((key) => `${key}=${appliedFilters[key]}`)
+      .join('&');
+
+    return `${skipPathname ? '' : '/search?'}${queryString}`;
   };
+
+  const FilterListItem = ({
+    filterType,
+    filterValue,
+    filterName,
+    currentFilter,
+  }) => (
+    <li>
+      <Link
+        className={`remove-link-style ${
+          filterValue === currentFilter ? 'text-bold' : ''
+        }`}
+        to={getFilterUrl({ [filterType]: filterValue })}
+      >
+        {filterName}
+      </Link>
+    </li>
+  );
+
   return (
     <div>
       <Helmet>
@@ -153,87 +190,66 @@ export default function SearchPage() {
           <h4>Department</h4>
           <div>
             <ul>
-              <li>
-                <Link
-                  className={`remove-link-style ${
-                    'all' === department ? 'text-bold' : ''
-                  }`}
-                  to={getFilterUrl({ department: 'all' })}
-                >
-                  ALL
-                </Link>
-              </li>
+              <FilterListItem
+                filterType="department"
+                filterValue="all"
+                filterName="ALL"
+                currentFilter={department}
+              />
               {departments.map((c) => (
-                <li key={c}>
-                  <Link
-                    className={`remove-link-style ${
-                      c === department ? 'text-bold' : ''
-                    }`}
-                    to={getFilterUrl({ department: c })}
-                  >
-                    {c}
-                  </Link>
-                </li>
+                <FilterListItem
+                  filterType="department"
+                  filterValue={c}
+                  filterName={c}
+                  currentFilter={department}
+                  key={c}
+                />
               ))}
             </ul>
           </div>
-          <hr></hr>
+          <hr />
           <div>
             <h4>Price</h4>
             <ul>
-              <li>
-                <Link
-                  className={`remove-link-style ${
-                    'all' === price ? 'text-bold' : ''
-                  }`}
-                  to={getFilterUrl({ price: 'all' })}
-                >
-                  ALL
-                </Link>
-              </li>
+              <FilterListItem
+                filterType="price"
+                filterValue="all"
+                filterName="ALL"
+                currentFilter={price}
+              />
               {prices.map((p) => (
-                <li key={p.value}>
-                  <Link
-                    to={getFilterUrl({ price: p.value })}
-                    className={`remove-link-style ${
-                      p.value === price ? 'text-bold' : ''
-                    }`}
-                  >
-                    {p.name}
-                  </Link>
-                </li>
+                <FilterListItem
+                  filterType="price"
+                  filterValue={p.value}
+                  filterName={p.name}
+                  currentFilter={price}
+                  key={p.value}
+                />
               ))}
             </ul>
           </div>
-          <hr></hr>
+          <hr />
           <div>
             <h4>Customer Review</h4>
             <ul>
               {ratings.map((r) => (
-                <li key={r.name}>
-                  <Link
-                    to={getFilterUrl({ rating: r.rating })}
-                    className={`remove-link-style ${
-                      `${r.rating}` === `${rating}` ? 'text-bold' : ''
-                    }`}
-                  >
-                    <Rating caption={' & up'} rating={r.rating}></Rating>
-                  </Link>
-                </li>
+                <FilterListItem
+                  filterType="rating"
+                  filterValue={r.rating}
+                  filterName={<Rating caption={' or more'} rating={r.rating} />}
+                  currentFilter={rating}
+                  key={r.name}
+                />
               ))}
-              <li>
-                <Link
-                  to={getFilterUrl({ rating: 'all' })}
-                  className={`remove-link-style ${
-                    rating === 'all' ? 'text-bold' : ''
-                  }`}
-                >
-                  <Rating caption={' & up'} rating={0}></Rating>
-                </Link>
-              </li>
+              <FilterListItem
+                filterType="rating"
+                filterValue="all"
+                filterName={<Rating caption={' or more'} rating={0} />}
+                currentFilter={rating}
+              />
             </ul>
           </div>
-          <hr></hr>
+          <hr />
         </Col>
         <Col md={9}>
           {loading ? (
@@ -246,10 +262,11 @@ export default function SearchPage() {
                 <Col md={9}>
                   <div style={{ color: '#bb0000' }}>
                     {countProducts === 0 ? 'No' : countProducts} Results
-                    {query !== 'all' && ' : ' + query}
-                    {department !== 'all' && ' : ' + department}
-                    {price !== 'all' && ' : Price ' + price}
-                    {rating !== 'all' && ' : Rating ' + rating + ' & up'}
+                    {query !== 'all' && ' > ' + query}
+                    {department !== 'all' && ' > ' + department}
+                    {price !== 'all' && ' > Price ' + price}
+                    {rating !== 'all' &&
+                      ' > Rating ' + rating + ' stars or more'}
                     {query !== 'all' ||
                     department !== 'all' ||
                     rating !== 'all' ||
@@ -286,6 +303,7 @@ export default function SearchPage() {
                       }}
                       className="form-control custom-select"
                     >
+                      <option value="newest">Default</option>
                       <option value="lowest">Price: Low to High</option>
                       <option value="highest">Price: High to Low</option>
                       <option value="toprated">Customer Reviews</option>

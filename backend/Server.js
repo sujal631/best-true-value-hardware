@@ -71,7 +71,7 @@ app.get('/api/keys/paypal', (req, res) =>
   res.send(`${process.env.PAYPAL_CLIENT_ID || 'sb'}`)
 );
 
-// Use routes for seed, cloudinary, products, slider images, users, orders, stripe and twilio
+// Use routes for seed, cloudinary, products, slider images, users, orders, stripe, twilio and sending email
 app.use('/api/seed', routeSeed);
 app.use('/api/upload', routeCloudinary);
 app.use('/api/products', routeProduct);

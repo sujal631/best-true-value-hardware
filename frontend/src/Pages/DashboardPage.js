@@ -54,10 +54,13 @@ export default function DashboardPage() {
   // Local state variables for time range and top selling products
   const [timeRange, setTimeRange] = useState('daily');
   const [topSellingProducts, setTopSellingProducts] = useState([]);
+  const [chartLoading, setChartLoading] = useState(true);
 
   // Fetch dashboard data and top selling products data from the server when the component mounts or when timeRange or userInfo changes
   useEffect(() => {
     async function fetchData() {
+      setChartLoading(true); // Set chart loading status to true when fetching data
+
       try {
         const { data } = await axios.get(
           `/api/orders/dashboard?timeRange=${timeRange}`,
@@ -83,9 +86,52 @@ export default function DashboardPage() {
           payload: getErrorMessage(err),
         });
       }
+      setChartLoading(false); // Set chart loading status to false when data is fetched
     }
     fetchData();
   }, [userInfo, timeRange]);
+
+  const getChartType = (timeRange) => {
+    return timeRange === 'yearly' ? 'ColumnChart' : 'AreaChart';
+  };
+
+  const getChartData = (timeRange, dailyOrders) => {
+    if (timeRange === 'yearly') {
+      const currentYear = new Date().getFullYear();
+      const monthlySales = new Array(12).fill(0);
+
+      dailyOrders.forEach((order) => {
+        const date = new Date(order._id);
+        if (date.getFullYear() === currentYear) {
+          monthlySales[date.getMonth()] += order.sales;
+        }
+      });
+
+      return [
+        ['Month', 'Sales'],
+        ...monthlySales.map((sales, index) => {
+          const monthName = new Intl.DateTimeFormat('en-US', {
+            month: 'short',
+          }).format(new Date(currentYear, index));
+          return [monthName, sales];
+        }),
+      ];
+    } else {
+      return [
+        ['Date', 'Sales'],
+        ...dailyOrders.map((x) => {
+          const date = new Date(x._id);
+          const formattedDate =
+            timeRange === 'monthly'
+              ? `${date.getMonth() + 1}/${date.getDate()}`
+              : `${
+                  date.getMonth() + 1
+                }/${date.getDate()}/${date.getFullYear()}`;
+          return [formattedDate, x.sales];
+        }),
+      ];
+    }
+  };
 
   //Component for rendering a summary card with a title, value, and optional child components
   const SummaryCard = ({
@@ -185,7 +231,7 @@ export default function DashboardPage() {
             </Col>
             <Col md={3}>
               <SummaryCard
-                title="Orders in the Last 24 Hours"
+                title="Orders in Last 24 Hours"
                 value={
                   dashboard.dailyOrders
                     ? dashboard.dailyOrders
@@ -282,28 +328,26 @@ export default function DashboardPage() {
                   <select
                     value={timeRange}
                     onChange={(e) => setTimeRange(e.target.value)}
-                    className="form-control w-auto"
+                    className="form-control w-auto custom-select"
                   >
                     {/* A dropdown menu to select a time range option, and the chart updates accordingly */}
                     <option value="daily">Daily</option>
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
                     <option value="yearly">Yearly</option>
-                    <option value="all">All</option>
                   </select>
                 </div>
                 {dashboard.dailyOrders.length === 0 ? (
                   <Message variant="danger">No Data</Message>
+                ) : chartLoading ? (
+                  <div style={{ height: '400px' }}></div>
                 ) : (
                   <Chart
                     width="100%"
                     height="400px"
-                    chartType="AreaChart"
+                    chartType={getChartType(timeRange)}
                     loader={<div>Loading...</div>}
-                    data={[
-                      ['Date', 'Sales'],
-                      ...dashboard.dailyOrders.map((x) => [x._id, x.sales]),
-                    ]}
+                    data={getChartData(timeRange, dashboard.dailyOrders)}
                     options={{
                       title: 'Sales Performance',
                       colors: ['#bb0000'],

@@ -79,11 +79,10 @@ const AdminSliderImages = () => {
             index: index,
           });
         } catch (error) {
-          toast.error('Error uploading image');
+          toast.error(`Error uploading image ${index + 1}`);
         }
       }
     }
-    toast.success('Images uploaded successfully');
     navigate('/'); // Navigate to the home screen
     setUploading(false); // Set uploading state to false when the upload finishes
   };

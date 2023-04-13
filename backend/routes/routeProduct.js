@@ -135,13 +135,16 @@ routeProduct.delete(
   expressAsyncHandler(deleteProduct)
 );
 
+// Route handler to add a review to a specific product
 routeProduct.post(
   '/:id/reviews',
-  isAuth,
+  isAuth, // Middleware to check if the user is authenticated
   expressAsyncHandler(async (req, res) => {
     const productId = req.params.id;
     const product = await Product.findById(productId);
+    // Check if the product exists
     if (product) {
+      // Check if the user has already submitted a review for the product
       if (
         product.reviews.find(
           (x) => x.name === `${req.user.firstName} ${req.user.lastName}`
@@ -152,6 +155,7 @@ routeProduct.post(
           .send({ message: 'You can only submit one review per product.' });
       }
 
+      // Create a new review object from the request data
       const review = {
         user: req.user._id,
         name: `${req.user.firstName} ${req.user.lastName}`,
@@ -159,12 +163,18 @@ routeProduct.post(
         title: req.body.title,
         comment: req.body.comment,
       };
+
+      // Add the review to the product and update the overall rating
       product.reviews.push(review);
       product.numReviews = product.reviews.length;
       product.rating =
         product.reviews.reduce((a, c) => c.rating + a, 0) /
         product.reviews.length;
+
+      // Save the updated product
       const updatedProduct = await product.save();
+
+      // Send the newly created review as a response
       res.status(201).send({
         message: 'Review Created',
         review: updatedProduct.reviews[updatedProduct.reviews.length - 1],
@@ -172,15 +182,19 @@ routeProduct.post(
         rating: product.rating,
       });
     } else {
+      // If the product is not found, send an error message
       res.status(404).send({ message: 'Product Not Found' });
     }
   })
 );
 
+// Route handler to retrieve the likes and dislikes of all reviews
 routeProduct.get(
   '/likes-dislikes',
   expressAsyncHandler(async (req, res) => {
     const products = await Product.find({});
+
+    // Calculate the total likes and dislikes for all reviews
     const likesDislikes = products.reduce(
       (acc, product) => {
         product.reviews.forEach((review) => {
@@ -194,22 +208,26 @@ routeProduct.get(
         dislikes: {},
       }
     );
-
+    // Send the likes and dislikes as a response
     res.status(200).send(likesDislikes);
   })
 );
 
+// Route handler to like a specific review
 routeProduct.put(
   '/:id/reviews/:reviewId/like',
-  isAuth,
+  isAuth, // Middleware to check if the user is authenticated
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     const review = product.reviews.find(
       (r) => r._id.toString() === req.params.reviewId
     );
+
+    // Check if the review exists
     if (!review) {
       res.status(404).send({ message: 'Review not found' });
     } else {
+      // Update the review's likes and remove from dislikes if necessary
       if (!review.likes.includes(req.user._id)) {
         review.likes.push(req.user._id);
         if (review.dislikes.includes(req.user._id)) {
@@ -218,7 +236,11 @@ routeProduct.put(
       } else {
         review.likes.pull(req.user._id);
       }
+
+      // Save the updated product
       const updatedProduct = await product.save();
+
+      // Send the updated likes and dislikes as a response
       res.status(200).send({
         message: 'Review like updated',
         updatedLikes: review.likes,
@@ -228,17 +250,21 @@ routeProduct.put(
   })
 );
 
+// Route handler to dislike a specific review
 routeProduct.put(
   '/:id/reviews/:reviewId/dislike',
-  isAuth,
+  isAuth, // Middleware to check if the user is authenticated
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     const review = product.reviews.find(
       (r) => r._id.toString() === req.params.reviewId
     );
+
+    // Check if the review exists
     if (!review) {
       res.status(404).send({ message: 'Review not found' });
     } else {
+      // Update the review's dislikes and remove from likes if necessary
       if (!review.dislikes.includes(req.user._id)) {
         review.dislikes.push(req.user._id);
         if (review.likes.includes(req.user._id)) {
@@ -247,7 +273,11 @@ routeProduct.put(
       } else {
         review.dislikes.pull(req.user._id);
       }
+
+      // Save the updated product
       const updatedProduct = await product.save();
+
+      // Send the updated likes and dislikes as a response
       res.status(200).send({
         message: 'Review dislike updated',
         updatedLikes: review.likes,
@@ -257,15 +287,17 @@ routeProduct.put(
   })
 );
 
+// Route handler to remove a specific review
 routeProduct.delete(
   '/:id/reviews/:reviewId',
-  isAuth,
+  isAuth, // Middleware to check if the user is authenticated
   expressAsyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
     const reviewIndex = product.reviews.findIndex(
       (r) => r._id.toString() === req.params.reviewId
     );
 
+    // Check if the review exists
     if (reviewIndex === -1) {
       res.status(404).send({ message: 'Review not found' });
     } else {
@@ -273,13 +305,19 @@ routeProduct.delete(
 
       // Check if the user is the author of the review
       if (review.user.toString() === req.user._id.toString()) {
+        // Remove the review from the product
         product.reviews.splice(reviewIndex, 1);
+
+        // Save the updated product
         const updatedProduct = await product.save();
+
+        // Send the updated reviews as a response
         res.status(200).send({
           message: 'Review deleted',
           updatedReviews: updatedProduct.reviews,
         });
       } else {
+        // If the user is not authorized to delete the review, send an error message
         res
           .status(403)
           .send({ message: 'Not authorized to delete this review' });

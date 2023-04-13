@@ -115,6 +115,17 @@ const ListOrdersPage = () => {
     }
   }, [currentPage, location, userInfo, searchTerm, isPickupReadyFilter]);
 
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    return formatter.format(date);
+  }
+
   return (
     <div>
       {/* Set the title of the page dynamically in the browser tab */}
@@ -191,7 +202,7 @@ const ListOrdersPage = () => {
                   </td>
                   <td className="btn-text">{phoneNumber}</td>
                   <td className="btn-text">{totalPrice.toFixed(2)}</td>
-                  <td className="btn-text">{paidAt.substring(0, 10)}</td>
+                  <td className="btn-text">{formatDate(paidAt)}</td>
                   <td className="btn-text">
                     <span
                       style={{ color: pickupStatusColor, fontWeight: '600' }}
