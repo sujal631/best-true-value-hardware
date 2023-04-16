@@ -75,7 +75,11 @@ const useSearchParams = (params) => {
   const sp = new URLSearchParams(search);
   const result = {};
   params.forEach((param) => {
-    result[param] = sp.get(param) || 'all';
+    if (param === 'page') {
+      result[param] = parseInt(sp.get(param) || '1', 10);
+    } else {
+      result[param] = sp.get(param) || 'all';
+    }
   });
   return result;
 };
