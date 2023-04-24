@@ -277,19 +277,11 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
                     </span>
                   )}
                 </p>
-                <div
-                  className="mb-3"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'flex-end',
-                    justifyContent: 'space-between',
-                  }}
-                >
+                <div className="mb-3">
                   {isAuthor && (
                     <button
                       variant="light"
-                      className="btn btn-outline-danger btn-text "
+                      className="btn btn-outline-danger btn-text mb-3"
                       type="button"
                       style={{
                         marginRight: '20px',
@@ -302,7 +294,13 @@ const ReviewComponent = ({ reviews, userInfo, productId, token }) => {
                       <i className="fas fa-trash-alt"></i> Delete
                     </button>
                   )}
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginLeft: isAuthor ? 'auto' : 0,
+                    }}
+                  >
                     <p
                       style={{
                         marginRight: '20px',
