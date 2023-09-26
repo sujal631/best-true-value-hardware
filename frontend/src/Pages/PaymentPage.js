@@ -8,6 +8,7 @@ import { Store } from '../Store';
 import { faCreditCard } from '@fortawesome/free-solid-svg-icons';
 import { faPaypal } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Message from '../Components/MessageComponent';
 
 // Defining the PaymentPage component
 export default function PaymentPage() {
@@ -54,6 +55,17 @@ export default function PaymentPage() {
       <div className="container small-container">
         {/* Displaying the page header */}
         <h1 className="my-3">Your Payment</h1>
+
+        {/* Disclaimer Message */}
+        <Message variant="warning">
+          <p style={{ fontSize: '0.8rem' }}>
+            <strong>Disclaimer:</strong> The payment methods provided here are
+            for demonstration purposes only using Paypal's Sandbox and Stripe's
+            test mode. No real transactions will be processed. Please do not
+            enter any real or personal payment information.
+          </p>
+        </Message>
+
         {/* Rendering a Form component to select a payment method */}
         <Form onSubmit={handleSubmit}>
           {/* Rendering radio buttons to select the payment method */}

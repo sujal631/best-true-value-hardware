@@ -7,6 +7,7 @@ import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import Message from '../Components/MessageComponent';
 import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons';
+import { Modal } from 'react-bootstrap';
 
 export default function Registration() {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ export default function Registration() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showPasswordRequirements, setShowPasswordRequirements] =
     useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   // Function to handle changes to form inputs
   const handleChange = (e) => {
@@ -127,6 +129,10 @@ export default function Registration() {
     }
   };
 
+  const handleDisclaimerToggle = () => {
+    setShowDisclaimer(!showDisclaimer);
+  };
+
   // Effect hook to check if user is already logged in and redirect if necessary
   useEffect(() => {
     if (userInfo) {
@@ -142,6 +148,37 @@ export default function Registration() {
       </Helmet>
       {/* Header of the page */}
       <h1 className="my-3">Registration</h1>
+
+      {/* Disclaimer Modal */}
+      <Modal show={showDisclaimer} onHide={handleDisclaimerToggle} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Disclaimers</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Disclaimer Message */}
+          <Message>
+            <p>
+              <strong>Disclaimer:</strong> This is a sample project for
+              demonstration purposes only. Please do not enter any real or
+              personal information. By registering, you acknowledge that this is
+              a mock platform and any data entered should be fictional.
+            </p>
+            {/* Note about using temporary emails */}
+            <Message variant="warning">
+              <p>
+                <strong>For emails,</strong> please use temporary email services
+                like <i>Mailinator</i> or <i>10Minutemail</i>, as this platform
+                sends mock invoices and notifications.
+              </p>
+            </Message>
+          </Message>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleDisclaimerToggle}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Form with the function handleSubmit being called on submit */}
       <Form onSubmit={handleSubmit}>

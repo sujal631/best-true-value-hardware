@@ -8,6 +8,8 @@ import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getErrorMessage } from '../utils';
 import { EyeFill, EyeSlashFill } from 'react-bootstrap-icons';
+import Message from '../Components/MessageComponent';
+import { Modal, Button } from 'react-bootstrap';
 
 // React component for login page
 export default function LogInPage() {
@@ -19,6 +21,7 @@ export default function LogInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   const {
     state: { userInfo }, // Getting user info from global context API
@@ -51,6 +54,10 @@ export default function LogInPage() {
       });
   };
 
+  const handleDisclaimerToggle = () => {
+    setShowDisclaimer(!showDisclaimer);
+  };
+
   // Checking if user is already logged in
   useEffect(() => {
     if (userInfo) {
@@ -67,7 +74,54 @@ export default function LogInPage() {
         <Helmet>
           <title>Log In</title>
         </Helmet>
+
         <h1 className="my-3">Log In</h1>
+
+        {/* Disclaimer Modal */}
+        <Modal show={showDisclaimer} onHide={handleDisclaimerToggle} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Disclaimers</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {/* Disclaimer Message */}
+            <Message>
+              <p>
+                <strong>Disclaimer:</strong> This is a sample project for
+                demonstration purposes only. Please do not enter any real or
+                personal information. By registering, you acknowledge that this
+                is a mock platform and any data entered should be fictional.
+              </p>
+              {/* Note about using temporary emails */}
+              <Message variant="warning">
+                <p>
+                  <strong>For emails,</strong> please use temporary email
+                  services like <i>Mailinator</i> or <i>10Minutemail</i>, as
+                  this platform sends mock invoices and notifications.
+                </p>
+              </Message>
+
+              {/* Admin Credentials */}
+              <Message variant="warning">
+                <p>
+                  {' '}
+                  {/* You can adjust the color to make it stand out */}
+                  <strong>Admin Access:</strong> To view the admin side, use the
+                  following credentials:
+                  <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;Email: <i>btvh@owner.com</i>
+                  <br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;Password: <i>Btvh1234</i>
+                </p>
+              </Message>
+            </Message>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleDisclaimerToggle}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
         {/* Form component that allows user to log in */}
         <form onSubmit={handleSubmit}>
           {/* Email input */}

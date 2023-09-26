@@ -19,6 +19,9 @@ import { Button } from 'react-bootstrap';
 import { loadStripe } from '@stripe/stripe-js/pure';
 import StripeCheckout from '../Components/StripeCheckout';
 import ReactModal from 'react-modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPaypal } from '@fortawesome/free-brands-svg-icons';
+import { faCreditCard } from '@fortawesome/free-solid-svg-icons';
 
 // Define the default state of the reducer
 const initialState = {
@@ -124,13 +127,25 @@ export default function OrderScreen() {
           `${index + 1}. ${item.name} x ${item.quantity} @ $${item.price}`
       )
       .join('\n');
-    const detailedMessage = `\nFrom: BEST TRUE VALUE HARDWARE \n\nThank you ${
-      order.shippingInfo.firstName
-    } ${order.shippingInfo.lastName} for shopping. Your order id #${
-      order._id
-    } has been successfully paid.\n\nItems:\n${itemsInfo}\n\nTotal Price: $${order.totalPrice.toFixed(
-      2
-    )}\n\nOnce again thank you for shopping with us!\n`;
+    const detailedMessage = `
+      From: BEST TRUE VALUE HARDWARE
+      
+      Dear ${order.shippingInfo.firstName} ${order.shippingInfo.lastName},
+      
+      Thank you for shopping with us. We're pleased to confirm that your payment for order ID #${
+        order._id
+      } has been successfully processed.
+      
+      Order Details:
+      ${itemsInfo}
+      
+      Total Amount: $${order.totalPrice.toFixed(2)}
+      
+      Your trust in our services is greatly appreciated. We hope to see you again soon.
+      
+      Best wishes,
+      BEST TRUE VALUE HARDWARE Team
+      `;
 
     try {
       // Send the SMS message using the Twilio API
@@ -159,19 +174,31 @@ export default function OrderScreen() {
           `${index + 1}. ${item.name} x ${item.quantity} @ $${item.price}`
       )
       .join('\n');
-    const detailedMessage = `\nFrom: BEST TRUE VALUE HARDWARE \n\nThank you ${
-      order.shippingInfo.firstName
-    } ${order.shippingInfo.lastName} for shopping. Your order id #${
-      order._id
-    } has been successfully paid.\n\nItems:\n${itemsInfo}\n\nTotal Price: $${order.totalPrice.toFixed(
-      2
-    )}\n\nOnce again thank you for shopping with us!\n`;
+    const detailedMessage = `
+      From: BEST TRUE VALUE HARDWARE
+      
+      Dear ${order.shippingInfo.firstName} ${order.shippingInfo.lastName},
+      
+      Thank you for shopping with us. We're pleased to confirm that your payment for order ID #${
+        order._id
+      } has been successfully processed.
+      
+      Order Details:
+      ${itemsInfo}
+      
+      Total Amount: $${order.totalPrice.toFixed(2)}
+      
+      Your trust in our services is greatly appreciated. We hope to see you again soon.
+      
+      Best wishes,
+      BEST TRUE VALUE HARDWARE Team
+      `;
 
     try {
       // Send the Email message using the SendGrid API
       const response = await axios.post('/api/sendgrid/sendEmail', {
         to: order.shippingInfo.email,
-        subject: 'Invoice',
+        subject: 'Your Payment Confirmation and Invoice',
         text: detailedMessage,
       });
 
@@ -291,11 +318,23 @@ export default function OrderScreen() {
           `${index + 1}. ${item.name} x ${item.quantity} @ $${item.price}`
       )
       .join('\n');
-    const detailedMessage = `\nFrom: BEST TRUE VALUE HARDWARE \n\nYour order #${
-      order._id
-    } is ready for pickup!\n\nItems:\n${itemsInfo}\n\nTotal Price: $${order.totalPrice.toFixed(
-      2
-    )}\n\nThank you for shopping with us!\n`;
+    const detailedMessage = `
+      From: BEST TRUE VALUE HARDWARE
+      
+      Dear ${order.shippingInfo.firstName} ${order.shippingInfo.lastName},
+      
+      Good news! Your order (Order ID: #${order._id}) is now ready for pickup.
+      
+      Order Details:
+      ${itemsInfo}
+      
+      Total Amount: $${order.totalPrice.toFixed(2)}
+      
+      We appreciate your business and look forward to serving you again soon.
+      
+      Warm regards,
+      BEST TRUE VALUE HARDWARE Team
+      `;
 
     //send SMS
     try {
@@ -336,7 +375,7 @@ export default function OrderScreen() {
         throw new Error(emailResponse.data.error);
       }
     } catch (error) {
-      toast.error(`Error sending SMS: ${error.message}`);
+      toast.error(`Error sending Email: ${error.message}`);
     }
   };
 
@@ -590,6 +629,7 @@ export default function OrderScreen() {
             </Card.Body>
           </Card>
         </Col>
+
         {/* Display order summary, payment options, and pickup ready button */}
         <Col xs={12} lg={4}>
           {/* Display the order summary card */}
@@ -605,11 +645,25 @@ export default function OrderScreen() {
                 <div>
                   {/* Display PayPal payment option if the selected payment method is PayPal */}
                   {order.paymentMethod === 'PayPal' && (
-                    <PayPalButtons
-                      createOrder={createPayPalOrder}
-                      onApprove={handleApprove}
-                      onError={handleError}
-                    ></PayPalButtons>
+                    <>
+                      <div className="alert alert-info mb-4">
+                        <h5>
+                          <FontAwesomeIcon icon={faPaypal} className="me-2" />
+                          PayPal Sandbox Credentials:
+                        </h5>
+                        <p style={{ paddingLeft: '10px', paddingTop: '10px' }}>
+                          <strong>Email:</strong>{' '}
+                          sb-zbry814203473@personal.example.com
+                          <br />
+                          <strong>Password:</strong> test@123
+                        </p>
+                      </div>
+                      <PayPalButtons
+                        createOrder={createPayPalOrder}
+                        onApprove={handleApprove}
+                        onError={handleError}
+                      ></PayPalButtons>
+                    </>
                   )}
 
                   {/* Display a loading spinner if the selected payment method is Debit/Credit and Stripe has not loaded yet */}
@@ -621,11 +675,31 @@ export default function OrderScreen() {
                   {!order.isPaid &&
                     order.paymentMethod === 'Debit/Credit' &&
                     stripe && (
-                      <StripeCheckout
-                        stripe={stripe}
-                        orderId={order._id}
-                        handleSuccessPayment={handleSuccessPayment}
-                      />
+                      <>
+                        <div className="alert alert-info mb-4">
+                          <h5>
+                            <FontAwesomeIcon
+                              icon={faCreditCard}
+                              className="me-2"
+                            />
+                            Test Debit/Credit Card:
+                          </h5>
+                          <p
+                            style={{ paddingLeft: '10px', paddingTop: '10px' }}
+                          >
+                            <strong>Card Number:</strong> 4242 4242 4242 4242
+                            <br />
+                            <strong>Expiry Date:</strong> Any future date
+                            <br />
+                            <strong>CVV:</strong> Any 3 digits
+                          </p>
+                        </div>
+                        <StripeCheckout
+                          stripe={stripe}
+                          orderId={order._id}
+                          handleSuccessPayment={handleSuccessPayment}
+                        />
+                      </>
                     )}
                 </div>
               )}
