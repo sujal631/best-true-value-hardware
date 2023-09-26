@@ -13,6 +13,7 @@ import routeTwilio from './routes/routeTwilio.js';
 import routeSendGrid from './routes/routeSendGrid.js';
 import twilio from 'twilio';
 import sendgrid from 'sendgrid';
+import path from 'path';
 
 // Load environment variables from .env file
 config();
@@ -81,6 +82,15 @@ app.use('/api/orders', routeOrder);
 app.use('/api/stripe', routeStripe);
 app.use('/api/twilio', routeTwilio);
 app.use('/api/sendgrid', routeSendGrid);
+
+// get the directory name of the current module, i.e., the directory where the current JavaScript file resides
+const __dirname = path.resolve();
+// tells Express to serve static files (like HTML, CSS, and JavaScript files) from the frontend/build directory
+app.use(express.static(path.join(__dirname, '/frontend/build')));
+// catch-all route that directs any GET requests that don't match any of the other routes to the index.html file in the frontend/build directory
+app.get('*', (req, res) =>
+  res.sendFile(path.join(__dirname, '/frontend/build/index.html'))
+);
 
 // Error handling middleware
 app.use((error, req, res, next) => {

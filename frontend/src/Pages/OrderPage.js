@@ -280,6 +280,9 @@ export default function OrderScreen() {
   const onConfirm = async (event) => {
     event.preventDefault();
 
+    // First, update the order status to "pickup ready"
+    await handlePickupReady();
+
     // Prepare the detailed message to be sent via SMS and Email
     const itemsInfo = order.orderItems
       .map(
@@ -302,12 +305,19 @@ export default function OrderScreen() {
       });
 
       // If the SMS sending is successful, update the order status and close the modal
-      if (response.data.success) {
-        handlePickupReady();
-        setShowModal(false);
-        window.scrollTo(0, 0);
-      } else {
-        toast.error(`Error sending SMS: ${response.data.error}`);
+      //   if (response.data.success) {
+      //     handlePickupReady();
+      //     setShowModal(false);
+      //     window.scrollTo(0, 0);
+      //   } else {
+      //     toast.error(`Error sending SMS: ${response.data.error}`);
+      //   }
+      // } catch (error) {
+      //   toast.error(`Error sending SMS: ${error.message}`);
+      // }
+
+      if (!response.data.success) {
+        throw new Error(response.data.error);
       }
     } catch (error) {
       toast.error(`Error sending SMS: ${error.message}`);
