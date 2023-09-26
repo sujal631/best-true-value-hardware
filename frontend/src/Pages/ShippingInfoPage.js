@@ -143,20 +143,39 @@ export default function ShippingInfoPage() {
   };
 
   // Function to handle phone number input change
+  const isValidPhoneNumber = (phone) => {
+    const pattern = /^\+\d{1,3}$/;
+    return pattern.test(phone);
+  };
+
+  const isValidEmail = (email) => {
+    const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return pattern.test(email);
+  };
+
+  const isValidZip = (zip) => {
+    const pattern = /^\d{5}$/;
+    return pattern.test(zip);
+  };
+
   const handlePhoneChange = (e) => {
     setPhoneNumber(e.target.value);
-    setShowPhoneMessage(e.target.value.length > 0);
+    setShowPhoneMessage(
+      !isValidPhoneNumber(e.target.value) && e.target.value.length > 0
+    );
   };
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
-    setShowEmailMessage(e.target.value.length > 0);
+    setShowEmailMessage(
+      !isValidEmail(e.target.value) && e.target.value.length > 0
+    );
   };
 
   // Function to handle zip code input change
   const handleZipChange = (e) => {
     setZip(e.target.value);
-    setShowZipMessage(e.target.value.length > 0);
+    setShowZipMessage(!isValidZip(e.target.value) && e.target.value.length > 0);
   };
 
   return (
@@ -221,6 +240,15 @@ export default function ShippingInfoPage() {
               title="Phone number should include a country code (1-3 digits) followed by a 10-digit number."
             />
           </div>
+          {showPhoneMessage && (
+            <div className="mb-3 btn-text">
+              <Message variant="warning">
+                Please provide a valid cell phone number so that a
+                representative from the store can call you to{' '}
+                <strong>PICKUP</strong> your item(s) when they are ready.
+              </Message>
+            </div>
+          )}
 
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
@@ -236,16 +264,6 @@ export default function ShippingInfoPage() {
               title="Please enter a valid email address."
             />
           </div>
-
-          {showPhoneMessage && (
-            <div className="mb-3 btn-text">
-              <Message variant="warning">
-                Please provide a valid cell phone number so that a
-                representative from the store can call you to{' '}
-                <strong>PICKUP</strong> your item(s) when they are ready.
-              </Message>
-            </div>
-          )}
 
           {showEmailMessage && (
             <div className="mb-3 btn-text">
