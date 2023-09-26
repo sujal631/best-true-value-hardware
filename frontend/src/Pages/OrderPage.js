@@ -266,6 +266,7 @@ export default function OrderScreen() {
         }
       );
       dispatch({ type: 'PICKUP_SUCCESS', payload: data });
+      setShowModal(false);
       // Show a success message informing the user that the order is ready for pickup
       toast.success(
         'The order is now available for pickup, and a confirmation notice has been sent to the customer.'
@@ -331,14 +332,11 @@ export default function OrderScreen() {
         text: detailedMessage,
       });
 
-      if (emailResponse.data.success) {
-        setShowModal(false);
-        window.scrollTo(0, 0);
-      } else {
-        toast.error(`Error sending Email: ${emailResponse.data.error}`);
+      if (!emailResponse.data.success) {
+        throw new Error(emailResponse.data.error);
       }
     } catch (error) {
-      toast.error(`Error sending Email: ${error.message}`);
+      toast.error(`Error sending SMS: ${error.message}`);
     }
   };
 
